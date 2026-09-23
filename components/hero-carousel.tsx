@@ -18,7 +18,7 @@ export function HeroCarousel({ slides, title, demo }: { slides: FinalSlide[]; ti
         onTouchStart={(event) => { const touch = event.touches[0]; touchStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null; }}
         onTouchEnd={(event) => { const start = touchStart.current; const touch = event.changedTouches[0]; if (!start || !touch) return; const dx = touch.clientX - start.x; const dy = touch.clientY - start.y; if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.4) show(active + (dx < 0 ? 1 : -1)); touchStart.current = null; }}>
         {[3, 2, 1].map((position) => <div className="stack-card stack-card-back" data-position={position} key={position} aria-hidden="true" />)}
-        <div className="stack-card" data-position="0"><SlideVisual kind={current.kind} src={current.src} alt={current.alt} priority={active === 0} demoLabel={title} demo={demo} /></div>
+        <div className="stack-card" data-position="0"><SlideVisual kind={current.kind} src={current.src} alt={current.alt} preload={active === 0} demoLabel={title} demo={demo} /></div>
       </div>
       <div className="carousel-controls">
         <button type="button" onClick={() => show(active - 1)} aria-label="Предыдущий слайд"><ArrowIcon direction="left" /></button>

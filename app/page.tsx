@@ -1,62 +1,221 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowIcon } from "@/components/arrow-icon";
-import { CaseStack } from "@/components/case-stack";
-import { HeroCarousel } from "@/components/hero-carousel";
-import { featuredCases, publicCases } from "@/lib/portfolio";
+import { MotionObserver } from "@/components/atelier/motion-observer";
+import { PhotoStoryMotion } from "@/components/atelier/photo-story-motion";
+import { ScrollStory } from "@/components/atelier/scroll-story";
+import { SourceScenarioToggle } from "@/components/atelier/source-scenario-toggle";
+import { SiteFooter, SiteHeader } from "@/components/site-shell";
+import { atelierStories, colorCoatStory, comparisonImages, darkCoatStory, windbreakerStory } from "@/lib/atelier-stories";
+import styles from "./atelier.module.css";
 
-const heroCase = featuredCases[0];
-const methods = [
-  ["01", "Собрать", "Товар, исходники, аудиторию и контекст выдачи."],
-  ["02", "Выстроить", "Главный аргумент и роль каждого слайда в серии."],
-  ["03", "Сверить", "Конструкцию, детали, фактуру, цвет и пропорции."],
-  ["04", "Передать", "Готовую воронку и адаптации в нужных форматах."],
+export const metadata: Metadata = {
+  title: "Atelier in Motion",
+  description: "Экспериментальная scroll-версия портфолио Елены Бадьиной: нейровизуал и системы карточек для одежды.",
+  openGraph: {
+    title: "Elena Badyina: Atelier in Motion",
+    description: "Товар остаётся собой. Визуал становится сценой.",
+    type: "website",
+    locale: "ru_RU",
+  },
+};
+
+const method = [
+  ["01", "Собрать материал", "Увидеть конструкцию, фактуру и ограничения исходников."],
+  ["02", "Определить главный аргумент", "Решить, что покупатель должен заметить первым."],
+  ["03", "Построить сцену", "Выбрать свет, среду, образ и ритм серии."],
+  ["04", "Сверить детали", "Проверить читаемые элементы товара по исходным материалам."],
+  ["05", "Собрать последовательность", "Связать кадры в понятную товарную историю."],
 ];
 
 export default function Home() {
   return (
-    <>
-      <header className="site-header shell">
-        <Link className="wordmark" href="/" aria-label="Елена Бадьина — главная">ЕБ<span>·</span></Link>
-        <nav aria-label="Основная навигация"><a href="#selected">Избранное</a><Link href="/works">Все работы</Link><a href="#method">Подход</a></nav>
-        <a className="header-cta" href="#contact">Обсудить проект <ArrowIcon /></a>
-      </header>
-      <main id="main">
-        <section className="hero shell">
-          <div className="hero-copy">
-            <p className="eyebrow">Одежда · Wildberries · Ozon</p>
-            <h1><span>Елена</span><span>Бадьина</span></h1>
-            <p className="hero-kicker">Нейровизуал с ручной сверкой деталей товара.</p>
-            <p className="hero-lead">AI помогает построить кадр. Елена вручную сохраняет правду о товаре — от кармана и молнии до фактуры и пропорций.</p>
-            <div className="hero-actions"><Link className="button primary" href={`/works/${heroCase.slug}`}>Смотреть работу <ArrowIcon /></Link><Link className="text-link" href="/works">Все {publicCases.length} работ <ArrowIcon /></Link></div>
+    <div className={styles.page}>
+      <MotionObserver />
+      <SiteHeader current="home" sticky />
+
+      <main id="main" tabIndex={-1}>
+        <ScrollStory images={darkCoatStory} />
+
+        <section className={`${styles.section} ${styles.selected}`} id="selected" data-atelier-reveal>
+          <div className={styles.shell}>
+            <div className={styles.sectionHead}>
+              <div>
+                <p className={styles.eyebrow}>Избранные истории</p>
+                <h2>Одна вещь. <em>Несколько способов</em> рассказать о ней.</h2>
+              </div>
+              <p>Три серии показывают, как исходный материал превращается в последовательный визуальный сценарий. Без заявлений о продажах и без подмены исходника строгим before/after.</p>
+            </div>
+            <div className={styles.storyIndex}>
+              {atelierStories.map((story, index) => (
+                <a href={`#${story.id}`} className={styles.indexCard} key={story.id}>
+                  <div className={styles.indexImage}>
+                    <Image
+                      src={story.images[index === 0 ? 3 : 1].src}
+                      alt=""
+                      fill
+                      sizes="(max-width: 767px) 92vw, 30vw"
+                    />
+                  </div>
+                  <span>{story.number}</span>
+                  <h3>{story.eyebrow}</h3>
+                  <span className={styles.sectionMarker} aria-hidden="true">↓</span>
+                  <small>К фотоистории на этой странице</small>
+                </a>
+              ))}
+            </div>
+            <Link className={styles.archiveLink} href="/works">
+              Открыть архив полноценных кейсов <ArrowIcon />
+            </Link>
           </div>
-          <HeroCarousel slides={heroCase.finalSlides} title={heroCase.title} demo={heroCase.status === "demo"} />
-          <div className="hero-index"><span>PORTFOLIO / DEMO</span><span>COMMERCE ATELIER</span></div>
         </section>
 
-        <section className="selected shell section" id="selected">
-          <div className="section-heading"><div><p className="eyebrow">Избранные воронки</p><h2>Сначала впечатление.<br /><em>Затем — аргументы.</em></h2></div><p>Главная оставляет только пять сильных сценариев. Полный архив показывает, как система выдерживает 6, 10 и 15 слайдов.</p></div>
-          <div className="featured-grid">
-            {featuredCases.map((item) => <article className="featured-card" key={item.slug}><Link href={`/works/${item.slug}`} aria-label={`Открыть кейс ${item.title}`}><CaseStack item={item} compact /></Link><div className="featured-card-meta"><p><span>{String(item.order).padStart(2, "0")}</span>{item.platform} · {item.taskType}</p><h3>{item.title}</h3><p>{item.product} · {item.finalSlides.length} слайдов</p><Link className="text-link" href={`/works/${item.slug}`}>Смотреть работу <ArrowIcon /></Link></div></article>)}
+        <PhotoStoryMotion
+          id="dark-coat"
+          className={`${styles.section} ${styles.darkStory}`}
+          frameCount={darkCoatStory.length}
+          captions={darkCoatStory.map((item) => item.caption)}
+          progressProperty="--dark-progress"
+          controlsClassName={`${styles.shell} ${styles.storyControls}`}
+          readoutClassName={`${styles.shell} ${styles.storyReadout} ${styles.storyReadoutLight}`}
+          legacyKind="dark"
+        >
+          <div className={`${styles.shell} ${styles.darkGrid}`} data-motion-stage data-dark-stage>
+            <div className={styles.storyCopy}>
+              <p className={`${styles.eyebrow} ${styles.light}`}>01 · От исходника к fashion-сцене</p>
+              <h2>От нейтрального кадра к <em>сцене с характером.</em></h2>
+              <p>Сначала читаются силуэт, длина и пояс. Затем появляется среда: тёплое дерево, направленный свет, более собранная стилизация. Модель и композиция меняются, поэтому это визуальный сценарий, а не прямое сравнение до и после.</p>
+              <Link className={`${styles.button} ${styles.buttonLight}`} href="/works/atelier-in-motion">
+                Открыть полный кейс о пальто <ArrowIcon />
+              </Link>
+            </div>
+            <div className={styles.darkCollage} data-photo-strip tabIndex={0} aria-label="Серия визуальных сценариев тёмного пальто">
+              {darkCoatStory.map((item, index) => (
+                <figure key={item.id} data-photo={index + 1} data-photo-frame>
+                  <div><Image src={item.src} alt={item.alt} fill sizes="(max-width: 1023px) 72vw, 22vw" /></div>
+                  <figcaption><span>0{index + 1}</span>{item.caption}</figcaption>
+                </figure>
+              ))}
+              <span className={styles.collageLine} aria-hidden="true" />
+            </div>
           </div>
-          <Link className="all-works-link" href="/works"><span>Смотреть все работы</span><strong>{String(publicCases.length).padStart(2, "0")}</strong><ArrowIcon /></Link>
+        </PhotoStoryMotion>
+
+        <PhotoStoryMotion
+          id="windbreaker"
+          className={`${styles.section} ${styles.windStory}`}
+          frameCount={windbreakerStory.length}
+          captions={windbreakerStory.map((item) => item.caption)}
+          progressProperty="--wind-progress"
+          controlsClassName={`${styles.shell} ${styles.storyControls}`}
+          readoutClassName={`${styles.shell} ${styles.storyReadout}`}
+        >
+          <div className={styles.shell} data-motion-stage>
+            <div className={styles.windHeading}>
+              <p className={styles.sceneNumber}>02</p>
+              <div>
+                <p className={styles.eyebrow}>Один товар, несколько сценариев</p>
+                <h2>Конструкция остаётся узнаваемой. <em>Контекст меняет настроение.</em></h2>
+              </div>
+              <p>Светлая ветровка проходит через нейтральный кадр, городской фронт, бронзовую стену и полный образ. Капюшон, контрастные молнии и длина остаются точками сверки.</p>
+            </div>
+            <div className={styles.windFrames} data-photo-strip tabIndex={0} aria-label="Серия городских сценариев светлой ветровки">
+              {windbreakerStory.map((item, index) => (
+                <figure key={item.id} data-photo-frame>
+                  <div><Image src={item.src} alt={item.alt} fill sizes="(max-width: 1023px) 72vw, 18vw" /></div>
+                  <figcaption><span>0{index + 1}</span>{item.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </PhotoStoryMotion>
+
+        <PhotoStoryMotion
+          id="color-coat"
+          className={`${styles.section} ${styles.colorStory}`}
+          frameCount={colorCoatStory.length}
+          captions={colorCoatStory.map((item) => item.caption)}
+          progressProperty="--color-progress"
+          controlsClassName={`${styles.shell} ${styles.storyControls} ${styles.storyControlsLight}`}
+          readoutClassName={`${styles.shell} ${styles.storyReadout} ${styles.storyReadoutLight}`}
+        >
+          <div className={`${styles.shell} ${styles.colorGrid}`} data-motion-stage>
+            <div className={styles.colorCopy}>
+              <p className={`${styles.eyebrow} ${styles.light}`}>03 · Цвет как система</p>
+              <h2>Цвет задаёт новую главу, <em>а не случайный фильтр.</em></h2>
+              <p>Чёрное пальто становится коричневым и получает несколько городских направлений. Здесь важны повторяемость оттенка, читаемые лацканы, пояс и длина.</p>
+            </div>
+            <div className={styles.colorFrames} data-photo-strip tabIndex={0} aria-label="Серия цветовых сценариев пальто">
+              {colorCoatStory.map((item, index) => (
+                <figure key={item.id} data-color-frame={index + 1} data-photo-frame>
+                  <div><Image src={item.src} alt={item.alt} fill sizes="(max-width: 1023px) 72vw, 20vw" /></div>
+                  <figcaption>{item.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </PhotoStoryMotion>
+
+        <section className={`${styles.section} ${styles.compareSection}`} id="compare" data-atelier-reveal>
+          <div className={`${styles.shell} ${styles.compareGrid}`}>
+            <div>
+              <p className={styles.eyebrow}>Посмотреть ближе</p>
+              <h2>Исходный материал. <em>Визуальный сценарий.</em></h2>
+              <p>Это не строгий before/after. Переключатель показывает, как меняются модель, композиция, свет и среда, пока товар остаётся центром истории.</p>
+            </div>
+            <SourceScenarioToggle source={comparisonImages.source} scenario={comparisonImages.scenario} />
+          </div>
         </section>
 
-        <section className="accuracy section" id="accuracy">
-          <div className="shell accuracy-head"><p className="eyebrow light">Точность товара</p><h2>Вещь остаётся<br /><em>собой</em></h2><p>Каждая значимая деталь сверяется с исходными материалами перед финальной выдачей. Точность зависит от полноты и качества исходников.</p></div>
-          <div className="shell accuracy-grid">
-            {[{ label: "Карманы", a: "/demo/storm-detail.png", b: "/demo/storm-detail.png" }, { label: "Фактура", a: "/demo/storm-detail.png", b: "/demo/storm-detail.png" }, { label: "Пропорции", a: "/demo/storm-fit.png", b: "/demo/storm-fit.png" }].map((pair) => <article key={pair.label}><div className="accuracy-pair"><div><Image src={pair.a} alt={`DEMO-исходник: ${pair.label.toLowerCase()}`} fill sizes="(max-width: 767px) 45vw, 15vw" /><span>Исходник</span></div><div><Image src={pair.b} alt={`DEMO-финальный кадр: ${pair.label.toLowerCase()}`} fill sizes="(max-width: 767px) 45vw, 15vw" /><span>Финал</span></div></div><h3>{pair.label}</h3><p>DEMO-пара показывает формат будущей ручной проверки.</p></article>)}
+        <section className={`${styles.section} ${styles.approach}`} id="approach" data-atelier-reveal>
+          <div className={`${styles.shell} ${styles.approachGrid}`}>
+            <div className={styles.approachTitle}>
+              <p className={`${styles.eyebrow} ${styles.light}`}>Подход Елены</p>
+              <h2>Пять точек <em>точной сборки.</em></h2>
+            </div>
+            <ol>
+              {method.map(([number, title, text]) => (
+                <li key={number}>
+                  <span>{number}</span>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </li>
+              ))}
+            </ol>
           </div>
-          <div className="shell"><Link className="button light-button" href="/works/storm#fidelity">Сравнить детали <ArrowIcon /></Link></div>
         </section>
 
-        <section className="method section" id="method"><div className="shell method-layout"><div className="method-title"><p className="eyebrow light">Подход</p><h2>Материал.<br /><em>Сверка.</em><br />Решение.</h2></div><ol>{methods.map(([num, title, text]) => <li key={num}><span>{num}</span><h3>{title}</h3><p>{text}</p></li>)}</ol></div></section>
+        <section className={`${styles.section} ${styles.accuracy}`} data-atelier-reveal>
+          <div className={`${styles.shell} ${styles.accuracyGrid}`}>
+            <div>
+              <p className={styles.eyebrow}>Точность товара</p>
+              <h2>Точность начинается с <em>хорошего исходного материала.</em></h2>
+              <p>В локальном прототипе показан принцип сверки. Публичные обещания точности появятся только вместе с подтверждённым процессом и разрешёнными материалами.</p>
+            </div>
+            <ul aria-label="Что можно сверять по исходным материалам">
+              <li><span>01</span>Силуэт и длина</li>
+              <li><span>02</span>Пояс и лацканы</li>
+              <li><span>03</span>Капюшон и молнии</li>
+              <li><span>04</span>Цвет и материал</li>
+              <li><span>05</span>Посадка в кадре</li>
+            </ul>
+          </div>
+        </section>
 
-        <section className="proof shell section"><div><p className="eyebrow">Подтверждённые результаты</p><h2>Цифры — только<br /><em>с паспортом</em></h2></div><div className="proof-card"><p>Показы, переходы и CTR появятся только вместе с артикулом, площадкой, периодом, источником и датой выгрузки.</p><div className="proof-values"><span><b>SKU</b> Артикул</span><span><b>14D</b> Период</span><span><b>CSV</b> Источник</span></div><small>В DEMO-реестре коммерческие результаты намеренно не заявлены.</small></div></section>
-
-        <section className="services-about shell section"><div><p className="eyebrow">Форматы работы · уточняются</p><ul><li>Новая система слайдов</li><li>Редизайн карточки</li><li>Адаптация серии SKU</li></ul></div><div id="about"><p className="eyebrow">О Елене</p><h2>Fashion-вкус.<br />Коммерческая ясность.</h2><p>Елена Бадьина проектирует визуальные системы карточек для Wildberries и Ozon. Здесь одна красивая обложка становится последовательной историей о товаре.</p></div></section>
+        <section className={`${styles.section} ${styles.about}`} id="about" data-atelier-reveal>
+          <div className={`${styles.shell} ${styles.aboutGrid}`}>
+            <p className={styles.aboutMark} aria-hidden="true">ЕБ</p>
+            <div>
+              <p className={styles.eyebrow}>О Елене</p>
+              <h2>Елена проектирует не один кадр, <em>а логику всей серии.</em></h2>
+              <p>Фокус портфолио: одежда, fashion-сценарии и карточки для Wildberries и Ozon. В этой версии главные герои страницы, сами работы.</p>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="contact" id="contact"><div className="shell"><p className="eyebrow light">Новый проект</p><h2>Покажите товар —<br /><em>начнём с задачи</em></h2><p>Можно прислать ссылку на карточку, текущие слайды и коротко описать, что нужно изменить.</p><button className="button contact-disabled" type="button" disabled>Telegram · ссылка уточняется</button><small>Контакт намеренно не ведёт на случайный аккаунт.</small><div className="footer-line"><span>Елена Бадьина</span><span>WB · OZON · FASHION</span><span>© 2026</span></div></div></footer>
-    </>
+
+      <SiteFooter />
+    </div>
   );
 }

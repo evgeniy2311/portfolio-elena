@@ -10,7 +10,7 @@ const imageByKind: Partial<Record<SlideKind, string>> = {
   lifestyle: "/demo/storm-fit.png",
 };
 
-export function SlideVisual({ kind, priority = false, src: customSrc, alt = "", demoLabel = "STORM", demo = true }: { kind: SlideKind; priority?: boolean; src?: string; alt?: string; demoLabel?: string; demo?: boolean }) {
+export function SlideVisual({ kind, preload = false, src: customSrc, alt = "", demoLabel = "STORM", demo = true }: { kind: SlideKind; preload?: boolean; src?: string; alt?: string; demoLabel?: string; demo?: boolean }) {
   const src = customSrc ?? imageByKind[kind];
   return (
     <div className={`slide-visual slide-${kind}`}>
@@ -19,7 +19,8 @@ export function SlideVisual({ kind, priority = false, src: customSrc, alt = "", 
           src={src}
           alt={alt}
           fill
-          priority={priority}
+          preload={preload}
+          loading={preload ? undefined : "lazy"}
           sizes="(max-width: 767px) 82vw, (max-width: 1100px) 45vw, 34vw"
           className="slide-photo"
         />

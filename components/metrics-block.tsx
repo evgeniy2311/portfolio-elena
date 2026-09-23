@@ -16,7 +16,7 @@ export function MetricsBlock() {
       </div>
       <p className="period-label">{label} · сопоставимый период: <strong>14 дней</strong></p>
       <div className="metric-grid">
-        {["Показы", "Переходы", "CTR"].map((item) => <article key={item}><span>{item}</span><strong>—</strong><small>Ожидаются данные</small></article>)}
+        {["Показы", "Переходы", "CTR"].map((item) => <article key={item}><span>{item}</span><strong>…</strong><small>Ожидаются данные</small></article>)}
       </div>
       <div className="formula"><span>Формула</span><b>CTR = переходы / показы × 100%</b></div>
       <dl className="source-list">

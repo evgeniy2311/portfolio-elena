@@ -17,9 +17,9 @@ const ui = Manrope({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://elena-badyina.example"),
-  title: { default: "Елена Бадьина — дизайн карточек для WB и Ozon", template: "%s | Елена Бадьина" },
+  title: { default: "Елена Бадьина, дизайн карточек для WB и Ozon", template: "%s | Елена Бадьина" },
   description: "Портфолио дизайнера товарных воронок для одежды на Wildberries и Ozon. Нейровизуал с ручной сверкой деталей товара.",
-  openGraph: { title: "Елена Бадьина — Commerce Atelier", description: "Дизайн карточек одежды для WB и Ozon.", type: "website", locale: "ru_RU" },
+  openGraph: { title: "Елена Бадьина | Commerce Atelier", description: "Дизайн карточек одежды для WB и Ozon.", type: "website", locale: "ru_RU" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

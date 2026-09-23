@@ -36,7 +36,7 @@ export function WorkCarousel({ slides, title, demo }: { slides: FinalSlide[]; ti
         }}
       >
         <div className="work-stage-image">
-          <SlideVisual kind={slide.kind} src={slide.src} alt={slide.alt} priority={active === 0} demoLabel={title} demo={demo} />
+          <SlideVisual kind={slide.kind} src={slide.src} alt={slide.alt} demoLabel={title} demo={demo} />
         </div>
         <div className="work-stage-copy">
           <p><span>{String(slide.position).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}</span>{slide.role}</p>

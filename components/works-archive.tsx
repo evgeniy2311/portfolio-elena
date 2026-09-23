@@ -64,10 +64,19 @@ export function WorksArchive({ items }: { items: PortfolioListing[] }) {
 
   useEffect(() => {
     const saved = sessionStorage.getItem(`works-scroll:${query}`);
-    if (saved) {
-      requestAnimationFrame(() => window.scrollTo({ top: Number(saved), behavior: "instant" }));
-      sessionStorage.removeItem(`works-scroll:${query}`);
-    }
+    const focusSlug = sessionStorage.getItem(`works-focus:${query}`);
+    if (!saved && !focusSlug) return;
+    requestAnimationFrame(() => {
+      if (saved) window.scrollTo({ top: Number(saved), behavior: "instant" });
+      requestAnimationFrame(() => {
+        if (focusSlug) {
+          const candidates = Array.from(document.querySelectorAll<HTMLElement>(`[data-work-slug="${focusSlug}"] [data-case-link]`));
+          candidates.find((element) => element.offsetParent !== null)?.focus({ preventScroll: true });
+        }
+      });
+    });
+    if (saved) sessionStorage.removeItem(`works-scroll:${query}`);
+    if (focusSlug) sessionStorage.removeItem(`works-focus:${query}`);
   }, [query]);
 
   useEffect(() => {
@@ -97,6 +106,7 @@ export function WorksArchive({ items }: { items: PortfolioListing[] }) {
     event.preventDefault();
     const nextQuery = listingQuery(item, query);
     sessionStorage.setItem(`works-scroll:${nextQuery}`, String(window.scrollY));
+    sessionStorage.setItem(`works-focus:${nextQuery}`, item.slug);
     window.history.replaceState(window.history.state, "", `${pathname}?${nextQuery}`);
     router.push(caseHref(item, query));
   }
@@ -128,27 +138,27 @@ export function WorksArchive({ items }: { items: PortfolioListing[] }) {
       <section className="archive-desktop shell" aria-label="Индекс работ">
         <div className="archive-index">
           {filtered.map((item) => (
-            <article className="archive-row" data-selected={item.slug === active?.slug} key={item.slug}>
-              <button type="button" className="archive-select" aria-pressed={item.slug === active?.slug} onFocus={() => setTransientSelection({ slug: item.slug, query })} onMouseEnter={() => setTransientSelection({ slug: item.slug, query })} onClick={() => select(item)}>
-                <span>{String(item.order).padStart(2, "0")}</span><strong>{item.title}</strong><small>{item.product}<br />{item.platform} · {item.taskType}</small><span>{item.slideCount} слайдов</span>
+            <article className="archive-row" data-selected={item.slug === active?.slug} data-work-slug={item.slug} key={item.slug}>
+              <button type="button" className="archive-select" aria-label={`Быстрый просмотр: ${item.title}`} aria-pressed={item.slug === active?.slug} onFocus={() => setTransientSelection({ slug: item.slug, query })} onMouseEnter={() => setTransientSelection({ slug: item.slug, query })} onClick={() => select(item)}>
+                <span>{String(item.order).padStart(2, "0")}</span><strong>{item.title}</strong><small>{item.product}<br />{item.platform} · {item.taskType}</small><span className="archive-row-meta"><span>{item.slideCount} слайдов</span><b>Быстрый просмотр +</b></span>
               </button>
-              <Link prefetch={false} href={caseHref(item, query)} onClick={(event) => openCase(event, item)}>Открыть кейс <ArrowIcon /></Link>
+              <Link prefetch={false} data-case-link aria-label={`Открыть кейс: полная история ${item.title}`} href={caseHref(item, query)} onClick={(event) => openCase(event, item)}>Открыть кейс <ArrowIcon /></Link>
             </article>
           ))}
           {filtered.length === 0 && <div className="empty-results"><h2>Нет совпадений</h2><p>Измените сочетание фильтров или сбросьте их.</p><button type="button" className="button primary" onClick={() => router.push(pathname)}>Сбросить фильтры</button></div>}
         </div>
-        {active && <aside className="archive-preview" aria-live="polite"><p className="eyebrow">Активная работа{active.status === "demo" && " · DEMO"}</p><CaseStack item={active} compact /><div><p>{active.category} · {active.platform}</p><h2>{active.title}</h2><p>{active.product} · {active.taskType} · {active.slideCount} слайдов</p><Link prefetch={false} className="button primary" href={caseHref(active, query)} onClick={(event) => openCase(event, active)}>Открыть кейс <ArrowIcon /></Link></div></aside>}
+        {active && <aside className="archive-preview" data-work-slug={active.slug} aria-live="polite"><p className="eyebrow">Быстрый просмотр{active.status === "demo" && " · DEMO"}</p><CaseStack item={active} compact /><div><p>{active.category} · {active.platform}</p><h2>{active.title}</h2><p>{active.product} · {active.taskType} · {active.slideCount} слайдов</p><Link prefetch={false} data-case-link aria-label={`Открыть кейс: полная история ${active.title}`} className="button primary" href={caseHref(active, query)} onClick={(event) => openCase(event, active)}>Открыть кейс <ArrowIcon /></Link></div></aside>}
       </section>
 
       <section className="archive-mobile shell" aria-label="Все работы">
         {filtered.map((item) => (
-          <article className="archive-card" key={item.slug}>
+          <article className="archive-card" data-work-slug={item.slug} key={item.slug}>
             <CaseStack item={item} compact />
             <div className="archive-card-head"><span>{String(item.order).padStart(2, "0")}{item.status === "demo" && " / DEMO"}</span><span>{item.platform} · {item.slideCount} слайдов</span></div>
             <h2>{item.title}</h2><p>{item.product} · {item.taskType}</p>
             <div className="archive-card-actions">
-              <button type="button" className="secondary-button" onClick={(event) => openQuick(item, event.currentTarget)}>Быстрый просмотр +</button>
-              <Link prefetch={false} className="button primary" href={caseHref(item, query)} onClick={(event) => openCase(event, item)}>Открыть кейс <ArrowIcon /></Link>
+              <button type="button" className="secondary-button" aria-label={`Быстрый просмотр: ${item.title}`} onClick={(event) => openQuick(item, event.currentTarget)}>Быстрый просмотр +</button>
+              <Link prefetch={false} data-case-link aria-label={`Открыть кейс: полная история ${item.title}`} className="button primary" href={caseHref(item, query)} onClick={(event) => openCase(event, item)}>Открыть кейс <ArrowIcon /></Link>
             </div>
           </article>
         ))}
@@ -156,7 +166,7 @@ export function WorksArchive({ items }: { items: PortfolioListing[] }) {
       </section>
 
       <dialog ref={dialogRef} className="quick-dialog" onCancel={(event) => { event.preventDefault(); closeQuick(); }} onClose={() => { if (quickSlug) closeQuick(); }} aria-labelledby="quick-title">
-        {quick && <div className="quick-dialog-inner"><div className="quick-dialog-head"><div><span>Быстрый просмотр{quick.status === "demo" && " · DEMO"}</span><h2 id="quick-title">{quick.title}</h2></div><button type="button" onClick={closeQuick} aria-label="Закрыть быстрый просмотр">×</button></div><div className="quick-stage" onTouchStart={(event) => { const touch = event.touches[0]; quickTouch.current = touch ? { x: touch.clientX, y: touch.clientY } : null; }} onTouchEnd={(event) => { const start = quickTouch.current; const touch = event.changedTouches[0]; if (!start || !touch) return; const dx = touch.clientX - start.x; const dy = touch.clientY - start.y; if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.4) setQuickIndex((quickIndex + (dx < 0 ? 1 : -1) + quickMedia.length) % quickMedia.length); quickTouch.current = null; }}><Image src={quickMedia[quickIndex].src} alt={quickMedia[quickIndex].alt} fill sizes="80vw" /></div><div className="quick-controls"><button type="button" onClick={() => setQuickIndex((quickIndex - 1 + quickMedia.length) % quickMedia.length)} aria-label="Предыдущий превью-слайд"><ArrowIcon direction="left" /></button><p aria-live="polite">{String(quickIndex + 1).padStart(2, "0")} / {String(quickMedia.length).padStart(2, "0")}</p><button type="button" onClick={() => setQuickIndex((quickIndex + 1) % quickMedia.length)} aria-label="Следующий превью-слайд"><ArrowIcon /></button></div><p>{quick.product} · {quick.platform} · {quick.slideCount} слайдов</p><Link prefetch={false} className="button primary" href={caseHref(quick, query)} onClick={(event) => openCase(event, quick)}>Открыть кейс <ArrowIcon /></Link></div>}
+        {quick && <div className="quick-dialog-inner"><div className="quick-dialog-head"><div><span>Быстрый просмотр{quick.status === "demo" && " · DEMO"}</span><h2 id="quick-title">{quick.title}</h2></div><button type="button" onClick={closeQuick} aria-label="Закрыть быстрый просмотр">×</button></div><div className="quick-stage" onTouchStart={(event) => { const touch = event.touches[0]; quickTouch.current = touch ? { x: touch.clientX, y: touch.clientY } : null; }} onTouchEnd={(event) => { const start = quickTouch.current; const touch = event.changedTouches[0]; if (!start || !touch) return; const dx = touch.clientX - start.x; const dy = touch.clientY - start.y; if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.4) setQuickIndex((quickIndex + (dx < 0 ? 1 : -1) + quickMedia.length) % quickMedia.length); quickTouch.current = null; }}><Image src={quickMedia[quickIndex].src} alt={quickMedia[quickIndex].alt} fill sizes="80vw" /></div><div className="quick-controls"><button type="button" onClick={() => setQuickIndex((quickIndex - 1 + quickMedia.length) % quickMedia.length)} aria-label="Предыдущий превью-слайд"><ArrowIcon direction="left" /></button><p aria-live="polite">{String(quickIndex + 1).padStart(2, "0")} / {String(quickMedia.length).padStart(2, "0")}</p><button type="button" onClick={() => setQuickIndex((quickIndex + 1) % quickMedia.length)} aria-label="Следующий превью-слайд"><ArrowIcon /></button></div><p>{quick.product} · {quick.platform} · {quick.slideCount} слайдов</p><Link prefetch={false} data-case-link aria-label={`Открыть кейс: полная история ${quick.title}`} className="button primary" href={caseHref(quick, query)} onClick={(event) => openCase(event, quick)}>Открыть кейс <ArrowIcon /></Link></div>}
       </dialog>
     </>
   );

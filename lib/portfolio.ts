@@ -170,7 +170,7 @@ function makeCase(seed: CaseSeed): PortfolioCase {
     context: seed.context ?? `Учебный сценарий для проверки шаблона портфолио: ${seed.product.toLowerCase()}, ${seed.platform}. Реальный клиент, артикул и результаты не заявляются.`,
     challenge: seed.challenge ?? "Показать товар последовательно: от первого контакта в выдаче до деталей, посадки и помощи с выбором.",
     hypothesis: seed.hypothesis ?? "Серия работает яснее, когда каждый слайд отвечает на один вопрос, а визуальный ритм остаётся единым.",
-    contribution: seed.contribution ?? ["Структура воронки — DEMO", "Арт-направление — DEMO", "Тексты и визуалы — временные"],
+    contribution: seed.contribution ?? ["Структура воронки · DEMO", "Арт-направление · DEMO", "Тексты и визуалы · временные"],
     constraints: seed.constraints ?? ["Не является клиентской работой", "Не содержит подтверждённых коммерческих результатов"],
     sourceMaterials: seed.sourceMaterials,
     fidelity: seed.fidelity,
