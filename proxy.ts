@@ -1,9 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { publicCases } from "@/lib/portfolio";
+import { workSlugs } from "@/lib/works";
 
-const publicWorkSlugs = new Set(["atelier-in-motion", ...publicCases.map(({ slug }) => slug)]);
+const publicWorkSlugs = new Set<string>(workSlugs);
 
+// Неизвестная работа сразу получает полноценную 404 без JavaScript (ADR-014).
 export function proxy(request: NextRequest) {
   const slug = request.nextUrl.pathname.split("/").filter(Boolean)[1];
   if (!slug || publicWorkSlugs.has(slug)) return NextResponse.next();

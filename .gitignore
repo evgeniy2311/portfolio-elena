@@ -21,3 +21,7 @@ assets/inbox/**
 !assets/inbox/.gitkeep
 
 *.log
+
+# Личный бизнес-план Елены: место жительства, документы, цитаты из рабочего чата. В публичный репозиторий не идёт.
+docs/business/
+docs/sessions/2026-10-12-orders-research.md

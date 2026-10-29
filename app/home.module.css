@@ -1,0 +1,1189 @@
+/*
+ * Главная. Движение описано здесь и зависит только от --p (0..1), которую пишет ScrollFx.
+ * Анимации включаются только при :global([data-fx="on"]) и в тех же media-условиях, что и «липкие» сцены.
+ * Без JS, при reduced motion и на телефонах каждая сцена сразу в финальном виде.
+ */
+
+.page {
+  background: var(--canvas);
+}
+
+.sectionHead {
+  display: grid;
+  gap: 18px;
+  max-width: 760px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.sectionHead h2 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+}
+
+.sectionHead > p:last-child:not(:first-child) {
+  max-width: 58ch;
+  color: var(--muted);
+  font-size: 1.125rem;
+}
+
+/* ---------- 1. Hero ---------- */
+
+.hero {
+  --p: 1;
+  position: relative;
+}
+
+.heroStage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100svh - var(--header-h));
+  padding-block: clamp(32px, 6vw, 64px);
+}
+
+.heroGrid {
+  display: grid;
+  gap: 40px;
+}
+
+.heroCopy {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: 22px;
+}
+
+.heroCopy h1 {
+  max-width: 13ch;
+  font-size: clamp(2.875rem, 5.2vw, 5.75rem);
+}
+
+.heroLead {
+  max-width: 46ch;
+  color: var(--muted);
+  font-size: clamp(1.0625rem, 1.3vw, 1.1875rem);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.heroNote {
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.collage {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.collage figure {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-small);
+  background: var(--surface);
+}
+
+.collage img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.collageSource figcaption {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.collageCaption {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.collageCaption svg {
+  color: var(--wine);
+}
+
+.scrollHint {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: clamp(32px, 4vw, 72px);
+  }
+
+  .collage {
+    display: block;
+    position: relative;
+    width: min(100%, calc((100svh - var(--header-h) - 96px) * 4 / 3));
+    aspect-ratio: 4 / 3;
+    justify-self: end;
+    container-type: size;
+  }
+
+  .collage figure {
+    position: absolute;
+    box-shadow: 0 18px 40px -24px rgb(42 29 24 / 0.45);
+  }
+
+  .collageSource { left: 0; top: 6%; width: 22%; z-index: 2; }
+  .collageFrame:nth-child(2) { left: 24%; top: 0; width: 30%; }
+  .collageFrame:nth-child(3) { left: 56%; top: 4%; width: 20%; }
+  .collageFrame:nth-child(4) { left: 78%; top: 0; width: 22%; }
+  .collageFrame:nth-child(5) { left: 0; top: 52%; width: 20%; }
+  .collageFrame:nth-child(6) { left: 22%; top: 57%; width: 18%; }
+  .collageFrame:nth-child(7) { left: 42%; top: 60%; width: 18%; }
+  .collageFrame:nth-child(8) { left: 62%; top: 44%; width: 18%; }
+  .collageFrame:nth-child(9) { left: 82%; top: 44%; width: 18%; }
+
+  .collageCaption {
+    display: block;
+    position: absolute;
+    left: 62%;
+    right: 0;
+    bottom: 2%;
+  }
+}
+
+/* Сцена: исходник крупно в центре, затем уезжает на своё место, кадры собираются вокруг. */
+@media (min-width: 1024px) and (min-height: 600px) {
+  :global([data-fx="on"]) .hero {
+    height: 300vh;
+  }
+
+  :global([data-fx="on"]) .heroStage {
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100svh - var(--header-h));
+  }
+
+  :global([data-fx="on"]) .collageSource {
+    --a: clamp(0, (var(--p) - 0.04) / 0.24, 1);
+    transform-origin: 0 0;
+    transform: translate(calc((1 - var(--a)) * 30cqw), calc((1 - var(--a)) * -6cqh)) scale(calc(1 + (1 - var(--a)) * 0.8));
+    will-change: transform;
+  }
+
+  :global([data-fx="on"]) .collageFrame {
+    --s: calc(0.2 + var(--i) * 0.075);
+    --t: clamp(0, (var(--p) - var(--s)) / 0.14, 1);
+    --r: 5deg;
+    opacity: var(--t);
+    transform: translateY(calc((1 - var(--t)) * 22cqh)) rotate(calc((1 - var(--t)) * var(--r))) scale(calc(0.86 + var(--t) * 0.14));
+    will-change: transform, opacity;
+  }
+
+  :global([data-fx="on"]) .collageFrame:nth-child(odd) {
+    --r: -6deg;
+  }
+
+  :global([data-fx="on"]) .collageCaption {
+    opacity: clamp(0, (var(--p) - 0.84) / 0.08, 1);
+  }
+
+  :global([data-fx="on"]) .scrollHint {
+    display: block;
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    opacity: clamp(0, 1 - var(--p) * 10, 1);
+  }
+}
+
+/* ---------- 2. Боль ---------- */
+
+.pains {
+  background: var(--cocoa);
+  color: var(--on-dark);
+  padding-block: clamp(88px, 12vw, 168px);
+}
+
+.painsTitle {
+  max-width: 14ch;
+  font-size: clamp(3rem, 8vw, 7.5rem);
+}
+
+.painsTitle em {
+  color: var(--camel);
+}
+
+.painList {
+  display: grid;
+  gap: 0;
+  margin: clamp(48px, 7vw, 96px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.painList li {
+  display: grid;
+  gap: 10px;
+  padding-block: 28px;
+  border-top: 1px solid var(--cocoa-soft);
+}
+
+.painList span {
+  color: var(--camel);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.painList h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 2.6vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.painList p {
+  max-width: 44ch;
+  color: var(--on-dark-muted);
+}
+
+.painsAnswer {
+  max-width: 24ch;
+  margin-top: clamp(48px, 7vw, 96px);
+  color: var(--camel);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-style: italic;
+  line-height: 1.08;
+}
+
+@media (min-width: 900px) {
+  .painList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+  }
+}
+
+/* ---------- 3. Услуги ---------- */
+
+.services {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.serviceGrid {
+  display: grid;
+  gap: 40px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.serviceGrid li {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.serviceImage {
+  overflow: hidden;
+  margin-bottom: 8px;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.serviceImage img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  transition: transform 900ms var(--ease);
+}
+
+.serviceGrid li:hover .serviceImage img {
+  transform: scale(1.04);
+}
+
+.serviceGrid h3 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.serviceGrid p {
+  max-width: 40ch;
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .serviceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .serviceGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .serviceGrid li:nth-child(3n + 2) {
+    margin-top: 64px;
+  }
+}
+
+/* ---------- 4. Лента «исходник → карточка» ---------- */
+
+.rail {
+  --p: 0;
+  position: relative;
+  background: var(--surface);
+}
+
+.railStage {
+  padding-block: clamp(72px, 10vw, 120px);
+}
+
+.railTrack {
+  display: grid;
+  gap: 24px;
+  padding-inline: var(--gutter);
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+.railIntro {
+  display: grid;
+  gap: 18px;
+  align-content: center;
+}
+
+.railIntro h2 {
+  font-size: clamp(2.5rem, 5.5vw, 4.75rem);
+}
+
+.railIntroText {
+  max-width: 38ch;
+  color: var(--muted);
+  font-size: 1.125rem;
+}
+
+.railArrow {
+  display: none;
+}
+
+.railPanel {
+  display: grid;
+  gap: 24px;
+  padding: clamp(20px, 3vw, 36px);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.railMeta {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.railNumber {
+  color: var(--wine);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+.railMeta h3 {
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(1.875rem, 2.6vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.02;
+}
+
+.railLabel {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.railSources {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.railSources img {
+  width: 64px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.railResult {
+  max-width: 34ch;
+}
+
+.railFrames {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.railFrames img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-small);
+  background: var(--surface);
+}
+
+.railFrames img:nth-child(2) {
+  transform: translateY(18px);
+}
+
+.railOutro {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: 12px;
+  padding-block: 24px;
+}
+
+.railOutroNumber {
+  color: var(--wine);
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 10vw, 9rem);
+  line-height: 0.8;
+}
+
+.railOutro p:not(.railOutroNumber) {
+  max-width: 24ch;
+  font-size: 1.1875rem;
+}
+
+@media (min-width: 1024px) {
+  .railStage {
+    overflow-x: auto;
+  }
+
+  .railTrack {
+    display: flex;
+    align-items: center;
+    gap: clamp(28px, 3vw, 48px);
+    width: max-content;
+    max-width: none;
+  }
+
+  .railIntro {
+    width: 400px;
+    flex-shrink: 0;
+  }
+
+  .railArrow {
+    display: inline-flex;
+    width: 56px;
+    height: 56px;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+  }
+
+  .railPanel {
+    width: min(1040px, 80vw);
+    flex-shrink: 0;
+    grid-template-columns: 280px minmax(0, 1fr);
+    align-items: center;
+    gap: 36px;
+  }
+
+  .railOutro {
+    width: 360px;
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 600px) {
+  :global([data-fx="on"]) .railStage {
+    position: sticky;
+    top: var(--header-h);
+    display: flex;
+    align-items: center;
+    height: calc(100svh - var(--header-h));
+    padding-block: 32px;
+    overflow: hidden;
+  }
+
+  :global([data-fx="on"]) .railTrack {
+    transform: translate3d(calc(var(--p) * var(--rail-shift, 0px) * -1), 0, 0);
+    will-change: transform;
+  }
+
+  :global([data-fx="on"]) .railPanel {
+    height: min(640px, calc(100svh - var(--header-h) - 64px));
+  }
+
+  :global([data-fx="on"]) .railFrames img {
+    max-height: calc(100svh - var(--header-h) - 160px);
+  }
+}
+
+/* ---------- 5. Задачи: стопка карточек ---------- */
+
+.requests {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.requestStack {
+  display: grid;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.requestCard {
+  display: grid;
+  gap: 24px;
+  padding: clamp(22px, 3vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.requestText {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 14px;
+}
+
+.requestLabel {
+  color: var(--wine);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+.requestText blockquote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.625rem);
+  line-height: 1.08;
+}
+
+.requestText p:not(.requestLabel) {
+  max-width: 44ch;
+  color: var(--muted);
+}
+
+.requestFrames {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-content: center;
+}
+
+.requestFrames img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-small);
+  background: var(--surface);
+}
+
+.requestFramesSquare {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Для перекраса важен цвет вещи: показываем верх кадра. */
+.requestFramesSquare img {
+  aspect-ratio: 5 / 4;
+  object-position: 50% 0;
+}
+
+@media (min-width: 900px) {
+  .requestCard {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: 40px;
+  }
+
+}
+
+@media (min-width: 900px) and (min-height: 700px) {
+  .requestStack {
+    gap: 22vh;
+    padding-bottom: 4vh;
+  }
+
+  .requestCard {
+    position: sticky;
+    top: calc(var(--header-h) + 24px + var(--i) * 16px);
+    min-height: min(480px, calc(100svh - var(--header-h) - 140px));
+    box-shadow: 0 -18px 40px -28px rgb(42 29 24 / 0.35);
+  }
+}
+
+/* ---------- 6. Точность ---------- */
+
+.accuracy {
+  --p: 1;
+  position: relative;
+  background: var(--cocoa);
+  color: var(--on-dark);
+}
+
+.accuracyStage {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.accuracyGrid {
+  display: grid;
+  gap: 40px;
+}
+
+.accuracyCopy {
+  display: grid;
+  align-content: center;
+  gap: 18px;
+}
+
+.accuracyCopy h2 {
+  max-width: 15ch;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.accuracyCopy h2 em {
+  color: var(--camel);
+}
+
+.accuracyCopy > p {
+  max-width: 50ch;
+  color: var(--on-dark-muted);
+  font-size: 1.125rem;
+}
+
+.checkList {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checkList li {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  padding-block: 12px;
+  border-top: 1px solid var(--cocoa-soft);
+}
+
+.checkList span {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--camel);
+  border-radius: 50%;
+  color: var(--camel);
+  font-weight: 650;
+}
+
+.checkList h3 {
+  font-size: 1.0625rem;
+}
+
+.checkList p {
+  color: var(--on-dark-muted);
+  font-size: 0.9688rem;
+}
+
+.accuracyCompare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.accuracyCompare figure {
+  position: relative;
+  margin: 0;
+}
+
+.accuracyCompare img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-small);
+  background: var(--cocoa-soft);
+}
+
+.accuracyCompare figcaption {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.accuracyDetails {
+  display: contents;
+}
+
+@media (min-width: 1024px) {
+  .accuracyGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: clamp(32px, 4vw, 72px);
+  }
+
+  .accuracyCompare {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .accuracySource {
+    grid-row: span 2;
+    align-self: center;
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 600px) {
+  :global([data-fx="on"]) .accuracy {
+    height: 320vh;
+  }
+
+  :global([data-fx="on"]) .accuracyStage {
+    position: sticky;
+    top: var(--header-h);
+    display: flex;
+    align-items: center;
+    height: calc(100svh - var(--header-h));
+    padding-block: 32px;
+  }
+
+  :global([data-fx="on"]) .accuracyCompare {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    align-items: center;
+    gap: 20px;
+    max-height: calc(100svh - var(--header-h) - 96px);
+  }
+
+  :global([data-fx="on"]) .accuracySource {
+    grid-row: auto;
+  }
+
+  :global([data-fx="on"]) .accuracyDetails {
+    display: grid;
+    position: relative;
+  }
+
+  :global([data-fx="on"]) .accuracyDetails figure {
+    grid-area: 1 / 1;
+  }
+
+  :global([data-fx="on"]) .accuracyCompare img {
+    max-height: calc(100svh - var(--header-h) - 120px);
+  }
+
+  /* Каждый пункт активен на своей четверти прокрутки; последний остаётся. */
+  :global([data-fx="on"]) .checkList li,
+  :global([data-fx="on"]) .accuracyDetails figure {
+    --s: calc(var(--i) * 0.24);
+    --in: clamp(0, (var(--p) - var(--s) + 0.06) / 0.06, 1);
+    --out: clamp(0, (var(--p) - var(--s) - 0.24) / 0.06, 1);
+    --on: calc(var(--in) - var(--out));
+  }
+
+  :global([data-fx="on"]) .checkList li:last-child,
+  :global([data-fx="on"]) .accuracyDetails figure:last-child {
+    --out: 0;
+  }
+
+  :global([data-fx="on"]) .checkList li {
+    opacity: calc(0.36 + var(--on) * 0.64);
+  }
+
+  :global([data-fx="on"]) .accuracyDetails figure {
+    opacity: var(--on);
+    transform: scale(calc(1.05 - var(--on) * 0.05));
+  }
+}
+
+/* ---------- 7. Почему я ---------- */
+
+.reasons {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.reasonGrid {
+  display: grid;
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reasonGrid li {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1.5px solid var(--ink);
+}
+
+.reasonGrid span {
+  color: var(--wine);
+  font-family: var(--font-display);
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.reasonGrid h3 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.reasonGrid p {
+  max-width: 40ch;
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .reasonGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+  }
+}
+
+/* ---------- 8. Бесплатная проба ---------- */
+
+.trial {
+  background: var(--wine);
+  color: var(--on-dark);
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.trialGrid {
+  display: grid;
+  gap: 48px;
+}
+
+.trialGrid > div {
+  display: grid;
+  justify-items: start;
+  gap: 22px;
+}
+
+.trial h2 {
+  max-width: 12ch;
+  font-size: clamp(2.875rem, 7vw, 6rem);
+}
+
+.trial h2 em {
+  color: var(--camel);
+}
+
+.trialLead {
+  max-width: 44ch;
+  color: #ead9cf;
+  font-size: 1.1875rem;
+}
+
+.trialSteps {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-content: center;
+}
+
+.trialSteps li {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: var(--radius);
+}
+
+.trialSteps span {
+  color: var(--camel);
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.trialSteps p {
+  font-size: 1.125rem;
+}
+
+@media (min-width: 1024px) {
+  .trialGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 72px;
+  }
+}
+
+/* ---------- 9. Как работаю ---------- */
+
+.process {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.processGrid {
+  display: grid;
+}
+
+.processList {
+  --p: 1;
+  position: relative;
+  display: grid;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.processLine {
+  position: absolute;
+  left: 23px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  background: var(--wine);
+  transform: scaleY(min(1, calc(var(--p) * 1.9)));
+  transform-origin: top;
+}
+
+.processList li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 20px;
+}
+
+.processList li > span {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--wine);
+  border-radius: 50%;
+  background: var(--canvas);
+  color: var(--wine);
+  font-weight: 700;
+}
+
+.processList h3 {
+  margin: 10px 0 6px;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.processList p {
+  max-width: 46ch;
+  color: var(--muted);
+}
+
+@media (min-width: 1024px) {
+  .processGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 72px;
+    align-items: start;
+  }
+
+  .processGrid .sectionHead {
+    position: sticky;
+    top: calc(var(--header-h) + 48px);
+  }
+}
+
+/* ---------- 10. Цены ---------- */
+
+.prices {
+  background: var(--surface);
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.priceGrid {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.priceGrid li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 28px 24px;
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.priceGrid h3 {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.priceGrid p {
+  color: var(--muted);
+}
+
+.priceGrid .priceValue {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.priceFeatured {
+  background: var(--ink) !important;
+  color: var(--on-dark);
+}
+
+.priceGrid .priceFeatured p {
+  color: var(--on-dark-muted);
+}
+
+.priceGrid .priceFeatured .priceValue {
+  border-color: #4a3f39;
+  color: var(--on-dark);
+}
+
+.priceGrid .priceBadge,
+.priceGrid .priceFeatured .priceBadge {
+  justify-self: start;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--camel);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.priceCta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.priceCta p {
+  max-width: 44ch;
+  font-size: 1.1875rem;
+}
+
+@media (min-width: 640px) {
+  .priceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .priceGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------- 11. Вопросы ---------- */
+
+.faq {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.faqGrid {
+  display: grid;
+}
+
+.faqList {
+  border-top: 1.5px solid var(--ink);
+}
+
+.faqList details {
+  border-bottom: 1px solid var(--line);
+}
+
+.faqList summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 64px;
+  padding-block: 16px;
+  font-size: 1.1875rem;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faqList summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqList summary::after {
+  content: "+";
+  flex-shrink: 0;
+  color: var(--wine);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  transition: transform 250ms var(--ease);
+}
+
+.faqList details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faqList details p {
+  max-width: 60ch;
+  padding-bottom: 22px;
+  color: var(--muted);
+}
+
+@media (min-width: 1024px) {
+  .faqGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 72px;
+    align-items: start;
+  }
+}

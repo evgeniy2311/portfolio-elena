@@ -1,12 +1,11 @@
 import type { MetadataRoute } from "next";
-import { publicCases } from "@/lib/portfolio";
+import { works } from "@/lib/works";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://elena-badyina.example";
   return [
     { url: base, changeFrequency: "monthly", priority: 1 },
     { url: `${base}/works`, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${base}/works/atelier-in-motion`, changeFrequency: "monthly", priority: 0.8 },
-    ...publicCases.map((item) => ({ url: `${base}/works/${item.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
+    ...works.map((item) => ({ url: `${base}/works/${item.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
   ];
 }

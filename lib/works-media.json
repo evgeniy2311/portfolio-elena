@@ -1,0 +1,1224 @@
+{
+  "burgundy-coat-city": {
+    "source": [
+      {
+        "src": "/works/burgundy-coat-city/source-1.webp",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "src": "/works/burgundy-coat-city/source-2.webp",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "src": "/works/burgundy-coat-city/source-3.webp",
+        "width": 768,
+        "height": 1024
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/burgundy-coat-city/frame-01.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-02.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-03.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-04.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-05.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-06.webp",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-07.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-08.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-09.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-10.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-11.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-12.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-13.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-14.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-15.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-16.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-17.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/burgundy-coat-city/frame-18.webp",
+        "width": 766,
+        "height": 1026
+      }
+    ]
+  },
+  "burgundy-coat-interior": {
+    "source": [
+      {
+        "src": "/works/burgundy-coat-interior/source-1.webp",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "src": "/works/burgundy-coat-interior/source-2.webp",
+        "width": 768,
+        "height": 1024
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/burgundy-coat-interior/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-09.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-10.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-11.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/burgundy-coat-interior/frame-12.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "brown-coat-three-looks": {
+    "source": [
+      {
+        "src": "/works/brown-coat-three-looks/source-1.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-coat-three-looks/source-2.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/brown-coat-three-looks/frame-01.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-02.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-03.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-04.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-05.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-06.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-07.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-08.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-09.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-10.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-11.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-12.webp",
+        "width": 766,
+        "height": 1026
+      },
+      {
+        "src": "/works/brown-coat-three-looks/frame-13.webp",
+        "width": 766,
+        "height": 1026
+      }
+    ]
+  },
+  "black-coat-evening": {
+    "source": [
+      {
+        "src": "/works/black-coat-evening/source-1.webp",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "src": "/works/black-coat-evening/source-2.webp",
+        "width": 767,
+        "height": 1024
+      },
+      {
+        "src": "/works/black-coat-evening/source-3.webp",
+        "width": 768,
+        "height": 1024
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/black-coat-evening/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-09.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-10.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-11.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/black-coat-evening/frame-12.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "beige-windbreaker": {
+    "source": [
+      {
+        "src": "/works/beige-windbreaker/source-1.webp",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "src": "/works/beige-windbreaker/source-2.webp",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "src": "/works/beige-windbreaker/source-3.webp",
+        "width": 768,
+        "height": 1024
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/beige-windbreaker/frame-01.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-09.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-10.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-11.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-12.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-13.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-14.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-15.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/beige-windbreaker/frame-16.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "puffer-jacket": {
+    "source": [
+      {
+        "src": "/works/puffer-jacket/source-1.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/source-2.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/source-3.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/puffer-jacket/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/puffer-jacket/frame-09.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "reversible-sheepskin": {
+    "source": [
+      {
+        "src": "/works/reversible-sheepskin/source-1.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/reversible-sheepskin/source-2.webp",
+        "width": 960,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/reversible-sheepskin/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/reversible-sheepskin/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/reversible-sheepskin/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/reversible-sheepskin/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/reversible-sheepskin/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/reversible-sheepskin/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/reversible-sheepskin/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/reversible-sheepskin/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "long-sheepskin": {
+    "source": [
+      {
+        "src": "/works/long-sheepskin/source-1.webp",
+        "width": 680,
+        "height": 1178
+      },
+      {
+        "src": "/works/long-sheepskin/source-2.webp",
+        "width": 943,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/long-sheepskin/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/long-sheepskin/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/long-sheepskin/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/long-sheepskin/frame-04.webp",
+        "width": 959,
+        "height": 1280
+      },
+      {
+        "src": "/works/long-sheepskin/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/long-sheepskin/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/long-sheepskin/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/long-sheepskin/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/long-sheepskin/frame-09.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "grey-shearling": {
+    "source": [
+      {
+        "src": "/works/grey-shearling/source-1.webp",
+        "width": 959,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/source-2.webp",
+        "width": 959,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/grey-shearling/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-09.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-shearling/frame-10.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "yellow-trench": {
+    "source": [
+      {
+        "src": "/works/yellow-trench/source-1.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/source-2.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/source-3.webp",
+        "width": 960,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/yellow-trench/frame-01.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/frame-07.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/frame-08.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/yellow-trench/frame-09.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "brown-pea-coat": {
+    "source": [
+      {
+        "src": "/works/brown-pea-coat/source-1.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/source-2.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/brown-pea-coat/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-09.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-10.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-11.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-12.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-13.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-pea-coat/frame-14.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "mint-windbreaker": {
+    "source": [
+      {
+        "src": "/works/mint-windbreaker/source-1.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/mint-windbreaker/source-2.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/mint-windbreaker/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/mint-windbreaker/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/mint-windbreaker/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/mint-windbreaker/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/mint-windbreaker/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/mint-windbreaker/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "white-wrap-blouse": {
+    "source": [
+      {
+        "src": "/works/white-wrap-blouse/source-1.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/source-2.webp",
+        "width": 960,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/white-wrap-blouse/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-09.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-10.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-11.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-12.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-13.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/white-wrap-blouse/frame-14.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "longsleeve-colors": {
+    "source": [
+      {
+        "src": "/works/longsleeve-colors/source-1.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/source-2.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/source-3.webp",
+        "width": 960,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/longsleeve-colors/frame-01.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-02.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-03.webp",
+        "width": 959,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-04.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-05.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-06.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-07.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-08.webp",
+        "width": 959,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-09.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/longsleeve-colors/frame-10.webp",
+        "width": 959,
+        "height": 1280
+      }
+    ]
+  },
+  "pink-longsleeve": {
+    "source": [
+      {
+        "src": "/works/pink-longsleeve/source-1.webp",
+        "width": 960,
+        "height": 1280
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/pink-longsleeve/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-07.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-08.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-09.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/pink-longsleeve/frame-10.webp",
+        "width": 960,
+        "height": 1280
+      }
+    ]
+  },
+  "brown-longsleeve": {
+    "source": [
+      {
+        "src": "/works/brown-longsleeve/source-1.webp",
+        "width": 800,
+        "height": 1081
+      },
+      {
+        "src": "/works/brown-longsleeve/source-2.webp",
+        "width": 800,
+        "height": 1081
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/brown-longsleeve/frame-01.webp",
+        "width": 960,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-longsleeve/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-longsleeve/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-longsleeve/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-longsleeve/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-longsleeve/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/brown-longsleeve/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      }
+    ]
+  },
+  "grey-longsleeve": {
+    "source": [
+      {
+        "src": "/works/grey-longsleeve/source-1.webp",
+        "width": 620,
+        "height": 730
+      }
+    ],
+    "frames": [
+      {
+        "src": "/works/grey-longsleeve/frame-01.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-longsleeve/frame-02.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-longsleeve/frame-03.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-longsleeve/frame-04.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-longsleeve/frame-05.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-longsleeve/frame-06.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-longsleeve/frame-07.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-longsleeve/frame-08.webp",
+        "width": 955,
+        "height": 1280
+      },
+      {
+        "src": "/works/grey-longsleeve/frame-09.webp",
+        "width": 956,
+        "height": 1280
+      }
+    ]
+  }
+}

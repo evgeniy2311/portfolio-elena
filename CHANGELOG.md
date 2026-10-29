@@ -4,6 +4,41 @@
 
 ## [Unreleased]
 
+### 2026-10-29 - Продающая главная на реальных работах
+
+#### Added
+
+- README: пошаговый запуск сайта на ноутбуке (для Елены); `docs/business/` и заметка 2026-10-12 добавлены в `.gitignore`, в публичный репозиторий не идут;
+- 17 реальных работ из выгрузки чата 2026-10-28: `lib/works.ts`, `lib/works-media.json`, `public/works/*`, импорт `scripts/import-works.mjs` + `scripts/works-import.json`;
+- новая главная (`app/page.tsx`, `app/home.module.css`) с оффером «2 кадра бесплатно» и сценами прокрутки; драйвер `components/scroll-fx.tsx`;
+- архив с фильтром (`components/works-grid.tsx`), страница работы с телефоном-каруселью (`components/card-preview.tsx`);
+- `lib/site.ts`: контакты, текст для Telegram, пакеты услуг; пока данные не подтверждены, сайт показывает честную заглушку;
+- новый набор Playwright-тестов (`tests/portfolio.spec.ts`).
+
+#### Changed
+
+- палитра тёплее (бордо, шоколад, кэмел из работ), подписи не мельче 13 px, две гарнитуры;
+- редиректы со старых DEMO-адресов, sitemap и proxy по новым работам, `images.qualities` для Next 16.
+
+#### Removed
+
+- DEMO-кейсы STORM, `lib/portfolio.ts`, atelier-истории и их компоненты, `public/atelier`, `public/demo`.
+
+### 2026-10-12 - Где брать заказы: площадки, тексты объявлений, платежи
+
+#### Added
+
+- `docs/business/2026-10-12-orders-plan.pdf` (91 стр.): площадки РФ и мира с вердиктами, план на 4 недели, цены рынка, цепочки вывода денег, схема автоматизации заявок, готовые тексты объявлений RU/EN, вопросы к Елене, 9 полных отчётов исследователей;
+- `docs/business/listings.md` — тексты объявлений (Kwork, Авито, Profi/FL/hh, Telegram, Fiverr, Upwork, Contra, LinkedIn, Behance, cold outreach);
+- `docs/business/plan-summary.md` и `docs/business/research/*.md`.
+
+### 2026-10-10 - Исследование направления сайта
+
+#### Added
+
+- PDF-отчёт `docs/research/2026-10-10-site-direction-research.pdf` (34 страницы): дизайн-ревью текущего сайта по ui-ux-pro-max, позиционирование, новый каркас главной, три тональности текстов, 7 палитр, 6 шрифтовых пар с кириллицей, ~110 референсов со скриншотами и ссылками, цены рынка, список данных от Елены;
+- позиционирование Елены её словами в `docs/PRODUCT_BRIEF.md`.
+
 ### 2026-08-23 - Unified site integration and independent UX audit
 
 #### Added
