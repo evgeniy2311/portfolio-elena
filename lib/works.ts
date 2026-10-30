@@ -168,9 +168,14 @@ const copy: WorkCopy[] = [
   },
 ];
 
+// Превью на GitHub Pages живёт в подпапке, next/image сам её к src не добавляет.
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const withBase = (image: WorkImage): WorkImage => ({ ...image, src: basePath + image.src });
+
 export const works: Work[] = copy.map((item) => {
   const files = media[item.slug];
-  return { ...item, source: files.source, frames: files.frames, cover: files.frames[0] };
+  const frames = files.frames.map(withBase);
+  return { ...item, source: files.source.map(withBase), frames, cover: frames[0] };
 });
 
 export const workSlugs = works.map(({ slug }) => slug);
@@ -182,13 +187,13 @@ export function getWork(slug: string): Work | undefined {
 export function frame(slug: keyof typeof media, index: number): WorkImage {
   const image = media[slug].frames[index];
   if (!image) throw new Error(`Нет кадра ${index} в ${slug}`);
-  return image;
+  return withBase(image);
 }
 
 export function source(slug: keyof typeof media, index: number): WorkImage {
   const image = media[slug].source[index];
   if (!image) throw new Error(`Нет исходника ${index} в ${slug}`);
-  return image;
+  return withBase(image);
 }
 
 export function altFor(work: Pick<Work, "title">, kind: "source" | "frame", index: number) {

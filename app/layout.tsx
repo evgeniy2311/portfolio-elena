@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://elena-badyina.example"),
   title: { default: "Елена Бадьина: карточки одежды для WB и Ozon", template: "%s | Елена Бадьина" },
   description: "Кадры для карточек одежды на Wildberries и Ozon без фотостудии. Ручная сверка каждой детали. Два первых кадра бесплатно.",
+  // Превью на GitHub Pages не должно попадать в поиск раньше настоящего сайта.
+  ...(process.env.NEXT_PUBLIC_BASE_PATH ? { robots: { index: false, follow: false } } : {}),
   openGraph: { title: "Елена Бадьина: визуал для карточек одежды", description: "Кадры для карточек одежды на WB и Ozon. Два первых кадра бесплатно.", type: "website", locale: "ru_RU" },
 };
 

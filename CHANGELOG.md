@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+### 2026-10-30 - Превью на GitHub Pages
+
+#### Added
+
+- `.github/workflows/preview.yml`: после каждого push в main сайт собирается статично и выкладывается на https://evgeniy2311.github.io/portfolio-elena/;
+- `next.config.ts`: при `NEXT_PUBLIC_BASE_PATH` статичная сборка (export, basePath, без оптимизации картинок и редиректов); `lib/works.ts` добавляет basePath к путям кадров; превью закрыто от поисковиков (`robots: noindex`); `app/sitemap.ts` помечен `force-static`.
+
 ### 2026-10-29 - Продающая главная на реальных работах
 
 #### Added
