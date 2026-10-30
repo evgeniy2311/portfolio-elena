@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!work) return {};
   return {
     title: work.title,
-    description: `${work.task} ${work.result}`,
+    description: `${work.request ?? work.brief ?? work.task} ${work.result}`,
     openGraph: { images: [{ url: work.cover.src, width: work.cover.width, height: work.cover.height }] },
   };
 }
@@ -58,15 +58,20 @@ export default async function WorkPage({ params }: Props) {
 
           <section className={`shell ${styles.caseIntro}`} aria-label="Задача и результат">
             <div className={styles.caseText}>
-              <div>
-                <h2>Задача</h2>
-                <p>{work.task}</p>
-              </div>
               {work.request ? (
                 <blockquote>
-                  <p className={styles.quoteLabel}>Запрос клиента</p>«{work.request}»
+                  <p className={styles.quoteLabel}>Запрос заказчика</p>«{work.request}»
+                </blockquote>
+              ) : work.brief ? (
+                <blockquote>
+                  <p className={styles.quoteLabel}>Задача</p>
+                  {work.brief}
                 </blockquote>
               ) : null}
+              <div>
+                <h2>Что прислали</h2>
+                <p>{work.task}</p>
+              </div>
               <div>
                 <h2>Результат</h2>
                 <p>{work.result}</p>

@@ -12,7 +12,7 @@ export function SiteHeader({ current }: HeaderProps) {
       <div className="shell site-header-row">
         <Link className="wordmark" href="/" aria-label="Елена Бадьина, на главную">
           Елена Бадьина
-          <small>карточки одежды · WB и Ozon</small>
+          <small>одежда и обувь · WB и Ozon</small>
         </Link>
         <nav aria-label="Основная навигация">
           <Link href="/works" aria-current={current === "works" ? "page" : undefined}>Работы</Link>
@@ -86,7 +86,7 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="shell site-footer-row">
         <span>Елена Бадьина</span>
-        <span>Визуал для карточек одежды на Wildberries и Ozon</span>
+        <span>Визуал для карточек одежды и обуви на Wildberries и Ozon</span>
         <span>© 2026</span>
       </div>
     </footer>

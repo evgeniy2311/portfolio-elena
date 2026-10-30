@@ -104,24 +104,37 @@ test("телефон с карточкой листается до послед�
   await expect(page.getByText(`Кадр ${total - 1} из ${total}`)).toBeVisible();
 });
 
-test("hero: исходник крупно в начале, к концу сцены собраны все кадры, обратная прокрутка возвращает", async ({ page }) => {
-  test.skip(!isDesktop(page), "Сцена прокрутки работает от 1024 px");
+test("первый экран сразу показывает работы, услуги сменяют друг друга при прокрутке", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator("main > section:first-child figure")).toHaveCount(9);
+  test.skip(!isDesktop(page), "Сцена услуг работает от 1024 px");
   await expect(page.locator("html")).toHaveAttribute("data-fx", "on");
-  const hero = "main > section:first-child";
-  const frames = page.locator(`${hero} figure:not(:first-child)`);
-  await expect(frames).toHaveCount(8);
+  const services = "#services";
+  const items = page.locator(`${services} ol:first-of-type > li`);
+  const opacityOfText = (index: number) => items.nth(index).locator("h3").evaluate((element) => Number(getComputedStyle(element.parentElement!).opacity));
 
-  await scrollToProgress(page, hero, 0);
-  expect(Number(await frames.last().evaluate((element) => getComputedStyle(element).opacity))).toBeLessThan(0.05);
+  await scrollToProgress(page, services, 0);
+  expect(await opacityOfText(0)).toBeGreaterThan(0.95);
+  expect(await opacityOfText(5)).toBeLessThan(0.05);
 
-  await scrollToProgress(page, hero, 1);
-  for (const opacity of await frames.evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)))) {
-    expect(opacity).toBeGreaterThan(0.98);
-  }
+  await scrollToProgress(page, services, 1);
+  expect(await opacityOfText(5)).toBeGreaterThan(0.95);
+  expect(await opacityOfText(0)).toBeLessThan(0.05);
+  await expectNoOverflow(page);
+});
 
-  await scrollToProgress(page, hero, 0.1);
-  expect(Number(await frames.last().evaluate((element) => getComputedStyle(element).opacity))).toBeLessThan(0.05);
+test("сцена сверки деталей помещается в экран ноутбука", async ({ page }) => {
+  test.skip(!isDesktop(page), "Сцена работает от 1024 px");
+  await page.setViewportSize({ width: 1280, height: 680 });
+  await page.goto("/");
+  const section = "section[aria-labelledby=accuracy-title]";
+  await scrollToProgress(page, section, 1);
+  const overflow = await page.locator(section).evaluate((element) => {
+    const stage = element.firstElementChild as HTMLElement;
+    const list = stage.querySelector("ol") as HTMLElement;
+    return list.getBoundingClientRect().bottom - stage.getBoundingClientRect().bottom;
+  });
+  expect(overflow).toBeLessThanOrEqual(0);
 });
 
 test("лента «исходник → карточка» доезжает до последней панели", async ({ page }) => {
@@ -140,8 +153,9 @@ test("при reduced motion всё показано сразу и без «ли�
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator("html")).not.toHaveAttribute("data-fx", "on");
-  const heroHeight = await page.locator("main > section:first-child").evaluate((element) => element.getBoundingClientRect().height);
-  expect(heroHeight).toBeLessThan((page.viewportSize()?.height ?? 800) * 2);
+  const servicesHeight = await page.locator("#services").evaluate((element) => element.getBoundingClientRect().height);
+  expect(servicesHeight).toBeLessThan((page.viewportSize()?.height ?? 800) * 6);
+  expect(await page.locator("#services ol:first-of-type > li h3").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element.parentElement!).opacity)))).toEqual([1, 1, 1, 1, 1, 1]);
   for (const opacity of await page.locator("main figure").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)))) {
     expect(opacity).toBe(1);
   }
