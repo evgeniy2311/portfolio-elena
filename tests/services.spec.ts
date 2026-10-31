@@ -128,6 +128,23 @@ test.describe("сцена от 1024 px", () => {
     expect(focusable).toBe(false);
   });
 
+  test("текст и превью прижаты к верху подложки; превью не повторяет главное фото посреди перехода", async ({ page }) => {
+    await scrollToPin(page, section, at(1.5));
+    await settle(page);
+    const slide = page.locator(`${section} [data-slide]`).nth(1);
+    const tops = await slide.evaluate((element) => {
+      const top = (selector: string) => element.querySelector(selector)!.getBoundingClientRect().top;
+      return { tint: top("span[data-tint]"), text: top("[data-text-slot] h3"), preview: top("div[aria-hidden='true'] img") };
+    });
+    expect(tops.text - tops.tint, "текст у верха подложки").toBeLessThan(120);
+    expect(tops.preview - tops.tint, "превью у верха подложки").toBeLessThan(120);
+    // Фото следующей услуги только начинает открываться (t .88): превью уже погасло.
+    await scrollToPin(page, section, at(1.88));
+    await settle(page);
+    const opacity = await slide.locator("div[aria-hidden='true']:has(img)").evaluate((element) => Number(getComputedStyle(element).opacity));
+    expect(opacity).toBeLessThan(0.05);
+  });
+
   test("у каждой смены свой переход фото", async ({ page }) => {
     const seen: string[] = [];
     for (const [offset, kind] of transitions.entries()) {

@@ -63,7 +63,7 @@ test("прежнего рекламного абзаца после списка
   await expect(page.locator(section).locator("p")).toHaveCount(4); // надзаголовок + три текста
 });
 
-test("порядок в строке: номер, заголовок, текст, фото; на телефоне фото 72 % ширины", async ({ page }) => {
+test("порядок в строке: на телефоне номер, заголовок, текст, фото 72 %; от 1024 колонка номер, фото, заголовок, текст", async ({ page }) => {
   await go(page, "/");
   const row = page.locator(`${section} ol > li`).first();
   await row.scrollIntoViewIfNeeded();
@@ -79,10 +79,12 @@ test("порядок в строке: номер, заголовок, текст
     expect(boxes.image.top).toBeGreaterThan(boxes.text.top);
     expect(boxes.image.width / boxes.row).toBeCloseTo(0.72, 1);
   } else if (width >= 1024) {
-    // 80px | 1fr | 280px: номер слева, текст в середине, фото справа шириной 280.
-    expect(boxes.title.left).toBeGreaterThan(boxes.number.left + 60);
-    expect(boxes.image.left).toBeGreaterThan(boxes.title.left);
-    expect(Math.round(boxes.image.width)).toBe(280);
+    // Три колонки: в колонке сверху вниз номер, фото, заголовок, текст; фото на всю ширину колонки.
+    expect(boxes.image.top).toBeGreaterThan(boxes.number.top - 10); // номер до появления сдвинут на 8 px
+    expect(boxes.title.top).toBeGreaterThan(boxes.image.top);
+    expect(boxes.text.top).toBeGreaterThan(boxes.title.top);
+    expect(Math.abs(boxes.image.left - boxes.number.left)).toBeLessThan(2);
+    expect(boxes.image.width / boxes.row).toBeGreaterThan(0.95);
   }
 });
 

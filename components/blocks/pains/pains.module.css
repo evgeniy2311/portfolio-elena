@@ -87,14 +87,36 @@
   }
 }
 
+/* От 1024: три колонки; в каждой линия, номер, кадр 4:5, подпись, заголовок, текст. Секция около экрана. */
 @media (min-width: 1024px) {
   .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-6);
   }
 
   .row {
-    grid-template-columns: 80px minmax(0, 1fr) 280px;
-    column-gap: var(--space-6);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .number {
+    order: 0;
+    padding-top: 0;
+  }
+
+  .figure {
+    order: 1;
+    margin: var(--space-2) 0 0;
+  }
+
+  .text {
+    order: 2;
+  }
+
+  /* Квадрат, чтобы секция умещалась примерно в один экран; кадр обрезается по центру, вещь остаётся в кадре. */
+  .figure img {
+    aspect-ratio: 1 / 1;
+    object-position: center 30%;
   }
 }
 
