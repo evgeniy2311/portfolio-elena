@@ -1,48 +1,129 @@
-/* Блок «Контакты». Правила перенесены из app/globals.css без изменений, классы переименованы для CSS-модуля. */
+/*
+ * Блок «Контакты» (design/brief.md, блок 15): wine-deep, механика «Final Flood».
+ * С движением винный фон растёт кругом из цвета подвала (noir) за первые 60 % прогресса --p секции,
+ * затем строки заголовка поднимаются из масок. Без JS и при reduced motion — сплошной фон и статичные кнопки.
+ */
 
 .contact {
-  --focus-color: var(--champagne);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   background: var(--wine-deep);
   color: var(--on-dark);
-  padding-block: clamp(80px, 12vw, 160px);
+  padding-block: var(--space-section);
+}
+
+:global([data-fx="on"]) .contact {
+  background: var(--noir);
+}
+
+:global([data-fx="on"]) .contact::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--wine-deep);
+  clip-path: circle(calc(8% + 142% * min(1, var(--p, 1) / 0.6)) at 50% 60%);
 }
 
 .contactInner {
   display: grid;
   justify-items: start;
-  gap: 28px;
+  gap: var(--space-stack);
 }
 
-.contact h2 {
+.contactInner :global(.eyebrow) {
+  margin-bottom: 0;
+}
+
+.contactTitle {
   max-width: 16ch;
-  font-size: clamp(2.75rem, 7vw, 6rem);
+  color: var(--on-dark);
 }
 
-.contact h2 em {
+.contactTitle em {
   color: var(--on-wine-accent);
 }
 
+.line {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  vertical-align: bottom;
+}
+
+.line > * {
+  display: inline-block;
+}
+
+:global([data-fx="on"]) .contactTitle[data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+:global([data-fx="on"]) .contactTitle .line > * {
+  transform: translateY(105%);
+  transition: transform var(--dur-4) var(--ease-atelier);
+}
+
+:global([data-fx="on"]) .contactTitle .line + .line > * {
+  transition-delay: 80ms;
+}
+
+:global([data-fx="on"]) .contactTitle:global(.is-in) .line > * {
+  transform: none;
+}
+
 .contactLead {
-  max-width: 56ch;
-  color: var(--on-dark-muted);
-  font-size: 1.1875rem;
+  max-width: 52ch;
+  color: var(--on-wine-muted);
+  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.3125rem);
+  line-height: 1.5;
 }
 
 .contactActions {
   display: grid;
-  justify-items: start;
-  gap: 12px;
+  width: 100%;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
 }
 
-.contactActions small {
-  color: var(--on-dark-muted);
-  font-size: 0.9375rem;
+.contactActions :global(.button) {
+  width: 100%;
 }
 
-.contactBackup {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
+.contactPending,
+.contactEmail {
+  max-width: 52ch;
+  color: var(--on-wine-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.contactEmail a {
   color: var(--on-dark);
-  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  .contactInner {
+    max-width: 900px;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .contactInner :global(.eyebrow) {
+    justify-content: center;
+  }
+
+  .contactActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+  }
+
+  .contactActions :global(.button) {
+    width: auto;
+  }
 }

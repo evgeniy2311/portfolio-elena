@@ -55,11 +55,59 @@ export const about = {
   experience: null as string | null,
 };
 
-export const trialMessage = "Здравствуйте! Хочу попробовать 2 бесплатных кадра. Пришлю фото вещи.";
+/** Повод обращения: от него зависит готовое сообщение (copy.md «Готовые сообщения»). */
+export type ContactIntent = "trial" | "project" | "season" | "video" | "question";
 
-export function telegramHref(): string | null {
-  if (!contact.telegram) return null;
-  return `${contact.telegram}?text=${encodeURIComponent(trialMessage)}`;
+export const intentMessages: Record<ContactIntent, string> = {
+  trial: "Здравствуйте! Хочу попробовать 2 бесплатных кадра. Пришлю фото вещи.",
+  project: "Здравствуйте! Хочу обсудить проект. Расскажу про вещи и площадку.",
+  season: "Здравствуйте! Готовим коллекцию к сезону, хотим обсудить объём и условия.",
+  video: "Здравствуйте! Хочу сделать видео из фото вещи.",
+  question: "Здравствуйте! У меня вопрос.",
+};
+
+/** Совместимость: сообщение кнопки «2 кадра бесплатно». */
+export const trialMessage = intentMessages.trial;
+
+function parseUrl(value: string | null | undefined): URL | null {
+  if (!value) return null;
+  try {
+    return new URL(value);
+  } catch {
+    return null;
+  }
+}
+
+/** Адрес Telegram только вида https://t.me/<ник>; всё прочее (другая схема, хост, путь) не активирует кнопку. */
+export function safeTelegram(value: string | null | undefined): string | null {
+  const url = parseUrl(value);
+  if (!url || url.protocol !== "https:" || url.hostname !== "t.me" || url.port || url.username || url.password || url.search || url.hash) return null;
+  if (!/^\/[A-Za-z][A-Za-z0-9_]{4,31}$/.test(url.pathname)) return null;
+  return `https://t.me${url.pathname}`;
+}
+
+/** Адрес WhatsApp только вида https://wa.me/<номер цифрами>. Номер на странице не показывается. */
+export function safeWhatsapp(value: string | null | undefined): string | null {
+  const url = parseUrl(value);
+  if (!url || url.protocol !== "https:" || url.hostname !== "wa.me" || url.port || url.username || url.password || url.search || url.hash) return null;
+  if (!/^\/\d{8,15}$/.test(url.pathname)) return null;
+  return `https://wa.me${url.pathname}`;
+}
+
+export function telegramHref(intent: ContactIntent = "trial", address: string | null = contact.telegram): string | null {
+  const base = safeTelegram(address);
+  return base ? `${base}?text=${encodeURIComponent(intentMessages[intent])}` : null;
+}
+
+export function whatsappHref(intent: ContactIntent = "project", address: string | null = contact.whatsapp): string | null {
+  const base = safeWhatsapp(address);
+  return base ? `${base}?text=${encodeURIComponent(intentMessages[intent])}` : null;
+}
+
+/** Что показывает блок контактов: готовые ссылки или честно выключенные кнопки. */
+export function contactLinks(source: Pick<Contact, "telegram" | "whatsapp" | "email"> = contact, intent: ContactIntent = "project") {
+  const email = source.email && /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(source.email) ? source.email : null;
+  return { telegram: telegramHref(intent, source.telegram), whatsapp: whatsappHref(intent, source.whatsapp), email };
 }
 
 export type Package = {

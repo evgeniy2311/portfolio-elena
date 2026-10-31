@@ -1,39 +1,61 @@
 import { ArrowIcon } from "@/components/arrow-icon";
-import { contact, telegramHref } from "@/lib/site";
+import { contactLinks } from "@/lib/site";
 import styles from "./contact.module.css";
 
-/** 13. Контакты. Общий блок для главной, архива и кейсов; пока ссылки на Telegram нет, кнопка неактивна. */
+const pendingId = "contact-pending";
+
+/**
+ * 15. Контакты, механика «Final Flood». Общий блок для главной, архива и кейсов.
+ * Неподтверждённый адрес: фокусируемая кнопка с aria-disabled, без ссылки, с пояснением через aria-describedby.
+ */
 export function ContactBlock() {
-  const href = telegramHref();
+  const links = contactLinks();
+  const pending = !links.telegram || !links.whatsapp;
   return (
-    <section className={styles.contact} id="contact" aria-labelledby="contact-title">
-      <div className={`shell ${styles.contactInner}`} data-reveal>
-        <p className="eyebrow">Первый шаг</p>
-        <h2 id="contact-title">
-          Пришлите фото вещи. <em>Два кадра сделаю бесплатно.</em>
+    <section className={styles.contact} id="contact" aria-labelledby="contact-title" data-ground="wine-deep" data-view>
+      <div className={`shell ${styles.contactInner}`}>
+        <p className="eyebrow eyebrow-light">Связаться</p>
+        <h2 id="contact-title" className={`display ${styles.contactTitle}`} data-reveal>
+          <span className={styles.line}>
+            <span>Расскажите о своей вещи,</span>
+          </span>{" "}
+          <span className={styles.line}>
+            <em>а я предложу, как её показать</em>
+          </span>
         </h2>
         <p className={styles.contactLead}>
-          Нужны 2–3 фото: спереди, сзади и крупно детали. Можно приложить ссылку на карточку. Если результат не понравится, вы ничего не должны.
+          Пишите в Telegram или WhatsApp, как удобнее. Пришлите фото вещи или ссылку на карточку, я посмотрю и скажу, с чего лучше начать.
         </p>
         <div className={styles.contactActions}>
-          {href ? (
-            <a className="button button-light" href={href} target="_blank" rel="noopener noreferrer">
+          {links.telegram ? (
+            <a className="button button-light" href={links.telegram} target="_blank" rel="noopener noreferrer">
               Написать в Telegram <ArrowIcon />
             </a>
           ) : (
-            <>
-              <button className="button button-light" type="button" disabled aria-describedby="contact-pending">
-                Telegram: ссылка скоро появится
-              </button>
-              <small id="contact-pending">Адрес Telegram ещё уточняется. Кнопка заработает после подтверждения.</small>
-            </>
+            <button className="button button-light" type="button" aria-disabled="true" aria-describedby={pendingId}>
+              Telegram: адрес скоро появится
+            </button>
           )}
-          {contact.backup ? (
-            <a className={styles.contactBackup} href={contact.backup.href}>
-              {contact.backup.label}
+          {links.whatsapp ? (
+            <a className="button button-ghost-light" href={links.whatsapp} target="_blank" rel="noopener noreferrer">
+              Написать в WhatsApp <ArrowIcon />
             </a>
-          ) : null}
+          ) : (
+            <button className="button button-ghost-light" type="button" aria-disabled="true" aria-describedby={pendingId}>
+              WhatsApp: ссылка скоро появится
+            </button>
+          )}
         </div>
+        {pending ? (
+          <p className={styles.contactPending} id={pendingId}>
+            Контакты уточняются. Кнопки заработают после подтверждения.
+          </p>
+        ) : null}
+        {links.email ? (
+          <p className={styles.contactEmail}>
+            Или на почту: <a href={`mailto:${links.email}`}>{links.email}</a>
+          </p>
+        ) : null}
       </div>
     </section>
   );

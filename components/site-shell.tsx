@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { ArrowIcon } from "@/components/arrow-icon";
-import { telegramHref } from "@/lib/site";
+import { ContactLink } from "@/components/ui/contact-link";
 
 type HeaderProps = { current?: "home" | "works" };
 
@@ -30,21 +29,12 @@ export function SiteHeader({ current }: HeaderProps) {
   );
 }
 
-/** Главная кнопка сайта. Ведёт в Telegram с готовым текстом или к блоку контактов, пока ссылки нет. */
+/** Главная кнопка сайта «2 кадра бесплатно»: ContactLink с поводом trial. Совместимость с прежним API. */
 export function TrialLink({ className = "button", compact = false, label }: { className?: string; compact?: boolean; label?: string }) {
-  const href = telegramHref();
-  const text = label ?? (compact ? "2 кадра бесплатно" : "Получить 2 кадра бесплатно");
-  if (href) {
-    return (
-      <a className={className} href={href} target="_blank" rel="noopener noreferrer">
-        {text} <ArrowIcon />
-      </a>
-    );
-  }
   return (
-    <Link className={className} href="/#contact">
-      {text} <ArrowIcon />
-    </Link>
+    <ContactLink intent="trial" className={className}>
+      {label ?? (compact ? "2 кадра бесплатно" : "Получить 2 кадра бесплатно")}
+    </ContactLink>
   );
 }
 
