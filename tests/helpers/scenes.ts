@@ -85,8 +85,9 @@ export async function instrument(page: Page) {
   });
 }
 
+/** Активные слушатели по типам; нулевые записи (слушатель добавлен и снят) не учитываются. */
 export function listenerCounts(page: Page) {
-  return page.evaluate(() => ({ ...(window as unknown as { __fxCounts: Record<string, number> }).__fxCounts }));
+  return page.evaluate(() => Object.fromEntries(Object.entries((window as unknown as { __fxCounts: Record<string, number> }).__fxCounts).filter(([, count]) => count > 0)));
 }
 
 /** Сколько раз за интервал страница просила кадр. */
