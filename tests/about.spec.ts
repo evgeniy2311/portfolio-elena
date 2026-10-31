@@ -122,3 +122,12 @@ test("пункты: заголовки одной высоты в ряду, те
     expect(row.height).toBeLessThan(32);
   }
 });
+
+test("на широком экране изображение стоит вровень с eyebrow, без пустоты сверху (N1)", async ({ page }) => {
+  await go(page, "/");
+  const width = page.viewportSize()!.width;
+  test.skip(width < 1024, "в одну колонку");
+  const image = (await page.locator(`${section} [data-collage]`).boundingBox())!;
+  const eyebrow = (await page.locator(`${section} .eyebrow`).boundingBox())!;
+  expect(Math.abs(image.y - eyebrow.y)).toBeLessThanOrEqual(8);
+});
