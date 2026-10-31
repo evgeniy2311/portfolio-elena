@@ -24,6 +24,18 @@ async function idle(page: Page) {
   await expect.poll(() => framesDuring(page, 300), { timeout: 8000 }).toBeLessThanOrEqual(1);
 }
 
+/**
+ * Бесконечные циклы (стена первого экрана, лента категорий) законно просят кадры, пока видны.
+ * Для проверок покоя движка их ставят на паузу их же кнопками ([data-loop-pause]).
+ */
+async function pauseLoops(page: Page) {
+  await expect(page.locator("[data-wall-pause]")).toHaveCount(1, { timeout: 30_000 });
+  await page.evaluate(() => {
+    for (const button of document.querySelectorAll<HTMLButtonElement>("[data-loop-pause][aria-pressed='false']")) button.click();
+  });
+  await expect(page.locator("[data-loop-pause][aria-pressed='false']")).toHaveCount(0);
+}
+
 const desktopOnly = (page: Page) => test.skip(!isPinViewport(page), "«Липкие» сцены работают от 1024 px и 600 px высоты");
 
 test.describe("математика", () => {
@@ -146,6 +158,7 @@ test.describe("один ticker и cleanup", () => {
     await instrument(page);
     await go(page, "/");
     await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
+    await pauseLoops(page);
     await page.waitForTimeout(800);
     expect(await framesDuring(page, 500)).toBeLessThanOrEqual(1);
     await page.mouse.wheel(0, 600);
@@ -157,6 +170,7 @@ test.describe("один ticker и cleanup", () => {
     await instrument(page);
     await go(page, "/");
     await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
+    await pauseLoops(page);
     await idle(page);
     const initial = await stableCounts(page);
 
@@ -169,6 +183,7 @@ test.describe("один ticker и cleanup", () => {
     await page.locator("header a.wordmark").click();
     await expect(page.locator("#services")).toHaveCount(1, { timeout: 30_000 });
     await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
+    await pauseLoops(page);
     await idle(page);
     expect(await stableCounts(page)).toEqual(initial);
 

@@ -112,7 +112,7 @@ test("телефон с карточкой листается до послед�
 
 test("первый экран сразу показывает работы, услуги сменяют друг друга при прокрутке", async ({ page }) => {
   await go(page, "/");
-  await expect(page.locator("main > section:first-child figure")).toHaveCount(9);
+  await expect(page.locator("main > section:first-child [data-copy=\"0\"] figure")).toHaveCount(12);
   test.skip(!isDesktop(page), "Сцена услуг работает от 1024 px");
   await expect(page.locator("html")).toHaveAttribute("data-fx", "on");
   const services = "#services";
