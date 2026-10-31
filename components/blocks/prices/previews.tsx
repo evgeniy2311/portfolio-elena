@@ -10,7 +10,7 @@ import styles from "./prices.module.css";
 /*
  * «Live Preview» внутри карточки пакета.
  * auto  — кадры сменяются сами (crossfade 350 мс раз в 1,6 с), только пока карточка на экране;
- *         наведение, фокус и кнопка «Пауза» останавливают.
+ *         наведение, фокус с клавиатуры и кнопка «Пауза» останавливают (касание и клик — нет).
  * scrub — на компьютере положение указателя выбирает кадр, касание листает по кругу.
  * Кнопки «назад/вперёд» и стрелки клавиатуры доходят до последнего кадра в любом режиме.
  * Без JS — обычная горизонтальная прокрутка кадров со snap, первым виден первый кадр.
@@ -80,7 +80,11 @@ export function FramePreview({ preview, dark = false }: Props) {
       data-ready={mounted ? "" : undefined}
       onPointerEnter={(event) => event.pointerType === "mouse" && setHeld(true)}
       onPointerLeave={() => setHeld(false)}
-      onFocus={() => setHeld(true)}
+      // Останавливает только фокус с клавиатуры: касание или клик тоже ставят фокус на ленту и кнопки,
+      // и показ замирал бы до первого клика мимо карточки.
+      onFocus={(event) => {
+        if (event.target.matches(":focus-visible")) setHeld(true);
+      }}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setHeld(false);
       }}

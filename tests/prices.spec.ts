@@ -92,6 +92,30 @@ test("воронка листается сама на экране, «Пауза
   expect(await counter.innerText()).toBe(stopped);
 });
 
+test("касание или клик по примеру не останавливают показ; фокус с клавиатуры останавливает", async ({ page, isMobile }) => {
+  await go(page, "/");
+  const funnel = card(page, "funnel");
+  await expect(funnel.locator("[data-loop-pause]")).toHaveCount(1, { timeout: 30_000 });
+  await funnel.locator("h3").scrollIntoViewIfNeeded();
+  const group = funnel.locator("[role=group]");
+  const counter = funnel.locator("[data-counter]");
+  if (isMobile) await group.tap();
+  else await group.click();
+  await page.mouse.move(1, 1);
+  await expect(group).toBeFocused();
+  const tapped = await counter.innerText();
+  await expect.poll(() => counter.innerText(), { timeout: 6000 }).not.toBe(tapped);
+
+  // Фокус с клавиатуры (:focus-visible) держит кадр.
+  await page.keyboard.press("Shift");
+  await group.blur();
+  await group.focus();
+  expect(await group.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+  const held = await counter.innerText();
+  await page.waitForTimeout(2200);
+  expect(await counter.innerText()).toBe(held);
+});
+
 test("короткая серия: указатель выбирает кадр, касание листает", async ({ page, isMobile }) => {
   await go(page, "/");
   const short = card(page, "short");
