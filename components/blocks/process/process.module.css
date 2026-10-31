@@ -10,6 +10,8 @@
 .process {
   background: var(--paper);
   padding-block: var(--space-section);
+  /* Последняя строка блока — ссылка-стрелка с зоной касания 44 px: её запас под текстом входит в нижнее поле. */
+  padding-bottom: calc(var(--space-section) - 12px);
 }
 
 .grid {
@@ -574,22 +576,27 @@
   }
 
   /* Одна неизменная коробка: верх вровень с заголовком, высота не зависит от состояния (D3). */
+  /*
+   * Коробка 3:4 заполняет колонку по высоте сцены (владелец: без больших пустых полей), а на узкой
+   * колонке упирается в её ширину. Размер берётся из контейнера колонки, поэтому пропорция 3:4 не ломается.
+   */
   .process[data-pinned="on"] .visual {
     display: grid;
     justify-items: center;
     align-items: start;
     min-height: 0;
+    container-type: size;
   }
 
   .process[data-pinned="on"] .assembly {
-    width: auto;
-    height: min(640px, calc(100svh - var(--header-h) - 64px));
-    max-width: 100%;
+    width: min(100cqw, 75cqh);
+    height: auto;
   }
 
   .process[data-pinned="on"] .layer {
     --d: calc(var(--k, 0) + var(--t, 0) - var(--i));
-    --al-s: clamp(0, var(--d) / 0.6, 1);
+    /* Движение состояния занимает первые 30 % его отрезка, дальше плато (бриф: переход ≤ 30 %, плато ≥ 60 %). */
+    --al-s: clamp(0, var(--d) / 0.3, 1);
     --in: clamp(0, (var(--d) + 0.08) / 0.16, 1);
     --out: clamp(0, (var(--d) - 0.92) / 0.16, 1);
     opacity: calc(var(--in) * (1 - var(--out)));
