@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowIcon } from "@/components/arrow-icon";
 import { Hero } from "@/components/blocks/hero/hero";
 import { Categories } from "@/components/blocks/categories/categories";
+import { About } from "@/components/blocks/about/about";
 import { ScrollFx } from "@/components/scroll-fx";
 import type { Vars } from "@/components/ui/css-vars";
 import { Photo } from "@/components/ui/photo";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
-import { about, formatPrice, packages } from "@/lib/site";
+import { formatPrice, packages } from "@/lib/site";
 import { frame, getWork, source, works, type Work, type WorkImage } from "@/lib/works";
 import styles from "./home.module.css";
 
@@ -143,12 +143,6 @@ const checks = [
   { title: "Длина и силуэт", text: "Где заканчивается пальто, как сидит в плечах.", image: frame("burgundy-coat-city", 0) },
 ];
 
-const aboutPoints = [
-  { title: "Одежда и обувь", text: "Беру только то, в чём разбираюсь. Косметику и бытовые товары не делаю." },
-  { title: "Насмотренность", text: "Каждый день слежу за модой. Знаю, с какого ракурса показать вещь и какой образ собрать на модели." },
-  { title: "Ручная сверка", text: "Сравниваю каждый кадр с оригиналом и переделываю, если что-то уехало." },
-];
-
 const steps = [
   { title: "Вы присылаете фото вещи", text: "2–3 фото: спереди, сзади и крупно детали. Пишете, для какой площадки и для кого вещь." },
   { title: "Два кадра бесплатно", text: "Делаю пробные кадры на вашей вещи. Вы видите качество до оплаты." },
@@ -196,46 +190,7 @@ export default function Home() {
 
         <Categories />
 
-        {/* 3. Обо мне */}
-        <section className={styles.about} id="about" aria-labelledby="about-title">
-          <div className={`shell ${styles.aboutGrid}`}>
-            <figure className={`${styles.aboutPhoto} ${about.photo ? "" : styles.aboutPhotoEmpty}`} data-reveal>
-              {about.photo ? (
-                <Image src={about.photo.src} width={about.photo.width} height={about.photo.height} alt="Елена Бадьина" sizes="(max-width: 899px) 80vw, 34vw" />
-              ) : (
-                <span className={styles.aboutMonogram} aria-hidden="true">
-                  ЕБ
-                </span>
-              )}
-            </figure>
-            <div className={styles.aboutText}>
-              <p className="eyebrow" data-reveal>
-                Обо мне
-              </p>
-              <h2 id="about-title" data-reveal>
-                Я Елена. <em>Делаю визуал для карточек</em> одежды и обуви.
-              </h2>
-              <p className={styles.aboutLead} data-reveal>
-                Помогаю продавцам на Wildberries и Ozon показать вещь так, чтобы её захотели купить: на модели, в городе, в интерьере. Без студии и без подмены товара.
-                {about.experience ? ` ${about.experience}` : ""}
-              </p>
-              <ul className={styles.aboutPoints}>
-                {aboutPoints.map((point, index) => (
-                  <li key={point.title} data-reveal style={{ "--d": `${index * 80}ms` } as Vars}>
-                    <h3>{point.title}</h3>
-                    <p>{point.text}</p>
-                  </li>
-                ))}
-              </ul>
-              <div className={styles.aboutActions} data-reveal>
-                <TrialLink />
-                <Link className="text-link" href="#contact">
-                  Мои контакты <ArrowIcon />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        <About />
 
         {/* 4. Почему вещь продаётся плохо */}
         <section className={styles.pains} aria-labelledby="pains-title">
