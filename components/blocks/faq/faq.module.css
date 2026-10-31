@@ -1,0 +1,82 @@
+/* Блок «Частые вопросы». Правила перенесены из app/home.module.css без изменений. */
+
+/* Общий заголовок секции, скопирован из app/home.module.css с прежней специфичностью. */
+.sectionHead {
+  display: grid;
+  gap: 18px;
+  max-width: 760px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.sectionHead h2 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+}
+
+.sectionHead > p:last-child:not(:first-child) {
+  max-width: 58ch;
+  color: var(--muted);
+  font-size: 1.125rem;
+}
+
+/* ---------- 11. Вопросы ---------- */
+
+.faq {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.faqGrid {
+  display: grid;
+}
+
+.faqList {
+  border-top: 1.5px solid var(--ink);
+}
+
+.faqList details {
+  border-bottom: 1px solid var(--line);
+}
+
+.faqList summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 64px;
+  padding-block: 16px;
+  font-size: 1.1875rem;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faqList summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqList summary::after {
+  content: "+";
+  flex-shrink: 0;
+  color: var(--wine);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  transition: transform 250ms var(--ease);
+}
+
+.faqList details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faqList details p {
+  max-width: 60ch;
+  padding-bottom: 22px;
+  color: var(--muted);
+}
+
+@media (min-width: 1024px) {
+  .faqGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 72px;
+    align-items: start;
+  }
+}
