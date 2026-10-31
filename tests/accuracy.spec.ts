@@ -95,9 +95,12 @@ test("от 1024 px: шаг 2 % — один пункт, тексты не нак
     const actual = Number(await readVar(page, section, "--p"));
     const current = page.locator(`${section} ol > li[aria-current="step"]`);
     await expect(current, `шаг ${progress}`).toHaveCount(1);
+    // На границе отрезков (шаги 25 %, 50 %, 75 %) сглаженное --p может остаться на 0,0005 ниже цели прокрутки:
+    // тогда верны оба соседних пункта, и проверка не зависит от того, на каком кадре остановилось сглаживание.
+    const expected = new Set([Math.min(3, Math.floor(actual * 4)), Math.min(3, Math.floor(progress * 4))]);
     await expect
-      .poll(() => current.evaluate((element) => Array.from(element.parentElement!.children).indexOf(element)), { message: `пункт при --p=${actual}` })
-      .toBe(Math.min(3, Math.floor(actual * 4)));
+      .poll(async () => expected.has(await current.evaluate((element) => Array.from(element.parentElement!.children).indexOf(element))), { message: `пункт при --p=${actual}` })
+      .toBe(true);
     const index = await current.evaluate((element) => Array.from(element.parentElement!.children).indexOf(element));
     seen.add(index);
     for (let wait = 0; wait < 2; wait += 1) {
