@@ -260,34 +260,36 @@ export function ScrollFx() {
      * Липкая панель «2 кадра бесплатно» (телефон и планшет, components/ui/mobile-trial-bar.tsx).
      * Показывается, когда посетитель дошёл до блока услуг (#services), а на страницах без него —
      * когда первый экран ([data-first-screen]) ушёл вверх. Скрыта, пока виден первый экран или #contact.
-     * Состояния — по IntersectionObserver, работает и при reduced motion.
+     * Состояние считается по фактическому положению секций при каждой прокрутке: наблюдатель
+     * пересечений не сообщает о секции, которую прыжок по якорю перескочил целиком.
+     * Работает и при reduced motion.
      */
     const ctaGate = document.getElementById("services");
     const firstScreen = document.querySelector("[data-first-screen]");
     const contactBlock = document.getElementById("contact");
-    const cta = { firstVisible: Boolean(firstScreen), firstPassed: !firstScreen, reached: false, contactVisible: false };
-    function applyCta() {
-      const reached = ctaGate ? cta.reached : cta.firstPassed;
-      root.dataset.cta = reached && !cta.firstVisible && !cta.contactVisible ? "show" : "hide";
+    function updateCta() {
+      const viewport = window.innerHeight;
+      const onScreen = (element: Element | null) => {
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        return rect.bottom > 0 && rect.top < viewport;
+      };
+      const firstPassed = !firstScreen || firstScreen.getBoundingClientRect().bottom <= 0;
+      const reached = ctaGate ? ctaGate.getBoundingClientRect().top < viewport : firstPassed;
+      const show = reached && !onScreen(firstScreen) && !onScreen(contactBlock);
+      const value = show ? "show" : "hide";
+      if (root.dataset.cta !== value) root.dataset.cta = value;
     }
-    const ctaObserver = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        const above = !entry.isIntersecting && entry.boundingClientRect.bottom <= 0;
-        if (entry.target === firstScreen) {
-          cta.firstVisible = entry.isIntersecting;
-          cta.firstPassed = above;
-        }
-        if (entry.target === ctaGate) cta.reached = entry.isIntersecting || above;
-        if (entry.target === contactBlock) cta.contactVisible = entry.isIntersecting;
-      }
-      applyCta();
-    });
-    for (const element of [firstScreen, ctaGate, contactBlock]) if (element) ctaObserver.observe(element);
-    applyCta();
+
+    function updateChrome() {
+      updateHeader();
+      updateCta();
+    }
 
     setup();
-    updateHeader();
-    window.addEventListener("scroll", updateHeader, { passive: true });
+    updateChrome();
+    window.addEventListener("scroll", updateChrome, { passive: true });
+    window.addEventListener("resize", updateChrome);
     reduced.addEventListener("change", setup);
     pinMedia.addEventListener("change", onResize);
     // Шрифты и картинки могут изменить ширину ленты после первого замера.
@@ -298,11 +300,11 @@ export function ScrollFx() {
       stopFrames();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", updateHeader);
+      window.removeEventListener("scroll", updateChrome);
+      window.removeEventListener("resize", updateChrome);
       reduced.removeEventListener("change", setup);
       pinMedia.removeEventListener("change", onResize);
       for (const observer of revealObservers.values()) observer.disconnect();
-      ctaObserver.disconnect();
       railImages.disconnect();
       for (const item of tracked) delete item.element.dataset.pinned;
       delete root.dataset.fx;

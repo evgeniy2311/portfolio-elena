@@ -68,6 +68,21 @@ test("главная: панель скрыта до услуг, видна по
   await expectHidden(page);
 });
 
+test("прыжки по якорям через услуги: состояние по фактическому положению", async ({ page }) => {
+  test.skip(!narrow(page), "Панель только уже 1024 px");
+  await go(page, "/");
+  await expect(page.locator("html")).toHaveAttribute("data-cta", "hide");
+  const viewport = page.viewportSize()!.height;
+  const processTop = await page.locator("#process").evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
+  const servicesTop = await page.locator("#services").evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
+  // Сразу далеко за услуги (как переход по «Как работаю»): панель видна.
+  await scrollTo(page, processTop);
+  await expect(bar(page)).toBeVisible();
+  // Обратно выше услуг одним прыжком, минуя их: скрыта.
+  await scrollTo(page, servicesTop - viewport - 200);
+  await expectHidden(page);
+});
+
 test("подвал не прячется под панелью", async ({ page }) => {
   test.skip(!narrow(page), "Панель только уже 1024 px");
   await go(page, "/");
