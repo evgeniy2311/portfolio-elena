@@ -1,33 +1,48 @@
 import { TrialLink } from "@/components/site-shell";
+import { ContactLink } from "@/components/ui/contact-link";
 import type { Vars } from "@/components/ui/css-vars";
-import { formatPrice, packages } from "@/lib/site";
+import { packages, priceLabel } from "@/lib/site";
+import { pricesCopy, previews } from "./data";
+import { FramePreview } from "./previews";
 import styles from "./prices.module.css";
 
-/** 11. Цены. Пакеты берутся из lib/site.ts. */
+/** 11. Цены: шесть пакетов с живыми примерами работ («Fan + Live Preview»), под сеткой основной оффер. */
 export function Prices() {
   return (
-    <section className={styles.prices} id="prices" aria-labelledby="prices-title">
+    <section className={styles.prices} id="prices" data-ground="surface" aria-labelledby="prices-title">
       <div className="shell">
-        <div className={styles.sectionHead} data-reveal>
-          <p className="eyebrow">Цены</p>
+        <div className={styles.head}>
+          <p className="eyebrow">{pricesCopy.eyebrow}</p>
           <h2 id="prices-title">
-            Платите за кадры, <em>а не за студию</em>
+            Вы платите <em>только за&nbsp;кадры</em>
           </h2>
-          <p>Без аренды студии, гонорара модели и стилиста. Точную цену назову, когда увижу вещь и задачу.</p>
+          <p className="lede">{pricesCopy.sub}</p>
         </div>
-        <ul className={styles.priceGrid}>
-          {packages.map((item, index) => (
-            <li key={item.name} className={item.featured ? styles.priceFeatured : undefined} data-reveal style={{ "--d": `${index * 70}ms` } as Vars}>
-              {item.featured ? <p className={styles.priceBadge}>Чаще всего берут</p> : null}
-              <h3>{item.name}</h3>
-              <p>{item.includes}</p>
-              {item.priceFrom !== null ? <p className={styles.priceValue}>{formatPrice(item.priceFrom)}</p> : null}
-            </li>
-          ))}
+        <ul className={styles.grid} data-reveal="fan" data-reveal-threshold="0.15">
+          {packages.map((item, index) => {
+            const preview = previews[item.id];
+            const classes = [styles.card, item.featured ? styles.featured : "", item.id === "season" ? styles.season : ""].join(" ");
+            return (
+              <li key={item.id} className={classes} data-card data-package={item.id} style={{ "--i": index } as Vars}>
+                {preview ? <FramePreview preview={preview} dark={item.featured} /> : null}
+                {item.featured ? <p className={styles.badge}>{pricesCopy.badge}</p> : null}
+                <h3 className={item.id === "season" ? "h3-lg" : "h3"}>{item.name}</h3>
+                <p className={styles.includes}>{item.includes}</p>
+                <p className={`num ${styles.price}`} data-price>
+                  {priceLabel(item)}
+                </p>
+                {item.id === "season" ? (
+                  <ContactLink intent="season" className={`button button-ghost ${styles.seasonButton}`}>
+                    {pricesCopy.season}
+                  </ContactLink>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
-        <div className={styles.priceCta} data-reveal>
-          <p>Начните с двух бесплатных кадров, а цену серии обсудим после.</p>
-          <TrialLink />
+        <div className={styles.cta}>
+          <p className="lede">{pricesCopy.cta}</p>
+          <TrialLink compact />
         </div>
       </div>
     </section>

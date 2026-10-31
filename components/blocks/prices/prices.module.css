@@ -1,114 +1,309 @@
-/* Блок «Цены». Правила перенесены из app/home.module.css без изменений. */
-
-/* Общий заголовок секции, скопирован из app/home.module.css с прежней специфичностью. */
-.sectionHead {
-  display: grid;
-  gap: 18px;
-  max-width: 760px;
-  margin-bottom: clamp(40px, 6vw, 72px);
-}
-
-.sectionHead h2 {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-}
-
-.sectionHead > p:last-child:not(:first-child) {
-  max-width: 58ch;
-  color: var(--muted);
-  font-size: 1.125rem;
-}
-
-/* ---------- 10. Цены ---------- */
+/*
+ * 11. Цены, «Fan + Live Preview». Сетка 3×2 / 2 / 1. Карточки при появлении раскрываются веером
+ * из стопки (900 мс, шаг 90 мс), в каждой — живой пример из настоящих кадров (previews.tsx).
+ * Без data-fx (без JS, reduced motion) — сразу финальная сетка.
+ */
 
 .prices {
+  padding-block: var(--space-section);
   background: var(--surface);
-  padding-block: clamp(88px, 12vw, 160px);
 }
 
-.priceGrid {
+.head {
   display: grid;
-  gap: 16px;
-  margin: 0;
+  justify-items: start;
+}
+
+.head h2 {
+  max-width: 16ch;
+  margin-bottom: var(--space-stack);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-5);
+  margin: var(--space-head) 0 0;
   padding: 0;
   list-style: none;
 }
 
-.priceGrid li {
+.card {
+  --card-text: var(--ink);
+  --card-muted: var(--muted);
   position: relative;
-  display: grid;
-  align-content: start;
-  gap: 12px;
-  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
   border-radius: var(--radius);
   background: var(--paper);
+  color: var(--card-text);
 }
 
-.priceGrid h3 {
-  font-family: var(--font-display);
-  font-size: 1.875rem;
-  font-weight: 500;
-  line-height: 1.05;
+.card h3 {
+  margin-top: var(--space-2);
 }
 
-.priceGrid p {
-  color: var(--muted);
+.includes {
+  color: var(--card-muted);
 }
 
-.priceGrid .priceValue {
+.price {
   margin-top: auto;
-  padding-top: 12px;
+  padding-top: var(--space-3);
   border-top: 1px solid var(--line);
-  color: var(--ink);
-  font-weight: 650;
+  font-size: 0.9375rem;
 }
 
-.priceFeatured {
-  background: var(--ink) !important;
-  color: var(--on-dark);
+/* Полная воронка: тёмная карточка, плашка шампань. */
+.featured {
+  --card-text: var(--on-dark);
+  --card-muted: var(--on-dark-muted);
+  --focus-color: var(--champagne);
+  background: var(--ink);
 }
 
-.priceGrid .priceFeatured p {
-  color: var(--on-dark-muted);
+.featured .price {
+  border-color: rgb(244 238 230 / 0.2);
 }
 
-.priceGrid .priceFeatured .priceValue {
-  border-color: #4a3f39;
-  color: var(--on-dark);
-}
-
-.priceGrid .priceBadge,
-.priceGrid .priceFeatured .priceBadge {
-  justify-self: start;
-  padding: 4px 12px;
-  border-radius: 999px;
+.badge {
+  position: absolute;
+  top: calc(var(--space-5) + 12px);
+  left: calc(var(--space-5) + 12px);
+  z-index: 2;
+  padding: 6px 10px;
+  border-radius: var(--radius-small);
   background: var(--champagne);
   color: var(--ink);
-  font-size: 0.8125rem;
-  font-weight: 700;
+  font: 600 0.75rem/1.2 var(--font-ui), system-ui, sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.priceCta {
+/* Сезон: типографическая карточка без изображения, рамка 1 px. */
+.season {
+  justify-content: flex-start;
+  border: 1px solid var(--ink);
+  background: var(--surface);
+}
+
+.season h3 {
+  margin-top: 0;
+  max-width: 10ch;
+}
+
+.seasonButton {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+}
+
+/* ---------- Живой пример ---------- */
+
+.preview {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.frames {
+  position: relative;
+  display: grid;
+  grid-auto-columns: 100%;
+  grid-auto-flow: column;
+  aspect-ratio: 3 / 4;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  border-radius: var(--radius-small);
+  background: var(--surface);
+  scrollbar-width: none;
+}
+
+.frames::-webkit-scrollbar {
+  display: none;
+}
+
+.frame {
+  scroll-snap-align: start;
+}
+
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* С JS кадры лежат стопкой и сменяются crossfade 350 мс. */
+.preview[data-ready] .frames {
+  display: block;
+  overflow: hidden;
+  scroll-snap-type: none;
+}
+
+.preview[data-ready] .frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 350ms var(--ease-atelier);
+}
+
+.preview[data-ready] .frame[data-active] {
+  opacity: 1;
+}
+
+.preview[data-preview="scrub"][data-ready] .frames {
+  cursor: ew-resize;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.control {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--card-text);
+  font: 600 0.8125rem/1 var(--font-ui), system-ui, sans-serif;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease-atelier);
+}
+
+.control:hover {
+  border-color: currentColor;
+}
+
+.previewDark .control {
+  border-color: rgb(244 238 230 / 0.35);
+}
+
+.control svg {
+  width: 18px;
+  height: 18px;
+}
+
+.counter {
+  min-width: 4.5ch;
+  color: var(--card-muted);
+  font-size: 0.8125rem;
+}
+
+.dots {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.25;
+  transition: opacity var(--dur-2) var(--ease-atelier);
+}
+
+.dots span[data-on] {
+  opacity: 1;
+}
+
+.pause {
+  padding-inline: 12px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Под сеткой ---------- */
+
+.cta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  margin-top: 40px;
+  gap: var(--space-4) var(--space-6);
+  margin-top: var(--space-head);
 }
 
-.priceCta p {
-  max-width: 44ch;
-  font-size: 1.1875rem;
+.cta p {
+  color: var(--ink);
 }
 
-@media (min-width: 640px) {
-  .priceGrid {
+/* ---------- Веер (только с data-fx) ---------- */
+
+:global([data-fx="on"]) .grid[data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+:global([data-fx="on"]) .grid[data-reveal] > .card {
+  opacity: 0;
+  transform: translateY(32px) rotate(var(--fan-r, 0deg));
+  transition:
+    opacity 900ms var(--ease-atelier) calc(var(--i) * 90ms),
+    transform 900ms var(--ease-atelier) calc(var(--i) * 90ms);
+}
+
+:global([data-fx="on"]) .grid[data-reveal]:global(.is-in) > .card {
+  opacity: 1;
+  transform: none;
+}
+
+/* Телефон: ±2°. */
+.card:nth-child(odd) {
+  --fan-r: -2deg;
+}
+
+.card:nth-child(even) {
+  --fan-r: 2deg;
+}
+
+@media (min-width: 768px) {
+  .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1100px) {
-  .priceGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Стопка: крайние колонки сдвинуты к средней и повёрнуты −4 / 0 / 4°, второй ряд поднят к первому. */
+  .card:nth-child(3n + 1) {
+    --fan-r: -4deg;
+    --fan-x: calc(100% + var(--space-5));
+  }
+
+  .card:nth-child(3n + 2) {
+    --fan-r: 0deg;
+    --fan-x: 0px;
+  }
+
+  .card:nth-child(3n) {
+    --fan-r: 4deg;
+    --fan-x: calc(-100% - var(--space-5));
+  }
+
+  .card:nth-child(n + 4) {
+    --fan-y: -60%;
+  }
+
+  :global([data-fx="on"]) .grid[data-reveal] > .card {
+    transform: translate(var(--fan-x, 0px), var(--fan-y, 0px)) rotate(var(--fan-r, 0deg));
   }
 }
