@@ -94,3 +94,23 @@ test.describe("стенд с тестовыми контактами", () => {
     await expect(trial).toHaveAttribute("href", `https://t.me/qa_fixture_sentinel?text=${encodeURIComponent(intentMessages.trial)}`);
   });
 });
+
+test("заголовок: однобуквенные слова не остаются в конце строки (неразрывный пробел)", async ({ page }) => {
+  await go(page, "/");
+  const text = await page.locator("#contact-title").evaluate((element) => element.textContent ?? "");
+  expect(text).toContain("о своей");
+  expect(text).toContain("а я предложу");
+  // Строка «Расскажите о» не заканчивается на «о»: «о» и «своей» стоят на одной строке.
+  const lines = await page.locator("#contact-title").evaluate((element) => {
+    const range = document.createRange();
+    const node = element.querySelector("span span")!.firstChild!;
+    const at = (node.textContent ?? "").indexOf("о своей");
+    range.setStart(node, at);
+    range.setEnd(node, at + 1);
+    const o = range.getBoundingClientRect().top;
+    range.setStart(node, at + 2);
+    range.setEnd(node, at + 3);
+    return { o, next: range.getBoundingClientRect().top };
+  });
+  expect(Math.abs(lines.o - lines.next)).toBeLessThan(2);
+});

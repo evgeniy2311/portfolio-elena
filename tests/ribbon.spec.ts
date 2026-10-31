@@ -219,6 +219,11 @@ test("клавиатура: фокус останавливает дрейф, с
   await page.waitForTimeout(700);
   const delta = unwrap((await shift(page)) - before, await copyWidth(page));
   expect(Math.abs(Math.abs(delta) - step)).toBeLessThan(3);
+  // Телефон: стрелки скрыты, ленту листают пальцем и клавиатурой (дизайн-QA D24).
+  if ((page.viewportSize()?.width ?? 1440) < 768) {
+    for (const name of ["Предыдущая категория", "Следующая категория"]) await expect(page.getByRole("button", { name })).toBeHidden();
+    return;
+  }
   await expect(page.getByRole("button", { name: "Следующая категория" })).toBeVisible();
   for (const name of ["Предыдущая категория", "Следующая категория"]) {
     const box = (await page.getByRole("button", { name }).boundingBox())!;
@@ -254,8 +259,14 @@ test("reduced motion: одна копия, обычная прокрутка с�
   expect(style.snap).toContain("x");
   expect(await shift(page)).toBe(0);
   await expect(page.locator(`${track} [data-copy="0"] figcaption`).first()).toBeVisible();
-  // Кнопки листают обычную прокрутку.
+  // Без дрейфа нет и «Паузы».
+  await expect(page.locator(`${root} [data-loop-pause]`)).toHaveCount(0);
+  // Кнопки листают обычную прокрутку (на телефоне стрелок нет, листают пальцем).
   await page.locator(viewport).scrollIntoViewIfNeeded();
+  if ((page.viewportSize()?.width ?? 1440) < 768) {
+    await expect(page.getByRole("button", { name: "Следующая категория" })).toBeHidden();
+    return;
+  }
   await page.getByRole("button", { name: "Следующая категория" }).click();
   await expect.poll(() => page.locator(viewport).evaluate((element) => element.scrollLeft)).toBeGreaterThan(100);
 });

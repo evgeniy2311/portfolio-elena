@@ -57,6 +57,14 @@
   padding-inline: 14px;
 }
 
+/* Телефон: ленту листают пальцем, стрелки лишние (D24). «Пауза» остаётся, пока лента дрейфует (WCAG 2.2.2);
+   при reduced motion дрейфа нет и паузы тоже. */
+@media (max-width: 767px) {
+  .control:not(.pause) {
+    display: none;
+  }
+}
+
 /* Текст только для чтения с экрана. */
 .srOnly {
   position: absolute;

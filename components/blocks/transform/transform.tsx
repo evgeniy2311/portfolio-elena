@@ -29,7 +29,7 @@ export function Transform() {
             <div className={styles.intro}>
               <p className="eyebrow">До и после</p>
               <h2 id="rail-title">
-                Что прислали <em>и что получилось</em>
+                Что прислали <em>и&nbsp;что получилось</em>
               </h2>
               <p className="lede">Слева фото от заказчика и его задача. Справа готовые кадры.</p>
               <span className={styles.introArrow} aria-hidden="true">

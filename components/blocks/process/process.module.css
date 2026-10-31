@@ -78,18 +78,20 @@
 }
 
 /* ---------- Сцена: статичные пять кадров со стрелками (без JS и при reduced motion) ---------- */
+/* Высота каждого кадра следует за содержимым (D21): никаких пустых коробок 3:4. */
 
 .assembly {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   justify-items: center;
+  align-items: start;
   gap: var(--space-7);
 }
 
 .layer {
   position: relative;
   width: min(100%, 320px);
-  aspect-ratio: 3 / 4;
+  padding: var(--space-4);
   border-radius: var(--radius-small);
   background: var(--canvas);
 }
@@ -126,28 +128,23 @@
 
 /* 1. Исходник в нейтральной рамке телефона, наклон −4°. */
 .phone {
-  position: absolute;
-  left: 50%;
-  top: 50%;
+  position: relative;
   width: 56%;
+  margin-inline: auto;
   aspect-ratio: 9 / 16;
   overflow: hidden;
   border: 6px solid var(--ink);
   border-radius: 22px;
   background: var(--surface);
-  transform: translate(-50%, -50%) rotate(calc(-4deg * var(--al-s)));
+  transform: rotate(calc(-4deg * var(--al-s)));
 }
 
 /* 2. Два бесплатных кадра проявляются сверху вниз за линией сканирования. */
 .scan {
-  position: absolute;
-  left: 5%;
-  right: 5%;
-  top: 50%;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4%;
-  transform: translateY(-50%);
 }
 
 /* <picture> кадра прозрачен для раскладки (display: contents), его <source> не должны занимать ячейки сетки. */
@@ -157,6 +154,7 @@
 
 .scan img {
   aspect-ratio: 3 / 4;
+  height: auto;
   border-radius: var(--radius-small);
   clip-path: inset(0 0 calc((1 - var(--al-s)) * 100%) 0);
 }
@@ -171,23 +169,24 @@
   opacity: clamp(0, (1 - var(--al-s)) * 8, 1);
 }
 
-/* 3. Серия: шесть кадров раскрываются веером из стопки в сетку 3 × 2. */
+/* 3. Серия: шесть кадров раскрываются веером из стопки в сетку 2 × 3. */
+.series {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
 .thumb {
-  position: absolute;
-  left: 35%;
-  top: 35%;
-  width: 30%;
+  position: relative;
   aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: var(--radius-small);
-  box-shadow: 0 0 0 2px var(--paper);
-  transform: translate(calc(var(--c) * 108% * var(--al-s)), calc(var(--r) * 112% * var(--al-s))) rotate(calc((var(--j) - 2.5) * 5deg * (1 - var(--al-s))));
 }
 
 /* 4. Сверка: уголки кадра и три точки на поясе, манжете и пряжке. */
 .checkFrame {
-  position: absolute;
-  inset: 5%;
+  position: relative;
+  aspect-ratio: 3 / 4;
 }
 
 .checkFrame img {
@@ -247,20 +246,19 @@
 }
 
 .deliveryCard {
-  position: absolute;
-  inset: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  align-content: center;
   justify-items: center;
   gap: var(--space-3);
   margin: 0;
 }
 
 .device {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 6px;
-  width: 50%;
+  width: 60%;
   min-width: 120px;
   padding: 6px 6px 12px;
   border: 5px solid var(--ink);
@@ -270,6 +268,7 @@
 }
 
 .screen {
+  width: 100%;
   aspect-ratio: 9 / 13;
   overflow: hidden;
   border-radius: 14px;
@@ -289,6 +288,7 @@
 
 .skeleton {
   display: block;
+  flex: none;
   width: 80%;
   height: 7px;
   border-radius: 4px;
@@ -361,6 +361,7 @@
 
   .layer {
     width: 100%;
+    padding: var(--space-3);
   }
 
   .layer:not(:last-child)::after {
@@ -379,13 +380,116 @@
   }
 }
 
-/* ---------- Режим «по времени»: телефон, планшет, низкое окно ---------- */
+/* ---------- Сложенная сцена (по времени и по прокрутке): один кадр 3:4, слои заполняют его целиком ---------- */
+/* Все размеры слоёв даны в процентах от ширины коробки 3:4, поэтому каждый слой занимает её по высоте (D3/D4). */
 
-:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly {
+:global([data-fx="on"]) .process .assembly,
+.process[data-pinned="on"] .assembly {
   position: relative;
   display: block;
-  width: min(100%, 440px);
   aspect-ratio: 3 / 4;
+}
+
+:global([data-fx="on"]) .process .layer,
+.process[data-pinned="on"] .layer {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  padding: 0;
+  background: none;
+}
+
+:global([data-fx="on"]) .process .layer::after,
+:global([data-fx="on"]) .process .layerNumber,
+.process[data-pinned="on"] .layer::after,
+.process[data-pinned="on"] .layerNumber {
+  display: none;
+}
+
+/* 1. Телефон на 94 % высоты кадра (70,5 % ширины при 9:16), наклон −4° сохраняется. */
+:global([data-fx="on"]) .process .phone,
+.process[data-pinned="on"] .phone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70.5%;
+  margin: 0;
+  transform: translate(-50%, -50%) rotate(calc(-4deg * var(--al-s)));
+}
+
+/* 2. Два пробных кадра внахлёст: первый в левом верхнем углу, второй в правом нижнем, вместе — вся высота. */
+:global([data-fx="on"]) .process .scan,
+.process[data-pinned="on"] .scan {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+:global([data-fx="on"]) .process .scan img,
+.process[data-pinned="on"] .scan img {
+  position: absolute;
+  width: 70%;
+  height: auto;
+  box-shadow: 0 0 0 3px var(--paper);
+}
+
+.shotA {
+  left: 0;
+  top: 0;
+}
+
+.shotB {
+  right: 0;
+  bottom: 0;
+}
+
+/* 3. Серия 2 × 3: кадры по 32 % ширины, три ряда с шагом 104 % — 98,6 % высоты. */
+:global([data-fx="on"]) .process .thumb,
+.process[data-pinned="on"] .thumb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 32%;
+  box-shadow: 0 0 0 2px var(--paper);
+  transform: translate(calc(-50% + var(--c) * 104% * var(--al-s)), calc(-50% + var(--r) * 104% * var(--al-s))) rotate(calc((var(--j) - 2.5) * 5deg * (1 - var(--al-s))));
+}
+
+/* 4. Сверка на всю коробку. */
+:global([data-fx="on"]) .process .checkFrame,
+.process[data-pinned="on"] .checkFrame {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+}
+
+/* 5. Телефон выдачи растёт на всю высоту кадра за вычетом подписи. */
+:global([data-fx="on"]) .process .deliveryCard,
+.process[data-pinned="on"] .deliveryCard {
+  position: absolute;
+  inset: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+:global([data-fx="on"]) .process .device,
+.process[data-pinned="on"] .device {
+  width: auto;
+  height: 100%;
+  aspect-ratio: 9 / 15;
+  min-width: 0;
+}
+
+:global([data-fx="on"]) .process .screen,
+.process[data-pinned="on"] .screen {
+  flex: 1;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
+/* ---------- Режим «по времени»: телефон, планшет, низкое окно ---------- */
+/* Коробка на всю ширину, но не выше 70 % экрана; видно только текущее состояние, уходящее гаснет за 300 мс. */
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly {
+  width: min(100%, calc(70svh * 3 / 4));
   margin-inline: auto;
 }
 
@@ -400,19 +504,16 @@
 
 :global([data-fx="on"]) .process:not([data-pinned="on"]) .layer {
   --al-s: 0;
-  position: absolute;
-  inset: 0;
-  width: auto;
-  background: none;
+  z-index: 0;
   opacity: 0;
   transition:
-    opacity 400ms var(--ease-atelier),
+    opacity 300ms var(--ease-atelier),
     --al-s 1000ms var(--ease-inout);
 }
 
 :global([data-fx="on"]) .process:not([data-pinned="on"]) .delivery {
   transition:
-    opacity 400ms var(--ease-atelier),
+    opacity 300ms var(--ease-atelier),
     --al-s 1400ms linear;
 }
 
@@ -422,12 +523,13 @@
 :global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly[data-phase="3"] .check,
 :global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly[data-phase="4"] .delivery {
   --al-s: 1;
+  z-index: 1;
   opacity: 1;
+  transition-duration: 0ms, 1000ms;
 }
 
-:global([data-fx="on"]) .process:not([data-pinned="on"]) .layer::after,
-:global([data-fx="on"]) .process:not([data-pinned="on"]) .layerNumber {
-  display: none;
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly[data-phase="4"] .delivery {
+  transition-duration: 0ms, 1400ms;
 }
 
 :global([data-fx="on"]) .process:not([data-pinned="on"]) .step {
@@ -471,19 +573,18 @@
     min-height: 0;
   }
 
+  /* Одна неизменная коробка: верх вровень с заголовком, высота не зависит от состояния (D3). */
   .process[data-pinned="on"] .visual {
     display: grid;
-    place-items: center;
+    justify-items: center;
+    align-items: start;
     min-height: 0;
-    height: 100%;
   }
 
   .process[data-pinned="on"] .assembly {
-    position: relative;
-    display: block;
-    height: min(640px, 100%);
+    width: auto;
+    height: min(640px, calc(100svh - var(--header-h) - 64px));
     max-width: 100%;
-    aspect-ratio: 3 / 4;
   }
 
   .process[data-pinned="on"] .layer {
@@ -491,10 +592,6 @@
     --al-s: clamp(0, var(--d) / 0.6, 1);
     --in: clamp(0, (var(--d) + 0.08) / 0.16, 1);
     --out: clamp(0, (var(--d) - 0.92) / 0.16, 1);
-    position: absolute;
-    inset: 0;
-    width: auto;
-    background: none;
     opacity: calc(var(--in) * (1 - var(--out)));
   }
 
@@ -504,11 +601,6 @@
 
   .process[data-pinned="on"] .layer:last-child {
     --out: 0;
-  }
-
-  .process[data-pinned="on"] .layer::after,
-  .process[data-pinned="on"] .layerNumber {
-    display: none;
   }
 
   .process[data-pinned="on"] .track {

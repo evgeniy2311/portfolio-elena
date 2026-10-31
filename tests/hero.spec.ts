@@ -189,5 +189,7 @@ test("одна основная кнопка и ссылка на архив", a
   const works = hero.getByRole("link", { name: /Смотреть работы/ });
   await expect(works).toHaveClass(/text-link/);
   expect(await works.getAttribute("href")).toMatch(/\/works\/?$/);
-  await expect(hero).toContainText("Lamoda");
+  // Строка «с кем работаю» коротко; площадки перечисляет только «Обо мне» (дизайн-QA D16).
+  await expect(hero).toContainText("Работаю прежде всего с брендами одежды.");
+  await expect(hero).not.toContainText("Lamoda");
 });
