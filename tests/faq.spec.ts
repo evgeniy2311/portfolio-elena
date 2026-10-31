@@ -47,10 +47,20 @@ test("Enter и пробел раскрывают и закрывают, сост
   await summary.focus();
   await page.keyboard.press("Enter");
   await settled(page, 0, true);
+  // Пока идёт закрытие, ответ ещё в дереве доступности: open снимается только после анимации. Порядок
+  // изменений пишет MutationObserver на странице, поэтому проверка не зависит от скорости машины.
+  await page.locator(`${section} details`).first().evaluate((details) => {
+    const log: string[] = [];
+    (window as unknown as { __faqLog: string[] }).__faqLog = log;
+    new MutationObserver((mutations) => {
+      for (const mutation of mutations) log.push(`${mutation.attributeName}=${details.getAttribute(mutation.attributeName!)} open=${(details as HTMLDetailsElement).open}`);
+    }).observe(details, { attributes: true, attributeFilter: ["open", "data-state"] });
+  });
   await page.keyboard.press("Space");
-  // Пока идёт закрытие, ответ ещё в дереве доступности.
-  await expect(page.locator(`${section} details`).first()).toHaveAttribute("open", "");
   await settled(page, 0, false);
+  const log = await page.evaluate(() => (window as unknown as { __faqLog: string[] }).__faqLog);
+  expect(log[0]).toBe("data-state=closing open=true");
+  expect(log.at(-1)).toMatch(/open=false$/);
   await page.keyboard.press(" ");
   await settled(page, 0, true);
 });
