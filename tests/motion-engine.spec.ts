@@ -9,7 +9,8 @@ import { framesDuring, instrument, isPinViewport, listenerCounts, pinGeometry, r
  */
 
 /**
- * visibilitychange слушают ticker (только пока у него есть подписчики, поэтому его вклад 0 или 1
+ * visibilitychange слушают (слушатель HMR-сокета dev-клиента Next не считается, см. helpers/scenes.ts)
+ * ticker (только пока у него есть подписчики, поэтому его вклад 0 или 1
  * в зависимости от момента замера) и блоки со своими таймерами: автосмена «Как это работает»
  * (по одному на [data-assembly-controls]) и ролики (один на набор, если есть [data-video-toggle]).
  * Число блоков берётся из DOM: утечка при повторном монтировании даёт больше «блоки + 1».

@@ -73,7 +73,10 @@ export async function instrument(page: Page) {
       const add = target.addEventListener.bind(target);
       const remove = target.removeEventListener.bind(target);
       target.addEventListener = (type: string, listener: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions) => {
-        if (watched.includes(type) && listener) {
+        // Клиент Next в dev сам слушает visibilitychange для HMR-сокета и под нагрузкой переподключается,
+        // добавляя слушатель заново. Это не код сайта (в статичной сборке его нет), поэтому он не считается.
+        const framework = /node_modules[_/]next[_/]dist[_/]client/.test(new Error().stack ?? "");
+        if (watched.includes(type) && listener && !framework) {
           const key = `${label}:${type}`;
           const set = registered.get(key) ?? new Set();
           set.add(listener);
