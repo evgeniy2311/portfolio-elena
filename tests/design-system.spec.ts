@@ -200,3 +200,63 @@ test("375 px и масштаб 200 %: нет горизонтальной про
     expect(overflow, route).toBeLessThanOrEqual(0);
   }
 });
+
+test.describe("шапка", () => {
+  for (const route of ["/", "/works", "/works/burgundy-coat-city"]) {
+    test(`${route}: «Написать» ведёт к началу блока контактов`, async ({ page }) => {
+      await go(page, route);
+      const write = page.locator("header").getByRole("link", { name: "Написать", exact: true });
+      await expect(write).toHaveClass(/button-ghost/);
+      await expect(page.locator("header").getByText("2 кадра бесплатно")).toHaveCount(0);
+      await write.click();
+      await expect(page.locator("#contact")).toBeInViewport();
+      // Начало блока у шапки; если ниже контактов мало страницы, прокрутка упирается в конец.
+      await expect
+        .poll(
+          () =>
+            page.locator("#contact").evaluate((element) => {
+              const atEnd = window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 2;
+              return element.getBoundingClientRect().top <= 100 || atEnd;
+            }),
+          { timeout: 5000 },
+        )
+        .toBe(true);
+      const top = await page.locator("#contact").evaluate((element) => element.getBoundingClientRect().top);
+      expect(top).toBeGreaterThanOrEqual(-2);
+    });
+  }
+
+  test("после 40 px прокрутки фон canvas 96 % и линия снизу", async ({ page }) => {
+    await go(page, "/");
+    const header = page.locator("header.site-header");
+    const look = () => header.evaluate((element) => ({ bg: getComputedStyle(element).backgroundColor, border: getComputedStyle(element).borderBottomColor, width: getComputedStyle(element).borderBottomWidth }));
+    await expect(page.locator("html")).toHaveAttribute("data-header", "top");
+    await page.evaluate(() => window.scrollTo({ top: 120, behavior: "instant" }));
+    await expect(page.locator("html")).toHaveAttribute("data-header", "scrolled");
+    await expect.poll(async () => (await look()).bg).toBe("rgba(246, 242, 236, 0.96)");
+    const scrolled = await look();
+    expect(scrolled.border).toBe("rgb(221, 211, 199)");
+    expect(scrolled.width).toBe("1px");
+  });
+
+  test("уже 900 px: нет навигации, знак и кнопка помещаются", async ({ page }) => {
+    const width = page.viewportSize()!.width;
+    await go(page, "/");
+    const nav = page.locator("header nav");
+    if (width < 900) await expect(nav).toBeHidden();
+    else await expect(nav).toBeVisible();
+    const row = await page.locator(".site-header-row").evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      const kids = Array.from(element.children)
+        .filter((child) => getComputedStyle(child).display !== "none")
+        .map((child) => child.getBoundingClientRect());
+      return { right: box.right, inner: element.clientWidth, overflow: element.scrollWidth - element.clientWidth, maxRight: Math.max(...kids.map((kid) => kid.right)), tops: kids.map((kid) => kid.top) };
+    });
+    expect(row.overflow).toBeLessThanOrEqual(0);
+    expect(row.maxRight).toBeLessThanOrEqual(width);
+    // Всё в одну строку.
+    expect(Math.max(...row.tops) - Math.min(...row.tops)).toBeLessThan(40);
+    const cta = await page.locator(".site-header-cta").boundingBox();
+    expect(cta!.height).toBeGreaterThanOrEqual(width < 900 ? 48 : 52);
+  });
+});

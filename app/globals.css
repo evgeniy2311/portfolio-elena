@@ -415,15 +415,19 @@ main:focus {
   transform: translateX(4px);
 }
 
-/* Шапка */
+/* Шапка: canvas 96 % и линия снизу после 40 px прокрутки; без JS сразу в этом виде. */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--canvas) 88%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  background: rgb(246 242 236 / 0.96);
+  border-bottom: 1px solid var(--line);
+  transition: background-color var(--dur-2) var(--ease-atelier), border-color var(--dur-2) var(--ease-atelier);
+}
+
+[data-header="top"] .site-header {
+  background: transparent;
+  border-bottom-color: transparent;
 }
 
 .site-progress {
@@ -441,70 +445,84 @@ main:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: var(--space-5);
   min-height: var(--header-h);
 }
 
 .wordmark {
   display: grid;
+  min-height: 44px;
+  align-content: center;
   white-space: nowrap;
-  font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.375rem;
   font-weight: 600;
   line-height: 1;
   text-decoration: none;
 }
 
 .wordmark small {
+  display: none;
   margin-top: 4px;
   color: var(--muted);
-  font-family: var(--font-ui);
-  font-size: 0.8125rem;
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-size: 0.75rem;
   font-weight: 500;
+  line-height: 1.2;
 }
 
 .site-header nav {
   display: none;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .site-header nav a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 12px;
-  border-radius: 999px;
-  font-size: 0.9375rem;
-  font-weight: 550;
+  padding: 0 10px;
+  color: var(--ink);
+  font-size: clamp(0.75rem, 0.728rem + 0.094vw, 0.8125rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
   text-decoration: none;
-  transition: background-color 200ms var(--ease);
+  text-transform: uppercase;
+  transition: color var(--dur-1) var(--ease-atelier);
 }
 
 .site-header nav a:hover,
 .site-header nav a[aria-current="page"] {
-  background: var(--surface);
+  color: var(--wine);
 }
 
-@media (min-width: 1024px) {
+.site-header nav a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+
+.site-header-cta {
+  flex: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 899px) {
+  .site-header-cta {
+    min-height: 48px;
+    padding-inline: 20px;
+  }
+}
+
+@media (min-width: 900px) {
   .site-header nav {
     display: flex;
   }
 }
 
-@media (max-width: 479px) {
+@media (min-width: 1200px) {
   .wordmark small {
-    display: none;
-  }
-
-  .site-header .button-small {
-    padding: 0 14px;
-    font-size: 0.875rem;
-  }
-}
-
-@media (max-width: 359px) {
-  .site-header .button-small svg {
-    display: none;
+    display: block;
   }
 }
 

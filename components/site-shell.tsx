@@ -4,6 +4,7 @@ import { telegramHref } from "@/lib/site";
 
 type HeaderProps = { current?: "home" | "works" };
 
+/** Шапка всех страниц. Действие «Написать» ведёт к блоку контактов, он есть на каждой странице. */
 export function SiteHeader({ current }: HeaderProps) {
   const home = current === "home" ? "" : "/";
   return (
@@ -12,7 +13,7 @@ export function SiteHeader({ current }: HeaderProps) {
       <div className="shell site-header-row">
         <Link className="wordmark" href="/" aria-label="Елена Бадьина, на главную">
           Елена Бадьина
-          <small>одежда и обувь · WB и Ozon</small>
+          <small>одежда и обувь для маркетплейсов</small>
         </Link>
         <nav aria-label="Основная навигация">
           <Link href="/works" aria-current={current === "works" ? "page" : undefined}>Работы</Link>
@@ -21,7 +22,9 @@ export function SiteHeader({ current }: HeaderProps) {
           <Link href={`${home}#prices`}>Цены</Link>
           <Link href={`${home}#faq`}>Вопросы</Link>
         </nav>
-        <TrialLink className="button button-small" compact />
+        <a className="button button-ghost site-header-cta" href="#contact">
+          Написать
+        </a>
       </div>
     </header>
   );

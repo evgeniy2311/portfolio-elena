@@ -90,8 +90,10 @@ export function ScrollFx() {
     }
 
     // Липкая кнопка на телефоне прячется, пока виден первый экран. Работает и при reduced motion.
+    // Шапка прозрачна у самого верха и получает фон и линию после 40 px прокрутки.
     function updateCta() {
       root.dataset.cta = window.scrollY > window.innerHeight * 0.7 ? "show" : "hide";
+      root.dataset.header = window.scrollY > 40 ? "scrolled" : "top";
     }
 
     function onResize() {
@@ -142,6 +144,7 @@ export function ScrollFx() {
       revealObserver.disconnect();
       delete root.dataset.fx;
       delete root.dataset.cta;
+      delete root.dataset.header;
     };
   }, []);
 

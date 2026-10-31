@@ -190,7 +190,7 @@ test("кнопка «2 кадра бесплатно» появляется на
     await expect(mobile).toBeHidden();
   }
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-  await page.locator("header").getByRole("link", { name: /2 кадра бесплатно/ }).click();
+  await page.locator("header").getByRole("link", { name: "Написать", exact: true }).click();
   await expect(page.locator("#contact h2")).toBeInViewport();
 });
 
