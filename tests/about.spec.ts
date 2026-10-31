@@ -100,3 +100,19 @@ test("при появлении изображение раскрывается 
   await page.locator(`${section} [data-collage]`).scrollIntoViewIfNeeded();
   await expect.poll(() => page.locator(`${section} [data-collage]`).evaluate((element) => getComputedStyle(element).clipPath), { timeout: 5000 }).toMatch(/^(none|inset\(0px\))$/);
 });
+
+test("пункты: заголовки одной высоты в ряду, текст сразу под ними (дизайн-QA D15)", async ({ page }) => {
+  await go(page, "/");
+  const rows = await page.locator("#about li").evaluateAll((items) =>
+    items.map((item) => {
+      const title = item.querySelector("h3")!.getBoundingClientRect();
+      const text = item.querySelector("p")!.getBoundingClientRect();
+      return { top: Math.round(title.top), height: title.height, gap: text.top - title.bottom };
+    }),
+  );
+  expect(rows).toHaveLength(4);
+  for (const row of rows) {
+    expect(row.gap).toBeLessThanOrEqual(10);
+    expect(row.height).toBeLessThan(32);
+  }
+});
