@@ -178,6 +178,18 @@ test("под сеткой фраза и основная кнопка стоят
   await go(page, "/");
   const text = page.locator(`${section} > .shell > div:last-child p`);
   const button = page.locator(`${section} > .shell > div:last-child a.button`);
+  // Раскладка ряда зависит от ширины текста и появления блока: меряем после загрузки шрифтов, когда два замера подряд совпали.
+  await button.scrollIntoViewIfNeeded();
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  let previous = "";
+  await expect
+    .poll(async () => {
+      const now = JSON.stringify([await text.boundingBox(), await button.boundingBox()]);
+      const same = now === previous;
+      previous = now;
+      return same;
+    }, { timeout: 10_000, intervals: [200] })
+    .toBe(true);
   const [t, b] = [(await text.boundingBox())!, (await button.boundingBox())!];
   if (b.y < t.y + t.height) expect(b.x - (t.x + t.width)).toBeLessThanOrEqual(40);
   else expect(Math.abs(b.x - t.x)).toBeLessThan(2);
