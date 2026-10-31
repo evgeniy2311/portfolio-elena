@@ -1,26 +1,7 @@
 /*
- * Главная. Движение описано здесь и зависит только от --p (0..1), которую пишет ScrollFx.
- * Анимации включаются только при :global([data-fx="on"]) и в тех же media-условиях, что и «липкие» сцены.
- * Без JS, при reduced motion и на телефонах каждая сцена сразу в финальном виде.
+ * Главная: только композиция страницы. Стили каждого блока лежат рядом с ним в components/blocks/<блок>/.
  */
 
 .page {
   background: var(--canvas);
-}
-
-.sectionHead {
-  display: grid;
-  gap: 18px;
-  max-width: 760px;
-  margin-bottom: clamp(40px, 6vw, 72px);
-}
-
-.sectionHead h2 {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-}
-
-.sectionHead > p:last-child:not(:first-child) {
-  max-width: 58ch;
-  color: var(--muted);
-  font-size: 1.125rem;
 }

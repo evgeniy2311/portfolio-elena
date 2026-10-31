@@ -312,53 +312,7 @@ main:focus {
   }
 }
 
-/* Контакт и подвал */
-.contact {
-  background: var(--cocoa);
-  color: var(--on-dark);
-  padding-block: clamp(80px, 12vw, 160px);
-}
-
-.contact-inner {
-  display: grid;
-  justify-items: start;
-  gap: 28px;
-}
-
-.contact h2 {
-  max-width: 16ch;
-  font-size: clamp(2.75rem, 7vw, 6rem);
-}
-
-.contact h2 em {
-  color: var(--camel);
-}
-
-.contact-lead {
-  max-width: 56ch;
-  color: var(--on-dark-muted);
-  font-size: 1.1875rem;
-}
-
-.contact-actions {
-  display: grid;
-  justify-items: start;
-  gap: 12px;
-}
-
-.contact-actions small {
-  color: var(--on-dark-muted);
-  font-size: 0.9375rem;
-}
-
-.contact-backup {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  color: var(--on-dark);
-  font-weight: 600;
-}
-
+/* Подвал */
 .site-footer {
   background: var(--cocoa);
   color: var(--on-dark-muted);

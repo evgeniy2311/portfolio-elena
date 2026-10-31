@@ -1,0 +1,47 @@
+/* Блок «Контакты». Правила перенесены из app/globals.css без изменений, классы переименованы для CSS-модуля. */
+
+.contact {
+  background: var(--cocoa);
+  color: var(--on-dark);
+  padding-block: clamp(80px, 12vw, 160px);
+}
+
+.contactInner {
+  display: grid;
+  justify-items: start;
+  gap: 28px;
+}
+
+.contact h2 {
+  max-width: 16ch;
+  font-size: clamp(2.75rem, 7vw, 6rem);
+}
+
+.contact h2 em {
+  color: var(--camel);
+}
+
+.contactLead {
+  max-width: 56ch;
+  color: var(--on-dark-muted);
+  font-size: 1.1875rem;
+}
+
+.contactActions {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
+.contactActions small {
+  color: var(--on-dark-muted);
+  font-size: 0.9375rem;
+}
+
+.contactBackup {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--on-dark);
+  font-weight: 600;
+}

@@ -11,8 +11,9 @@ import { Trial } from "@/components/blocks/trial/trial";
 import { Process } from "@/components/blocks/process/process";
 import { Prices } from "@/components/blocks/prices/prices";
 import { Faq } from "@/components/blocks/faq/faq";
+import { ContactBlock } from "@/components/blocks/contact/contact";
 import { ScrollFx } from "@/components/scroll-fx";
-import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
+import { SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
@@ -35,29 +36,17 @@ export default function Home() {
 
       <main id="main" tabIndex={-1}>
         <Hero />
-
         <Categories />
-
         <About />
-
         <Pains />
-
         <Services />
-
         <Transform />
-
         <Requests />
-
         <Accuracy />
-
         <Trial />
-
         <Process />
-
         <Prices />
-
         <Faq />
-
         <ContactBlock />
       </main>
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowIcon } from "@/components/arrow-icon";
-import { contact, telegramHref } from "@/lib/site";
+import { telegramHref } from "@/lib/site";
 
 type HeaderProps = { current?: "home" | "works" };
 
@@ -45,41 +45,8 @@ export function TrialLink({ className = "button", compact = false, label }: { cl
   );
 }
 
-export function ContactBlock() {
-  const href = telegramHref();
-  return (
-    <section className="contact" id="contact" aria-labelledby="contact-title">
-      <div className="shell contact-inner" data-reveal>
-        <p className="eyebrow">Первый шаг</p>
-        <h2 id="contact-title">
-          Пришлите фото вещи. <em>Два кадра сделаю бесплатно.</em>
-        </h2>
-        <p className="contact-lead">
-          Нужны 2–3 фото: спереди, сзади и крупно детали. Можно приложить ссылку на карточку. Если результат не понравится, вы ничего не должны.
-        </p>
-        <div className="contact-actions">
-          {href ? (
-            <a className="button button-light" href={href} target="_blank" rel="noopener noreferrer">
-              Написать в Telegram <ArrowIcon />
-            </a>
-          ) : (
-            <>
-              <button className="button button-light" type="button" disabled aria-describedby="contact-pending">
-                Telegram: ссылка скоро появится
-              </button>
-              <small id="contact-pending">Адрес Telegram ещё уточняется. Кнопка заработает после подтверждения.</small>
-            </>
-          )}
-          {contact.backup ? (
-            <a className="contact-backup" href={contact.backup.href}>
-              {contact.backup.label}
-            </a>
-          ) : null}
-        </div>
-      </div>
-    </section>
-  );
-}
+/** Совместимость: блок контактов живёт в components/blocks/contact, архив и кейсы импортируют его отсюда. */
+export { ContactBlock } from "@/components/blocks/contact/contact";
 
 export function SiteFooter() {
   return (
