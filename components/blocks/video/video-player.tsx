@@ -36,7 +36,10 @@ export function VideoPlayers({ clips, rowClassName, tileClassName, barClassName,
       if (!video || !video.paused) return;
       video.play().then(
         () => setState(index, "playing"),
-        () => {
+        (error: unknown) => {
+          // AbortError: запуск прервала наша же пауза (ролик ушёл с экрана) или новая загрузка. Это не запрет
+          // браузера; вид уже выставит событие pause или следующий sync.
+          if (error instanceof DOMException && error.name === "AbortError") return;
           // Браузер не дал включить: остаётся постер и кнопка.
           current.userPlay[index] = false;
           setState(index, "blocked");
@@ -81,11 +84,25 @@ export function VideoPlayers({ clips, rowClassName, tileClassName, barClassName,
       { threshold: [0, 0.5, 1] },
     );
     for (const video of videos) if (video) observer.observe(video);
+    // Вид следует настоящему состоянию ролика: его может запустить или остановить и не этот компонент
+    // (браузер ставит паузу сам, системные кнопки медиа).
+    const media = videos.map((video, index) => {
+      if (!video) return () => {};
+      const onPlay = () => setState(index, "playing");
+      const onPause = () => setState(index, current.userPaused[index] ? "paused" : "idle");
+      video.addEventListener("playing", onPlay);
+      video.addEventListener("pause", onPause);
+      return () => {
+        video.removeEventListener("playing", onPlay);
+        video.removeEventListener("pause", onPause);
+      };
+    });
     document.addEventListener("visibilitychange", sync);
     phone.addEventListener("change", sync);
     reduced.addEventListener("change", sync);
     return () => {
       observer.disconnect();
+      for (const off of media) off();
       document.removeEventListener("visibilitychange", sync);
       phone.removeEventListener("change", sync);
       reduced.removeEventListener("change", sync);

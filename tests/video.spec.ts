@@ -223,4 +223,34 @@ test.describe("стенд с роликами", () => {
     expect(await playing(page)).toBe(0);
     expect(errors.filter((text) => !/Download the React DevTools|HMR|Fast Refresh/.test(text))).toEqual([]);
   });
+
+  test("прерванный запуск (AbortError) не блокирует плитку; вид следует событиям play/pause", async ({ page }) => {
+    // Первый запуск каждого ролика прерывается, как при play() сразу перед pause(); дальше — настоящий play.
+    await page.addInitScript(() => {
+      const original = HTMLMediaElement.prototype.play;
+      const aborted = new WeakSet<HTMLMediaElement>();
+      HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
+        if (aborted.has(this)) return original.call(this);
+        aborted.add(this);
+        return Promise.reject(new DOMException("The play() request was interrupted by a call to pause().", "AbortError"));
+      };
+    });
+    await serveFixtures(page);
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/);
+    const tile = page.locator(`${section} [data-video-tile]`).first();
+    const video = tile.locator("video");
+    await tile.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    expect(await page.locator(`${section} [data-video-tile][data-state="blocked"]`).count()).toBe(0);
+
+    // Ролик запустили мимо компонента: плитка показывает «играет» и кнопку паузы.
+    await video.evaluate((element: HTMLVideoElement) => element.play());
+    await expect(tile).toHaveAttribute("data-state", "playing");
+    await expect(tile.locator("[data-video-toggle]")).toHaveAccessibleName(/Пауза/);
+    // Браузер сам поставил паузу: плитка не остаётся в «играет».
+    await video.evaluate((element: HTMLVideoElement) => element.pause());
+    await expect(tile).not.toHaveAttribute("data-state", "playing");
+    await expect(tile.locator("[data-video-toggle]")).toHaveAccessibleName(/Смотреть ролик/);
+  });
 });
