@@ -526,8 +526,19 @@
     will-change: transform;
   }
 
+  /*
+   * Панель по высоте всегда заполняет сцену (поля по 16 px). Если по ширине окна кадры при своей
+   * пропорции не помещаются, колонка готовых кадров сужается до остатка ширины (кадры с object-fit: cover
+   * чуть плотнее кадрируются), а панель не становится ниже: так над и под ней нет пустых полос.
+   */
   :global([data-fx="on"]) .rail {
     --ph-h: calc(100svh - var(--header-h) - 2 * var(--space-4));
+    --ph: var(--ph-h);
+    --results-w: min(calc((var(--ph) - 2 * var(--panel-pad)) * var(--ratio)), calc(100vw - 2 * var(--gutter) - var(--fixed)));
+  }
+
+  :global([data-fx="on"]) .panel {
+    grid-template-columns: var(--meta-w) var(--results-w);
   }
 
   /*
@@ -554,5 +565,11 @@
     --in: clamp(0, (var(--pp, 1) - 0.2 - var(--l) * 0.08) / 0.18, 1);
     opacity: var(--in);
     transform: translateY(calc((1 - var(--in)) * 12px));
+  }
+}
+
+@media (min-width: 1280px) and (min-height: 600px) {
+  :global([data-fx="on"]) .panel {
+    grid-template-columns: var(--meta-w) var(--src-w) var(--results-w);
   }
 }
