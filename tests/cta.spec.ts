@@ -11,8 +11,25 @@ const bar = (page: Page) => page.locator("[data-mobile-cta]");
 const narrow = (page: Page) => (page.viewportSize()?.width ?? 0) < 1024;
 
 async function scrollTo(page: Page, y: number) {
+  await settleScroll(page);
   await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
+  const landed = await page.evaluate(() => ({ y: window.scrollY, max: document.documentElement.scrollHeight - window.innerHeight }));
+  expect(Math.abs(landed.y - Math.min(Math.max(y, 0), landed.max))).toBeLessThanOrEqual(1);
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
+
+/** Ждёт, пока плавная прокрутка (html scroll-behavior: smooth, например от фокуса при Tab) закончится. */
+async function settleScroll(page: Page) {
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  let previous = -1;
+  await expect
+    .poll(async () => {
+      const y = await page.evaluate(() => window.scrollY);
+      const stable = y === previous;
+      previous = y;
+      return stable;
+    }, { intervals: [120] })
+    .toBe(true);
 }
 
 async function expectHidden(page: Page) {
