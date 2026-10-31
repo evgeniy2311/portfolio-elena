@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowIcon } from "@/components/arrow-icon";
 import { Hero } from "@/components/blocks/hero/hero";
 import { Categories } from "@/components/blocks/categories/categories";
 import { About } from "@/components/blocks/about/about";
 import { Pains } from "@/components/blocks/pains/pains";
 import { Services } from "@/components/blocks/services/services";
 import { Transform } from "@/components/blocks/transform/transform";
+import { Requests } from "@/components/blocks/requests/requests";
 import { ScrollFx } from "@/components/scroll-fx";
 import type { Vars } from "@/components/ui/css-vars";
 import { Photo } from "@/components/ui/photo";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
 import { formatPrice, packages } from "@/lib/site";
-import { frame, getWork, source } from "@/lib/works";
+import { frame, source } from "@/lib/works";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
@@ -28,50 +27,6 @@ export const metadata: Metadata = {
 };
 
 const accuracySource = source("burgundy-coat-city", 0);
-
-const requests: Array<{ slug: string; label: string; quote: string; verbatim: boolean; note: string; frames: number[]; square?: boolean }> = [
-  {
-    slug: "burgundy-coat-city",
-    label: "Запрос заказчика",
-    quote: "Пальто 42 размера. Сделать 48–50 размер на худой девушке, оверсайз стиль.",
-    verbatim: true,
-    note: "Модель и посадку меняю, крой, пуговицы, пояс и длина остаются как на исходнике.",
-    frames: [0, 9, 13],
-  },
-  {
-    slug: "burgundy-coat-interior",
-    label: "Запрос заказчика",
-    quote: "То же пальто, но в интерьерной студии, в минималистичном стиле.",
-    verbatim: true,
-    note: "Вторая серия для той же вещи: другой свет, другая сцена, тот же товар.",
-    frames: [0, 4, 9],
-  },
-  {
-    slug: "longsleeve-colors",
-    label: "Запрос заказчика",
-    quote: "Лонгслив в четырёх цветах. И сделать чёрный, которого нет на фото.",
-    verbatim: true,
-    note: "Одна модель, четыре цвета. Карточки разных цветов выглядят как одна коллекция.",
-    frames: [0, 1, 5, 3],
-    square: true,
-  },
-  {
-    slug: "brown-coat-three-looks",
-    label: "Задача",
-    quote: "Одно пальто, три разных образа.",
-    verbatim: false,
-    note: "С джинсами и рубашкой, с белым жилетом, с кожаной юбкой. Каждая покупательница видит себя.",
-    frames: [0, 7, 10],
-  },
-  {
-    slug: "reversible-sheepskin",
-    label: "Задача",
-    quote: "Дублёнка двусторонняя. Покупатель должен понять, что это две вещи в одной.",
-    verbatim: false,
-    note: "В одной серии вещь показана мехом наружу и кожей наружу.",
-    frames: [0, 3, 6],
-  },
-];
 
 const checks = [
   { title: "Застёжка и пуговицы", text: "Два ряда пуговиц, их число и расстояние между ними.", image: frame("burgundy-coat-city", 2) },
@@ -134,43 +89,7 @@ export default function Home() {
 
         <Transform />
 
-        {/* 7. Задачи клиентов: карточки складываются стопкой */}
-        <section className={styles.requests} aria-labelledby="requests-title">
-          <div className="shell">
-            <div className={styles.sectionHead} data-reveal>
-              <p className="eyebrow">Задачи, с которыми приходят</p>
-              <h2 id="requests-title">
-                Не просто «сделайте красиво», <em>а конкретная задача</em>
-              </h2>
-            </div>
-            <ol className={styles.requestStack}>
-              {requests.map((request, index) => {
-                const work = getWork(request.slug);
-                if (!work) return null;
-                return (
-                  <li className={styles.requestCard} key={request.slug} style={{ "--i": index } as Vars}>
-                    <div className={styles.requestText}>
-                      <p className={styles.requestLabel}>{request.label}</p>
-                      <blockquote>{request.verbatim ? `«${request.quote}»` : request.quote}</blockquote>
-                      <p>{request.note}</p>
-                      <Link className="text-link" href={`/works/${work.slug}`}>
-                        {work.title} <ArrowIcon />
-                      </Link>
-                    </div>
-                    <div className={`${styles.requestFrames} ${request.square ? styles.requestFramesSquare : ""}`}>
-                      {request.frames.map((frameIndex) => {
-                        const image = work.frames[frameIndex];
-                        return image ? (
-                          <Photo key={image.src} image={image} alt={`${work.title}: кадр ${frameIndex + 1}`} sizes="(max-width: 767px) 30vw, 16vw" />
-                        ) : null;
-                      })}
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-        </section>
+        <Requests />
 
         {/* 8. Точность: исходник неподвижен, детали сменяют друг друга */}
         <section className={styles.accuracy} data-pin aria-labelledby="accuracy-title">

@@ -1,0 +1,43 @@
+export const requests: Array<{ slug: string; label: string; quote: string; verbatim: boolean; note: string; frames: number[]; square?: boolean }> = [
+  {
+    slug: "burgundy-coat-city",
+    label: "Запрос заказчика",
+    quote: "Пальто 42 размера. Сделать 48–50 размер на худой девушке, оверсайз стиль.",
+    verbatim: true,
+    note: "Модель и посадку меняю, крой, пуговицы, пояс и длина остаются как на исходнике.",
+    frames: [0, 9, 13],
+  },
+  {
+    slug: "burgundy-coat-interior",
+    label: "Запрос заказчика",
+    quote: "То же пальто, но в интерьерной студии, в минималистичном стиле.",
+    verbatim: true,
+    note: "Вторая серия для той же вещи: другой свет, другая сцена, тот же товар.",
+    frames: [0, 4, 9],
+  },
+  {
+    slug: "longsleeve-colors",
+    label: "Запрос заказчика",
+    quote: "Лонгслив в четырёх цветах. И сделать чёрный, которого нет на фото.",
+    verbatim: true,
+    note: "Одна модель, четыре цвета. Карточки разных цветов выглядят как одна коллекция.",
+    frames: [0, 1, 5, 3],
+    square: true,
+  },
+  {
+    slug: "brown-coat-three-looks",
+    label: "Задача",
+    quote: "Одно пальто, три разных образа.",
+    verbatim: false,
+    note: "С джинсами и рубашкой, с белым жилетом, с кожаной юбкой. Каждая покупательница видит себя.",
+    frames: [0, 7, 10],
+  },
+  {
+    slug: "reversible-sheepskin",
+    label: "Задача",
+    quote: "Дублёнка двусторонняя. Покупатель должен понять, что это две вещи в одной.",
+    verbatim: false,
+    note: "В одной серии вещь показана мехом наружу и кожей наружу.",
+    frames: [0, 3, 6],
+  },
+];
