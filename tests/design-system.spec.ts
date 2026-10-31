@@ -174,7 +174,7 @@ test("кнопки: 4 px, высота 52/48, контраст обычного,
   expect(contrast(tertiary.color, tertiary.bg)).toBeGreaterThanOrEqual(4.5);
 });
 
-test("шрифты next/font: Cormorant 500/600 обычный и курсив, Manrope 400/500/600", async ({ page }) => {
+test("шрифты next/font: Cormorant 500/600 обычный и курсив 500, Manrope 400/500/600", async ({ page }) => {
   await go(page, "/");
   await page.evaluate(() => document.fonts.ready);
   const faces = await page.evaluate(() => Array.from(document.fonts, (face) => ({ family: face.family.replaceAll(/["']/g, ""), style: face.style, weight: face.weight })));
@@ -184,7 +184,9 @@ test("шрифты next/font: Cormorant 500/600 обычный и курсив, 
       const [from, to = from] = face.weight.split(" ").map(Number);
       return weight >= from && weight <= to;
     });
-  for (const style of ["normal", "italic"]) for (const weight of [500, 600]) expect(covers("Cormorant Garamond", style, weight), `Cormorant ${style} ${weight}`).toBe(true);
+  for (const weight of [500, 600]) expect(covers("Cormorant Garamond", "normal", weight), `Cormorant normal ${weight}`).toBe(true);
+  // Курсив только 500 отдельным файлом без preload (дизайн-QA D25: меньше начертаний, нет предупреждений о preload).
+  expect(covers("Cormorant Garamond", "italic", 500), "Cormorant italic 500").toBe(true);
   for (const weight of [400, 500, 600]) expect(covers("Manrope", "normal", weight), `Manrope ${weight}`).toBe(true);
   expect(covers("Cormorant Garamond", "normal", 400), "Cormorant 400 больше не нужен").toBe(false);
 });
@@ -226,7 +228,8 @@ test.describe("шапка", () => {
     });
   }
 
-  test("после 40 px прокрутки фон canvas 96 % и линия снизу", async ({ page }) => {
+  // Дизайн-QA D22: фон после прокрутки сплошной canvas, предыдущая сцена не просвечивает сквозь шапку.
+  test("после 40 px прокрутки сплошной фон canvas и линия снизу", async ({ page }) => {
     await go(page, "/");
     const header = page.locator("header.site-header");
     const look = () => header.evaluate((element) => ({ bg: getComputedStyle(element).backgroundColor, border: getComputedStyle(element).borderBottomColor, width: getComputedStyle(element).borderBottomWidth }));
@@ -234,7 +237,7 @@ test.describe("шапка", () => {
     await page.evaluate(() => window.scrollTo({ top: 120, behavior: "instant" }));
     await expect(page.locator("html")).toHaveAttribute("data-header", "scrolled");
     // Переход фона и линии идёт --dur-2, ждём конечное состояние.
-    await expect.poll(look).toEqual({ bg: "rgba(246, 242, 236, 0.96)", border: "rgb(221, 211, 199)", width: "1px" });
+    await expect.poll(look).toEqual({ bg: "rgb(246, 242, 236)", border: "rgb(221, 211, 199)", width: "1px" });
   });
 
   test("уже 900 px: нет навигации, знак и кнопка помещаются", async ({ page }) => {
