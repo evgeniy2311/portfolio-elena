@@ -1,105 +1,227 @@
-/* Блок «С чем работаю: бегущая лента». Правила перенесены из app/home.module.css без изменений. */
-
-/* ---------- 2. С чем работаю: бегущая лента ---------- */
+/*
+ * 2. «С чем работаю», «Silk Ribbon». Лента на всю ширину под заголовком. Движение ведёт ribbon.tsx
+ * (data-ribbon="on"); без JS, при reduced motion и для одной плитки — обычная прокрутка со snap.
+ */
 
 .categories {
-  padding-block: clamp(40px, 6vw, 72px);
-  border-block: 1px solid var(--line);
-  background: var(--paper);
-}
-
-.categoriesTitle {
-  margin-bottom: 24px;
-  color: var(--wine);
-  font-family: var(--font-ui);
-  font-size: 0.9375rem;
-  font-weight: 650;
-  letter-spacing: 0.01em;
-  line-height: 1.3;
-}
-
-.marquee {
-  display: flex;
-  overflow: hidden;
-  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-}
-
-.marqueeTrack {
-  display: flex;
-  flex-shrink: 0;
-  gap: 16px;
-  margin: 0;
-  padding: 0 16px 0 0;
-  list-style: none;
-  animation: marquee 48s linear infinite;
-}
-
-.marquee:hover .marqueeTrack {
-  animation-play-state: paused;
-}
-
-.marqueeTrack li {
-  position: relative;
-  flex-shrink: 0;
-  width: clamp(150px, 16vw, 210px);
-  overflow: hidden;
-  border-radius: var(--radius);
+  padding-block: var(--space-section-tight);
   background: var(--surface);
 }
 
-.marqueeTrack img {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
+.head {
+  display: grid;
+  gap: var(--space-5);
+  align-items: end;
 }
 
-.marqueeTrack li span {
+.heading h2 {
+  max-width: 16ch;
+}
+
+.sub {
+  margin-top: var(--space-stack);
+}
+
+.controls {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.control {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--ink);
+  font: 600 0.8125rem/1 var(--font-ui), system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-atelier), color var(--dur-1) var(--ease-atelier);
+}
+
+.control:hover {
+  background: var(--ink);
+  color: var(--canvas);
+}
+
+.control svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pause {
+  padding-inline: 14px;
+}
+
+/* Текст только для чтения с экрана. */
+.srOnly {
   position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--paper);
-  font-weight: 650;
-  text-align: center;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-.marqueeTrack .marqueeText {
+/* ---------- Лента ---------- */
+
+.viewport {
+  --tile-w: 200px;
+  --tile-gap: 16px;
+  margin-top: calc(var(--space-head) - 28px);
+  /* Запас под увеличенную центральную плитку (×1.06) и её рамку на −8 px. */
+  padding-block: 28px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.viewport:focus-visible {
+  outline-offset: -2px;
+}
+
+.track {
+  display: flex;
+  gap: var(--tile-gap);
+  width: max-content;
+  padding-inline: var(--gutter);
+  transform-origin: 50% 50%;
+}
+
+.set {
+  display: flex;
+  gap: var(--tile-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Без движения видна одна копия набора. */
+.ribbon:not([data-ribbon="on"]) .set:not([data-copy="0"]) {
+  display: none;
+}
+
+.tile {
+  position: relative;
+  flex: none;
+  width: var(--tile-w);
+  scroll-snap-align: start;
+}
+
+.tile figure {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: var(--radius-small);
+  background: var(--canvas);
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* TEMP: обувь до утверждения кадра. */
+.tileText figure {
   display: grid;
   place-items: center;
   background: var(--wine);
 }
 
-.marqueeTrack .marqueeText span {
-  position: static;
-  background: none;
+.tileWord {
   color: var(--on-dark);
-  font-family: var(--font-display);
-  font-size: 2rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 2.5rem;
   font-style: italic;
   font-weight: 500;
+  line-height: 1;
 }
 
-@keyframes marquee {
-  to {
-    transform: translateX(-100%);
+/* Подпись всегда читается: бумага 92 %, чернила. */
+.chip {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 6px 10px;
+  border-radius: var(--radius-small);
+  background: rgb(255 253 250 / 0.92);
+  color: var(--ink);
+  font: 600 0.875rem/1.2 var(--font-ui), system-ui, sans-serif;
+}
+
+/* ---------- Движение (JS) ---------- */
+
+.ribbon[data-ribbon="on"] .viewport {
+  overflow: hidden;
+  scroll-snap-type: none;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.ribbon[data-ribbon="on"][data-dragging] .viewport {
+  cursor: grabbing;
+}
+
+.ribbon[data-ribbon="on"] .track {
+  padding-inline: 0;
+  will-change: transform;
+  user-select: none;
+}
+
+.ribbon[data-ribbon="on"] .tile {
+  transform: scale(0.9);
+  filter: saturate(0.7);
+  transition:
+    transform var(--dur-3) var(--ease-atelier),
+    filter var(--dur-3) var(--ease-atelier);
+}
+
+.ribbon[data-ribbon="on"] .tile[data-center] {
+  transform: scale(1.06);
+  filter: none;
+}
+
+.ribbon[data-ribbon="on"] .tile[data-center]::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-small);
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .viewport {
+    --tile-w: 240px;
+    --tile-gap: 24px;
   }
 }
 
-/* Без движения лента просто листается пальцем, второй (декоративный) повтор скрыт. */
-@media (prefers-reduced-motion: reduce) {
-  .marquee {
-    overflow-x: auto;
-    mask-image: none;
-    padding-inline: var(--gutter);
+@media (min-width: 1024px) {
+  .head {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   }
 
-  .marqueeTrack {
-    animation: none;
+  .controls {
+    justify-self: end;
   }
 
-  .marqueeTrack[aria-hidden] {
-    display: none;
+  .viewport {
+    --tile-w: 300px;
+    --tile-gap: 28px;
   }
 }
