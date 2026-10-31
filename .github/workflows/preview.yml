@@ -26,8 +26,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Proxy нужен только серверу; статичной сборке неизвестные адреса отдаёт 404.html.
-      - run: rm proxy.ts
+      # Та же обёртка, что и локально: убирает proxy.ts только на время export-сборки и возвращает его.
+      # QA-флаг NEXT_PUBLIC_QA_FIXTURE здесь не задаётся никогда; сборка с ним завершается ошибкой.
       - run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: /portfolio-elena
