@@ -1,9 +1,11 @@
-import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowIcon } from "@/components/arrow-icon";
+import { Hero } from "@/components/blocks/hero/hero";
 import { ScrollFx } from "@/components/scroll-fx";
+import type { Vars } from "@/components/ui/css-vars";
+import { Photo } from "@/components/ui/photo";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
 import { about, formatPrice, packages } from "@/lib/site";
 import { frame, getWork, source, works, type Work, type WorkImage } from "@/lib/works";
@@ -21,28 +23,7 @@ export const metadata: Metadata = {
   },
 };
 
-type Vars = CSSProperties & Record<`--${string}`, string | number>;
-
 const accuracySource = source("burgundy-coat-city", 0);
-
-// Первый экран: сразу много работ, как в портфолио студий. Три колонки, в каждой разные вещи.
-const heroColumns: Array<Array<{ image: WorkImage; alt: string }>> = [
-  [
-    { image: frame("burgundy-coat-city", 0), alt: "Бордовое пальто на модели у городского фасада" },
-    { image: frame("beige-windbreaker", 0), alt: "Бежевая ветровка на модели у тёмной стены" },
-    { image: frame("pink-longsleeve", 0), alt: "Розовый лонгслив на модели в студии" },
-  ],
-  [
-    { image: frame("yellow-trench", 0), alt: "Жёлтый тренч на модели на летней улице" },
-    { image: frame("black-coat-evening", 0), alt: "Чёрное пальто в интерьере с тёплой подсветкой" },
-    { image: frame("grey-shearling", 0), alt: "Дублёнка с мехом и каракулем на городском перекрёстке" },
-  ],
-  [
-    { image: frame("brown-coat-three-looks", 7), alt: "Шоколадное пальто с белым жилетом в городе" },
-    { image: frame("white-wrap-blouse", 0), alt: "Белая блузка на запах с брюками" },
-    { image: frame("puffer-jacket", 0), alt: "Зимняя куртка с поясом у городского фасада" },
-  ],
-];
 
 // С какими вещами работаю: бегущая лента категорий с моими кадрами.
 const categories: Array<{ label: string; image: WorkImage }> = [
@@ -214,21 +195,6 @@ const faq = [
   },
 ];
 
-function Photo({ image, alt, sizes, className, priority = false, eager = false }: { image: WorkImage; alt: string; sizes: string; className?: string; priority?: boolean; eager?: boolean }) {
-  return (
-    <Image
-      loading={eager && !priority ? "eager" : undefined}
-      className={className}
-      src={image.src}
-      width={image.width}
-      height={image.height}
-      alt={alt}
-      sizes={sizes}
-      priority={priority}
-    />
-  );
-}
-
 export default function Home() {
   const frameCount = works.reduce((sum, work) => sum + work.frames.length, 0);
   return (
@@ -237,37 +203,7 @@ export default function Home() {
       <SiteHeader current="home" />
 
       <main id="main" tabIndex={-1}>
-        {/* 1. Первый экран: оффер и сразу много работ */}
-        <section className={styles.hero} data-view aria-labelledby="hero-title">
-          <div className={`shell ${styles.heroGrid}`}>
-            <div className={styles.heroCopy}>
-              <p className="eyebrow">Елена Бадьина · фото одежды и обуви для WB и Ozon</p>
-              <h1 id="hero-title">
-                Фото, которые поднимут вашу карточку <em>над сотнями похожих</em>
-              </h1>
-              <p className={styles.heroLead}>Ставлю вашу вещь на модель, в город или в интерьер без фотосессии. И сверяю каждую деталь с оригиналом.</p>
-              <div className={styles.heroActions}>
-                <TrialLink />
-                <Link className="button button-ghost" href="#transform">
-                  Смотреть работы
-                </Link>
-              </div>
-              <p className={styles.heroNote}>Первые два кадра делаю бесплатно на вашей вещи.</p>
-            </div>
-
-            <div className={styles.wall} aria-label="Мои работы: кадры для карточек одежды">
-              {heroColumns.map((column, columnIndex) => (
-                <div className={styles.wallColumn} key={columnIndex} style={{ "--c": columnIndex } as Vars}>
-                  {column.map((item, index) => (
-                    <figure key={item.image.src}>
-                      <Photo image={item.image} alt={item.alt} sizes="(max-width: 1023px) 32vw, 18vw" priority={index === 0} eager />
-                    </figure>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <Hero />
 
         {/* 2. С какими вещами работаю: бегущая лента категорий */}
         <section className={styles.categories} aria-labelledby="categories-title">
