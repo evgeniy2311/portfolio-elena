@@ -57,8 +57,10 @@ test("все изображения главной загружаются", asyn
       await new Promise((resolve) => setTimeout(resolve, 40));
     }
   });
+  // Кадры, которые на этой ширине не рисуются (display: none, например превью сцены услуг на телефоне), браузер
+  // с loading="lazy" не грузит, и это правильно: проверяются только отрисованные.
   await expect
-    .poll(() => page.evaluate(() => Array.from(document.images).filter((image) => !image.complete || image.naturalWidth === 0).length), { timeout: 15_000 })
+    .poll(() => page.evaluate(() => Array.from(document.images).filter((image) => image.getClientRects().length > 0 && (!image.complete || image.naturalWidth === 0)).length), { timeout: 15_000 })
     .toBe(0);
 });
 
