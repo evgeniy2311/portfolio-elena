@@ -26,3 +26,6 @@ assets/inbox/**
 docs/business/
 docs/sessions/2026-10-12-orders-research.md
 /out/
+
+# Эталонные снимки проверки рефакторинга (~70 МБ PNG) хранятся только локально; текстовые слепки стилей в Git.
+tests/refactor-parity.spec.ts-snapshots/*.png
