@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { deckCards } from "../components/blocks/requests/data";
 import { go } from "./helpers/navigation";
-import { isPinViewport, pinGeometry, readVar } from "./helpers/scenes";
+import { isPinViewport, pinGeometry, readVar, settle } from "./helpers/scenes";
 
 /*
  * Блок «Задачи заказчиков» (Deck). От 1024×600 одна «липкая» сцена: все карточки в одной ячейке,
@@ -24,6 +24,8 @@ type Sample = { y: number; p: number; stageTop: number; stageHeight: number; top
 /** Прокрутка в точку и ожидание, пока сглаженное --p догонит прокрутку. */
 async function sampleAt(page: Page, y: number, geometry: { start: number; end: number }): Promise<Sample> {
   await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
+  // Сначала кадр движка после прокрутки: иначе старое --p у границы сцены сойдёт за новое.
+  await settle(page);
   const expected = Math.min(1, Math.max(0, (y - geometry.start) / (geometry.end - geometry.start)));
   await expect.poll(async () => Math.abs(Number(await readVar(page, deck, "--p")) - expected), { timeout: 5000 }).toBeLessThan(0.002);
   return page.locator(deck).evaluate((element, scroll) => {
@@ -60,7 +62,18 @@ test("от 1024 px: равные высоты, без подъёма карто�
   test.skip(!isPinViewport(page), "Стопка «липнет» от 1024×600");
   test.setTimeout(180_000);
   await ready(page);
-  const geometry = await pinGeometry(page, deck);
+  // Геометрия после того, как страница устоялась (поздний замер ленты, шрифты): два одинаковых замера подряд.
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), (await pinGeometry(page, deck)).start);
+  let geometry = await pinGeometry(page, deck);
+  await expect
+    .poll(async () => {
+      await page.waitForTimeout(400);
+      const next = await pinGeometry(page, deck);
+      const same = next.start === geometry.start && next.end === geometry.end;
+      geometry = next;
+      return same;
+    })
+    .toBe(true);
   expect(geometry.sticky).toBe(true);
   const header = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")));
   const step = 40;
