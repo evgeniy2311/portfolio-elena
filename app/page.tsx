@@ -8,6 +8,7 @@ import { Transform } from "@/components/blocks/transform/transform";
 import { Requests } from "@/components/blocks/requests/requests";
 import { Accuracy } from "@/components/blocks/accuracy/accuracy";
 import { Trial } from "@/components/blocks/trial/trial";
+import { Process } from "@/components/blocks/process/process";
 import { ScrollFx } from "@/components/scroll-fx";
 import type { Vars } from "@/components/ui/css-vars";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
@@ -25,14 +26,6 @@ export const metadata: Metadata = {
     locale: "ru_RU",
   },
 };
-
-const steps = [
-  { title: "Вы присылаете фото вещи", text: "2–3 фото: спереди, сзади и крупно детали. Пишете, для какой площадки и для кого вещь." },
-  { title: "Два кадра бесплатно", text: "Делаю пробные кадры на вашей вещи. Вы видите качество до оплаты." },
-  { title: "Договариваемся о серии", text: "Выбираем стиль, сцены и количество кадров." },
-  { title: "Собираю и сверяю", text: "Делаю серию и проверяю каждый кадр с оригиналом: крой, детали, цвет." },
-  { title: "Отдаю готовые файлы", text: "Кадры в формате 3:4, он подходит и для Wildberries, и для Ozon." },
-];
 
 const faq = [
   {
@@ -86,29 +79,7 @@ export default function Home() {
 
         <Trial />
 
-        {/* 10. Как это работает */}
-        <section className={styles.process} id="process" aria-labelledby="process-title">
-          <div className={`shell ${styles.processGrid}`}>
-            <div className={styles.sectionHead} data-reveal>
-              <p className="eyebrow">Пять шагов</p>
-              <h2 id="process-title">
-                Как это <em>работает</em>
-              </h2>
-            </div>
-            <ol className={styles.processList} data-view>
-              <span className={styles.processLine} aria-hidden="true" />
-              {steps.map((step, index) => (
-                <li key={step.title} data-reveal>
-                  <span>{index + 1}</span>
-                  <div>
-                    <h3>{step.title}</h3>
-                    <p>{step.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
+        <Process />
 
         {/* 11. Цены */}
         <section className={styles.prices} id="prices" aria-labelledby="prices-title">

@@ -1,0 +1,96 @@
+/* Блок «Как это работает». Правила перенесены из app/home.module.css без изменений. */
+
+/* Общий заголовок секции, скопирован из app/home.module.css с прежней специфичностью. */
+.sectionHead {
+  display: grid;
+  gap: 18px;
+  max-width: 760px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.sectionHead h2 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+}
+
+.sectionHead > p:last-child:not(:first-child) {
+  max-width: 58ch;
+  color: var(--muted);
+  font-size: 1.125rem;
+}
+
+/* ---------- 9. Как работаю ---------- */
+
+.process {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.processGrid {
+  display: grid;
+}
+
+.processList {
+  --p: 1;
+  position: relative;
+  display: grid;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.processLine {
+  position: absolute;
+  left: 23px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  background: var(--wine);
+  transform: scaleY(min(1, calc(var(--p) * 1.9)));
+  transform-origin: top;
+}
+
+.processList li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 20px;
+}
+
+.processList li > span {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--wine);
+  border-radius: 50%;
+  background: var(--canvas);
+  color: var(--wine);
+  font-weight: 700;
+}
+
+.processList h3 {
+  margin: 10px 0 6px;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.processList p {
+  max-width: 46ch;
+  color: var(--muted);
+}
+
+@media (min-width: 1024px) {
+  .processGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 72px;
+    align-items: start;
+  }
+
+  .processGrid .sectionHead {
+    position: sticky;
+    top: calc(var(--header-h) + 48px);
+  }
+}
