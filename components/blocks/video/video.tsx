@@ -33,7 +33,7 @@ export function Video() {
             {hasVideos ? (
               <VideoPlayers clips={videos} rowClassName={styles.row} tileClassName={styles.tile} barClassName={styles.bar} toggleClassName={styles.toggle} />
             ) : (
-              <ul className={styles.row} data-video-row="" aria-label="Постеры будущих роликов">
+              <ul className={styles.row} data-video-row="" aria-label="Постеры будущих роликов" tabIndex={0}>
                 {videoPosters.map((poster, index) => (
                   <li key={poster.image.src} className={styles.tile} data-video-tile="" data-reveal="letterbox" style={{ "--d": `${index * 120}ms` } as Vars}>
                     <Photo image={poster.image} alt={poster.alt} sizes="(max-width: 767px) 80vw, (max-width: 1023px) 40vw, 300px" />

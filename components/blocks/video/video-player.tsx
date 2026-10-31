@@ -108,7 +108,7 @@ export function VideoPlayers({ clips, rowClassName, tileClassName, barClassName,
   }
 
   return (
-    <ul className={rowClassName} data-video-row="" aria-label="Ролики из фото">
+    <ul className={rowClassName} data-video-row="" aria-label="Ролики из фото" tabIndex={0}>
       {clips.map((clip, index) => {
         const state = states[index];
         const poster = responsivePath(clip.poster.src, 640, "webp") ?? clip.poster.src;
