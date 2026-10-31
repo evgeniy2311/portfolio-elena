@@ -90,6 +90,50 @@ test.describe("математика", () => {
   });
 });
 
+test.describe("ticker: ошибка подписчика", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Чистая логика, ширина экрана не важна");
+  });
+
+  test("подписчик, бросивший ошибку, остаётся в цикле; ошибка логируется один раз", async () => {
+    // Минимальные заглушки браузерных API: ticker работает только с ними.
+    const g = globalThis as unknown as Record<string, unknown>;
+    const frames: Array<(now: number) => void> = [];
+    const saved = { window: g.window, document: g.document };
+    g.document = { hidden: false, addEventListener() {}, removeEventListener() {} };
+    g.window = {
+      matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }),
+      requestAnimationFrame: (callback: (now: number) => void) => frames.push(callback),
+      cancelAnimationFrame() {},
+    };
+    const errors: unknown[][] = [];
+    const originalError = console.error;
+    console.error = (...args: unknown[]) => void errors.push(args);
+    try {
+      const { subscribeTicker, tickerState } = await import("../components/fx/ticker");
+      let calls = 0;
+      const unsubscribe = subscribeTicker(() => {
+        calls += 1;
+        throw new Error("сбой в кадре");
+      });
+      let healthy = 0;
+      const unsubscribeHealthy = subscribeTicker(() => void (healthy += 1));
+      for (let frame = 1; frame <= 3; frame += 1) frames.shift()!(frame * 16);
+      expect(calls).toBe(3);
+      expect(healthy).toBe(3);
+      expect(errors).toHaveLength(1);
+      expect(tickerState().subscribers).toBe(2);
+      unsubscribe();
+      unsubscribeHealthy();
+      expect(tickerState().subscribers).toBe(0);
+    } finally {
+      console.error = originalError;
+      g.window = saved.window;
+      g.document = saved.document;
+    }
+  });
+});
+
 test.describe("сцены страницы", () => {
   test("старые [data-pin]: 0 там, где слой прилипает, 1 там, где отлипает", async ({ page }) => {
     desktopOnly(page);

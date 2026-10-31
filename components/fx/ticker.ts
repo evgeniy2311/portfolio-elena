@@ -7,6 +7,7 @@
 export type TickerCallback = (dt: number, now: number) => void;
 
 const subscribers = new Set<TickerCallback>();
+const failed = new WeakSet<TickerCallback>();
 let frame = 0;
 let last = 0;
 let reducedQuery: MediaQueryList | null = null;
@@ -24,8 +25,12 @@ function loop(now: number) {
     try {
       callback(dt, now);
     } catch (error) {
-      subscribers.delete(callback);
-      console.error("ticker: подписчик отключён после ошибки", error);
+      // Подписчик остаётся: иначе владелец, у которого отписка всё ещё «живая», никогда не получит кадров.
+      // Ошибка логируется один раз на подписчика, чтобы не засорять консоль на каждом кадре.
+      if (!failed.has(callback)) {
+        failed.add(callback);
+        console.error("ticker: ошибка в подписчике, цикл продолжается", error);
+      }
     }
   }
   schedule();
