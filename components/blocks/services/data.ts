@@ -77,7 +77,6 @@ export const services: Service[] = [
     alt: "Жёлтый тренч, вид сзади: пояс, хлястики и шлица",
     tint: "mustard",
     transition: "split",
-    // Блока «Видео из фото» пока нет на странице (этап 9.1): до него ссылка ведёт к контактам.
-    href: "#contact",
+    href: "#video",
   },
 ];
