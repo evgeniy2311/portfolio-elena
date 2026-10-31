@@ -260,3 +260,17 @@ test.describe("шапка", () => {
     expect(cta!.height).toBeGreaterThanOrEqual(width < 900 ? 48 : 52);
   });
 });
+
+test("подвал: noir, имя и строка о площадках с Lamoda и сайтами брендов", async ({ page }) => {
+  for (const route of ["/", "/works"]) {
+    await go(page, route);
+    const footer = page.locator("footer.site-footer");
+    await expect(footer).toContainText("Елена Бадьина");
+    await expect(footer).toContainText("Визуал для карточек одежды и обуви: Ozon, Wildberries, Lamoda, сайты брендов");
+    const colors = await footer.evaluate((element) => ({ bg: getComputedStyle(element).backgroundColor, text: getComputedStyle(element).color, name: getComputedStyle(element.querySelector(".site-footer-name")!).color }));
+    expect(colors.bg).toBe("rgb(26, 24, 23)");
+    expect(colors.text).toBe("rgb(185, 176, 166)");
+    expect(colors.name).toBe("rgb(244, 238, 230)");
+    expect(contrast(colors.text, colors.bg)).toBeGreaterThanOrEqual(4.5);
+  }
+});

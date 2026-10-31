@@ -55,9 +55,8 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="shell site-footer-row">
-        <span>Елена Бадьина</span>
-        <span>Визуал для карточек одежды и обуви на Wildberries и Ozon</span>
-        <span>© 2026</span>
+        <span className="site-footer-name">Елена Бадьина</span>
+        <span>Визуал для карточек одежды и обуви: Ozon, Wildberries, Lamoda, сайты брендов</span>
       </div>
     </footer>
   );
