@@ -1,212 +1,495 @@
-/* Блок «Сверка деталей». Правила перенесены из app/home.module.css без изменений. */
-
-/* ---------- 6. Точность ---------- */
+/* Блок 8 «Сверка деталей» · Loupe. Значения — design/brief.md §8 и motion.md. Фон noir. */
 
 .accuracy {
   --p: 1;
+  --lens: 72px;
   position: relative;
-  --focus-color: var(--champagne);
+  padding-block: var(--space-section);
   background: var(--noir);
   color: var(--on-dark);
 }
 
-.accuracyStage {
-  padding-block: clamp(88px, 12vw, 160px);
-}
+/* ---------- Без движка (reduced motion, без JS): статичная сетка четырёх пар ---------- */
 
-.accuracyGrid {
+.grid {
   display: grid;
-  gap: 40px;
+  gap: var(--space-head);
 }
 
-.accuracyCopy {
+.copy {
   display: grid;
-  align-content: center;
-  gap: 18px;
+  align-content: start;
+  gap: var(--space-5);
 }
 
-.accuracyCopy h2 {
-  max-width: 15ch;
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
+.head {
+  display: grid;
+  justify-items: start;
 }
 
-.accuracyCopy h2 em {
+.head h2 {
+  max-width: 16ch;
+  color: var(--on-dark);
+}
+
+.head h2 em {
   color: var(--champagne);
 }
 
-.accuracyCopy > p {
-  max-width: 50ch;
+.text {
+  max-width: 52ch;
+  margin-top: var(--space-stack);
   color: var(--on-dark-muted);
-  font-size: 1.125rem;
 }
 
-.checkList {
+.hint {
+  margin-top: var(--space-3);
+  color: var(--on-dark);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.list {
   display: grid;
-  gap: 6px;
-  margin: 12px 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.checkList li {
+.item {
   display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 14px;
-  padding-block: 12px;
+  gap: var(--space-1);
+  padding-block: var(--space-3);
   border-top: 1px solid rgb(244 238 230 / 0.14);
 }
 
-.checkList span {
-  display: inline-flex;
-  width: 36px;
-  height: 36px;
+.step {
+  display: flex;
   align-items: center;
-  justify-content: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--on-dark);
+  font: 600 1.0625rem/1.3 var(--font-ui), system-ui, sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ring {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  place-items: center;
   border: 1px solid var(--champagne);
   border-radius: 50%;
   color: var(--champagne);
-  font-weight: 650;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
-.checkList h3 {
-  font-size: 1.0625rem;
+.ringNumber,
+.tick {
+  grid-area: 1 / 1;
 }
 
-.checkList p {
+.tick {
+  display: none;
+  width: 32px;
+  height: 32px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+}
+
+.description {
+  max-width: 46ch;
+  padding-left: calc(32px + var(--space-3));
   color: var(--on-dark-muted);
-  font-size: 0.9688rem;
+  font-size: 0.9375rem;
 }
 
-.accuracyCompare {
+.viewer {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-4);
 }
 
-.accuracyCompare figure {
+.source,
+.result {
   position: relative;
   margin: 0;
 }
 
-.accuracyCompare img {
-  width: 100%;
+.sourceImage,
+.resultImage {
+  position: relative;
   aspect-ratio: 3 / 4;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: var(--radius-small);
   background: color-mix(in srgb, var(--on-dark) 8%, var(--noir));
 }
 
-.accuracyCompare figcaption {
+.sourceImage img,
+.resultImage img {
   position: absolute;
-  left: 8px;
-  bottom: 8px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.caption {
+  position: absolute;
+  left: var(--space-2);
+  bottom: var(--space-2);
+  max-width: calc(100% - 2 * var(--space-2));
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-small);
   background: var(--paper);
   color: var(--ink);
   font-size: 0.8125rem;
-  font-weight: 650;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
-.accuracyDetails {
-  display: contents;
+.captionNumber {
+  font-variant-numeric: tabular-nums lining-nums;
 }
+
+.dot {
+  position: absolute;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1.5px solid var(--champagne);
+  border-radius: 50%;
+  background: rgb(26 24 23 / 0.75);
+  color: var(--champagne);
+  font-size: 0.75rem;
+  font-weight: 600;
+  transform: translate(-50%, -50%);
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.results .caption {
+  font-size: 0.75rem;
+}
+
+.lens,
+.connector {
+  display: none;
+}
+
+/* ---------- С движком: лупа, кадр из точки, один пункт ---------- */
+
+:global([data-fx="on"]) .dot,
+:global([data-fx="on"]) .captionNumber {
+  display: none;
+}
+
+:global([data-fx="on"]) .sourceImage {
+  container-type: size;
+}
+
+:global([data-fx="on"]) .lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: block;
+  width: var(--lens);
+  height: var(--lens);
+  overflow: hidden;
+  border-radius: 50%;
+  clip-path: circle(50%);
+  transform: translate(calc(var(--fx) * 1cqw - 50%), calc(var(--fy) * 1cqh - 50%));
+  transition: transform 700ms var(--ease-inout);
+}
+
+:global([data-fx="on"]) .lens::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--champagne);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(26 24 23 / 0.35);
+}
+
+/* Тот же снимок ×2,2: точка детали всегда в центре лупы. */
+:global([data-fx="on"]) .lensImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 220cqw;
+  height: 220cqh;
+  transform: translate(calc(var(--lens) / 2 - var(--fx) * 2.2cqw), calc(var(--lens) / 2 - var(--fy) * 2.2cqh));
+  transition: transform 700ms var(--ease-inout);
+}
+
+:global([data-fx="on"]) .lensImage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:global([data-fx="on"]) .results {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:global([data-fx="on"]) .result {
+  grid-area: 1 / 1;
+  z-index: 0;
+}
+
+:global([data-fx="on"]) .result[data-state="previous"] {
+  z-index: 1;
+}
+
+:global([data-fx="on"]) .result[data-state="active"] {
+  z-index: 2;
+}
+
+/* Кадр открывается кругом из той же относительной точки, что и деталь на исходнике. */
+:global([data-fx="on"]) .resultImage {
+  clip-path: circle(0% at calc(var(--rx) * 1%) calc(var(--ry) * 1%));
+  transition: clip-path 700ms var(--ease-expo) 120ms;
+}
+
+:global([data-fx="on"]) .result[data-state="active"] .resultImage,
+:global([data-fx="on"]) .result[data-state="previous"] .resultImage {
+  clip-path: circle(150% at calc(var(--rx) * 1%) calc(var(--ry) * 1%));
+}
+
+:global([data-fx="on"]) .result[data-state="previous"] .resultImage {
+  transition: none;
+}
+
+/* «По одному»: уходящая подпись и описание гаснут за 200 мс, новые приходят после них. */
+:global([data-fx="on"]) .results .caption,
+:global([data-fx="on"]) .description {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 200ms var(--ease-atelier),
+    transform 200ms var(--ease-atelier),
+    visibility 0s linear 200ms;
+}
+
+:global([data-fx="on"]) .result[data-state="active"] .caption,
+:global([data-fx="on"]) .item[data-state="active"] .description {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity var(--dur-2) var(--ease-atelier) 200ms,
+    transform var(--dur-2) var(--ease-atelier) 200ms,
+    visibility 0s linear 200ms;
+}
+
+:global([data-fx="on"]) .connector {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+:global([data-fx="on"]) .connector path {
+  fill: none;
+  stroke: var(--champagne);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 600ms var(--ease-inout) 300ms forwards;
+}
+
+:global([data-fx="on"]) .connector circle {
+  fill: var(--champagne);
+  opacity: 0;
+  animation: appear var(--dur-2) var(--ease-atelier) 860ms forwards;
+}
+
+/* Галочка текущего пункта рисуется за 400 мс; пройденные пункты на 50 % с заполненным кружком. */
+:global([data-fx="on"]) .item[data-state="active"] .ringNumber,
+:global([data-fx="on"]) .item[data-state="done"] .ringNumber {
+  visibility: hidden;
+}
+
+:global([data-fx="on"]) .item[data-state="active"] .tick,
+:global([data-fx="on"]) .item[data-state="done"] .tick {
+  display: block;
+}
+
+:global([data-fx="on"]) .item[data-state="active"] .tick {
+  stroke-dashoffset: 1;
+  animation: draw 400ms var(--ease-atelier) forwards;
+}
+
+:global([data-fx="on"]) .item[data-state="active"] .ring {
+  border-width: 1.5px;
+}
+
+/* li в сцене — display: contents, поэтому прозрачность у кнопки пункта. */
+:global([data-fx="on"]) .item[data-state="done"] .step {
+  opacity: 0.5;
+}
+
+:global([data-fx="on"]) .item[data-state="done"] .ring {
+  background: var(--champagne);
+  color: var(--noir);
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- С движком уже 1024 px: фото, под ним четыре пункта-кнопки ---------- */
+
+@media not ((min-width: 1024px) and (min-height: 600px)) {
+  :global([data-fx="on"]) .copy {
+    display: contents;
+  }
+
+  :global([data-fx="on"]) .head {
+    order: 1;
+  }
+
+  :global([data-fx="on"]) .viewer {
+    order: 2;
+    touch-action: pan-y;
+  }
+
+  :global([data-fx="on"]) .list {
+    order: 3;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-4) var(--space-2);
+    margin-top: calc(var(--space-head) * -0.5);
+  }
+
+  :global([data-fx="on"]) .item {
+    display: contents;
+  }
+
+  :global([data-fx="on"]) .step {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: var(--space-2);
+    padding-top: var(--space-1);
+    font-size: 0.75rem;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  :global([data-fx="on"]) .description {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    padding-left: 0;
+  }
+}
+
+/* ---------- «Липкая» сцена от 1024×600: 4 × 80vh, слева текст и пункты, справа лупа ---------- */
 
 @media (min-width: 1024px) {
-  .accuracyGrid {
+  .accuracy {
+    --lens: 120px;
+  }
+
+  .grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     align-items: center;
     gap: clamp(32px, 4vw, 72px);
-  }
-
-  .accuracyCompare {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .accuracySource {
-    grid-row: span 2;
-    align-self: center;
   }
 }
 
 @media (min-width: 1024px) and (min-height: 600px) {
   :global([data-fx="on"]) .accuracy {
-    height: 320vh;
+    height: calc(4 * 80vh);
+    padding-block: 0;
   }
 
-  :global([data-fx="on"]) .accuracyStage {
+  :global([data-fx="on"]) .stage {
     position: sticky;
     top: var(--header-h);
     display: flex;
     align-items: center;
     height: calc(100svh - var(--header-h));
-    padding-block: 32px;
+    padding-block: var(--space-4);
     overflow: clip;
   }
 
-  :global([data-fx="on"]) .accuracyCompare {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
-    align-items: center;
-    gap: 20px;
-    max-height: calc(100svh - var(--header-h) - 96px);
+  :global([data-fx="on"]) .grid {
+    width: 100%;
   }
 
-  :global([data-fx="on"]) .accuracySource {
-    grid-row: auto;
+  :global([data-fx="on"]) .copy {
+    gap: clamp(12px, 2.4vh, 24px);
   }
 
-  :global([data-fx="on"]) .accuracyDetails {
-    display: grid;
-    position: relative;
+  :global([data-fx="on"]) .head h2 {
+    font-size: clamp(2.25rem, min(4.4vw, 6.4vh), 4.5rem);
   }
 
-  :global([data-fx="on"]) .accuracyDetails figure {
-    grid-area: 1 / 1;
+  :global([data-fx="on"]) .text {
+    font-size: clamp(0.9375rem, 0.45rem + 1.3vh, 1.0625rem);
   }
 
-  :global([data-fx="on"]) .accuracyCompare img {
-    max-height: calc(100svh - var(--header-h) - 120px);
+  :global([data-fx="on"]) .list {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Каждый пункт активен на своей четверти прокрутки; последний остаётся. */
-  :global([data-fx="on"]) .checkList li,
-  :global([data-fx="on"]) .accuracyDetails figure {
-    --s: calc(var(--i) * 0.24);
-    --in: clamp(0, (var(--p) - var(--s) + 0.06) / 0.06, 1);
-    --out: clamp(0, (var(--p) - var(--s) - 0.24) / 0.06, 1);
-    --on: calc(var(--in) - var(--out));
+  :global([data-fx="on"]) .item {
+    display: contents;
   }
 
-  :global([data-fx="on"]) .checkList li:last-child,
-  :global([data-fx="on"]) .accuracyDetails figure:last-child {
-    --out: 0;
+  :global([data-fx="on"]) .step {
+    min-height: 44px;
+    padding-block: 2px;
+    border-top: 1px solid rgb(244 238 230 / 0.14);
   }
 
-  :global([data-fx="on"]) .checkList li {
-    opacity: calc(0.36 + var(--on) * 0.64);
-    padding-block: 8px;
+  :global([data-fx="on"]) .description {
+    grid-row: 5;
+    grid-column: 1;
+    min-height: 3.2em;
+    padding-top: var(--space-2);
   }
 
-  /* Описание раскрывается только у активного пункта, поэтому список помещается в экран ноутбука. */
-  :global([data-fx="on"]) .checkList p {
-    max-height: calc(var(--on) * 3.2em);
-    overflow: hidden;
-  }
-
-  :global([data-fx="on"]) .accuracyCopy h2 {
-    font-size: clamp(2.25rem, min(4.4vw, 6.5vh), 4.5rem);
-  }
-
-  :global([data-fx="on"]) .accuracyCopy > p {
-    font-size: 1.0625rem;
-  }
-
-  :global([data-fx="on"]) .accuracyCopy {
-    gap: 14px;
-  }
-
-  :global([data-fx="on"]) .accuracyDetails figure {
-    opacity: var(--on);
-    transform: scale(calc(1.05 - var(--on) * 0.05));
+  /* Два кадра рядом, высота ограничена сценой. */
+  :global([data-fx="on"]) .viewer {
+    grid-template-columns: repeat(2, min(calc((100% - var(--space-5)) / 2), calc((100svh - var(--header-h) - 2 * var(--space-4)) * 0.75)));
+    justify-content: center;
+    gap: var(--space-5);
   }
 }

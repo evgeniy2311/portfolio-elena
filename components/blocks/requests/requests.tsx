@@ -1,48 +1,31 @@
-import Link from "next/link";
-import { ArrowIcon } from "@/components/arrow-icon";
-import type { Vars } from "@/components/ui/css-vars";
-import { Photo } from "@/components/ui/photo";
-import { getWork } from "@/lib/works";
-import { requests } from "./data";
+import { ContactLink } from "@/components/ui/contact-link";
+import { deckCards } from "./data";
+import { Deck } from "./deck";
 import styles from "./requests.module.css";
 
-/** 7. Задачи клиентов: карточки складываются стопкой. */
+/**
+ * 7. Задачи заказчиков, «Deck». От 1024×600 одна «липкая» сцена: слева заголовок и кнопка,
+ * справа стопка карточек (секция 5 × 70vh + 100vh). Ниже — список с «подъёмом» карточек.
+ */
 export function Requests() {
   return (
-    <section className={styles.requests} aria-labelledby="requests-title">
-      <div className="shell">
-        <div className={styles.sectionHead} data-reveal>
-          <p className="eyebrow">Задачи, с которыми приходят</p>
-          <h2 id="requests-title">
-            Не просто «сделайте красиво», <em>а конкретная задача</em>
-          </h2>
+    <section className={styles.requests} id="requests" data-ground="canvas" aria-labelledby="requests-title">
+      <div className={styles.deck} data-pin data-deck data-segments={deckCards.length}>
+        <div className={`shell ${styles.stage}`} data-stage>
+          <div className={styles.head}>
+            <p className="eyebrow">Задачи заказчиков</p>
+            <h2 id="requests-title">
+              С какой задачей приходят <em>ко&nbsp;мне</em>
+            </h2>
+            <p className="lede">Обычно у заказчика есть конкретная просьба. Вот пять из моих работ.</p>
+          </div>
+          <Deck cards={deckCards} />
+          <div className={styles.cta}>
+            <ContactLink intent="project" className="button button-ghost">
+              Обсудить проект
+            </ContactLink>
+          </div>
         </div>
-        <ol className={styles.requestStack}>
-          {requests.map((request, index) => {
-            const work = getWork(request.slug);
-            if (!work) return null;
-            return (
-              <li className={styles.requestCard} key={request.slug} style={{ "--i": index } as Vars}>
-                <div className={styles.requestText}>
-                  <p className={styles.requestLabel}>{request.label}</p>
-                  <blockquote>{request.verbatim ? `«${request.quote}»` : request.quote}</blockquote>
-                  <p>{request.note}</p>
-                  <Link className="text-link" href={`/works/${work.slug}`}>
-                    {work.title} <ArrowIcon />
-                  </Link>
-                </div>
-                <div className={`${styles.requestFrames} ${request.square ? styles.requestFramesSquare : ""}`}>
-                  {request.frames.map((frameIndex) => {
-                    const image = work.frames[frameIndex];
-                    return image ? (
-                      <Photo key={image.src} image={image} alt={`${work.title}: кадр ${frameIndex + 1}`} sizes="(max-width: 767px) 30vw, 16vw" />
-                    ) : null;
-                  })}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
       </div>
     </section>
   );

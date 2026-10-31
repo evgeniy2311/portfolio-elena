@@ -150,8 +150,8 @@ test("лента «исходник → карточка» доезжает до
   await go(page, "/");
   const rail = "#transform";
   await scrollToProgress(page, rail, 1);
-  const outro = page.locator(`${rail} a[href$='/works'], ${rail} a[href$='/works/']`);
-  await expect(outro).toBeInViewport();
+  // Последняя панель целиком в окне; вывод с кнопкой пробы идёт следом, в обычном потоке (tests/transform.spec.ts).
+  await expect(page.locator(`${rail} [data-panel]`).last()).toBeInViewport({ ratio: 0.95 });
   await expectNoOverflow(page);
   await scrollToProgress(page, rail, 0);
   await expect(page.locator(`${rail} h2`)).toBeInViewport();

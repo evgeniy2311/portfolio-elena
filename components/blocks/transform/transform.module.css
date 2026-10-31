@@ -1,202 +1,558 @@
-/* Блок «До и после». Правила перенесены из app/home.module.css без изменений. */
-
-/* ---------- 4. Лента «исходник → карточка» ---------- */
+/* Блок 6 «До и после» · Darkroom Develop. Значения — design/brief.md §6 и motion.md. */
 
 .rail {
   --p: 0;
   position: relative;
+  padding-block: var(--space-section);
   background: var(--surface);
 }
 
-.railStage {
-  padding-block: clamp(72px, 10vw, 120px);
+.stage {
+  width: 100%;
 }
 
-.railTrack {
+/* ---------- Телефон и планшет: заголовок, под ним карусель со снапом ---------- */
+
+.track {
   display: grid;
-  gap: 24px;
+  gap: var(--space-head);
+}
+
+.intro {
+  display: grid;
+  justify-items: start;
   padding-inline: var(--gutter);
-  max-width: 1440px;
-  margin-inline: auto;
 }
 
-.railIntro {
-  display: grid;
-  gap: 18px;
-  align-content: center;
+.intro h2 {
+  max-width: 16ch;
 }
 
-.railIntro h2 {
-  font-size: clamp(2.5rem, 5.5vw, 4.75rem);
+.intro :global(.lede) {
+  margin-top: var(--space-stack);
 }
 
-.railIntroText {
-  max-width: 38ch;
-  color: var(--muted);
-  font-size: 1.125rem;
-}
-
-.railArrow {
+.introArrow {
   display: none;
 }
 
-.railPanel {
+.panels {
+  display: flex;
+  gap: var(--space-4);
+  padding-inline: var(--gutter);
+  padding-bottom: var(--space-2);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+
+.panels::-webkit-scrollbar {
+  display: none;
+}
+
+.panel {
   display: grid;
-  gap: 24px;
-  padding: clamp(20px, 3vw, 36px);
+  flex: 0 0 88%;
+  align-content: start;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-4);
   border-radius: var(--radius);
   background: var(--paper);
+  scroll-snap-align: start;
 }
 
-.railMeta {
+.meta {
   display: grid;
   align-content: start;
-  gap: 10px;
+  justify-items: start;
+  gap: var(--space-3);
 }
 
-.railNumber {
+.number {
   color: var(--wine);
-  font-size: 0.9375rem;
-  font-weight: 650;
+  font-size: 0.8125rem;
 }
 
-.railMeta h3 {
-  margin-bottom: 8px;
-  font-family: var(--font-display);
-  font-size: clamp(1.875rem, 2.6vw, 2.5rem);
-  font-weight: 500;
-  line-height: 1.02;
+.title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.1;
 }
 
-.railLabel {
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-weight: 650;
-}
-
-.railSources {
+.label {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.railSources img {
-  width: 64px;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  border-radius: 6px;
-  background: var(--surface);
-}
-
-.railBrief {
-  max-width: 30ch;
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  line-height: 1.15;
-}
-
-.railFrames {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr;
   align-items: center;
   gap: 10px;
+  color: var(--wine);
+  font-size: clamp(0.75rem, 0.728rem + 0.094vw, 0.8125rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
-.railFrames img {
+.label::before {
+  content: "";
+  flex: none;
+  width: 24px;
+  height: 1px;
+  background: currentColor;
+}
+
+.story {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-2) 0 0;
+}
+
+.storyLine {
+  display: grid;
+  gap: 6px;
+}
+
+.storyLine dd {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* «Получилось» — главный итог, чуть плотнее остальных. */
+.storyLine:last-child dd {
+  font-weight: 500;
+}
+
+.more {
+  margin-top: var(--space-1);
+}
+
+.sources {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.sourceList {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.source {
+  width: 72px;
+  flex: none;
+}
+
+.source img {
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: var(--radius-small);
-  background: var(--surface);
 }
 
-.railFrames img:nth-child(2) {
-  transform: translateY(18px);
+.results {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--space-2);
 }
 
-.railOutro {
+.lead {
+  grid-row: 1 / span 2;
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 3 / 4;
+}
+
+.small {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--radius-small);
+}
+
+/* Кадры заполняют свою ячейку целиком: высоту задаёт сетка, а не пропорции файла. */
+.lead img,
+.small img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-small);
+}
+
+.develop {
+  position: absolute;
+  inset: 0;
+}
+
+.develop {
+  overflow: hidden;
+  border-radius: var(--radius-small);
+}
+
+.small.develop {
+  position: relative;
+}
+
+/* ---------- Шторка «исходник / результат» ---------- */
+
+.split {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--radius-small);
+}
+
+.split img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.splitResult {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.splitHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--split);
+  width: 2px;
+  margin-left: -1px;
+  background: var(--paper);
+  pointer-events: none;
+}
+
+.splitHandle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: rgb(28 23 20 / 0.55);
+  transform: translate(-50%, -50%);
+}
+
+.splitTag {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: 4px 8px;
+  border-radius: var(--radius-small);
+  background: rgb(255 253 250 / 0.92);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.splitTagEnd {
+  top: auto;
+  bottom: var(--space-2);
+  left: auto;
+  right: var(--space-2);
+}
+
+/* Ползунок на всю площадь, но ловит только ручку: свайп по кадру остаётся прокруткой карусели. */
+.splitRange {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  cursor: ew-resize;
+  opacity: 0;
+  appearance: none;
+  pointer-events: none;
+}
+
+.splitRange::-webkit-slider-thumb {
+  width: 44px;
+  height: 44px;
+  appearance: none;
+  pointer-events: auto;
+  cursor: ew-resize;
+}
+
+.splitRange::-moz-range-thumb {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  pointer-events: auto;
+  cursor: ew-resize;
+}
+
+.split:has(.splitRange:focus-visible) .splitHandle::after {
+  outline: 2px solid var(--wine);
+  outline-offset: 3px;
+}
+
+/* ---------- Проявление на телефоне: по панели, один раз (rail-develop.tsx) ---------- */
+
+@media not ((min-width: 1024px) and (min-height: 600px)) {
+  :global([data-fx="on"]) .panel [data-develop] img {
+    filter: grayscale(1) contrast(0.85) blur(8px);
+    transform: scale(1.04);
+    transition:
+      filter var(--dur-5) var(--ease-expo) calc(var(--j, 0) * 120ms),
+      transform var(--dur-5) var(--ease-expo) calc(var(--j, 0) * 120ms);
+  }
+
+  :global([data-fx="on"]) .panel[data-developed] [data-develop] img {
+    filter: none;
+    transform: none;
+  }
+}
+
+/* ---------- Вывод после ленты: обычный поток, canvas ---------- */
+
+.outro {
+  padding-block: var(--space-section-tight);
+  background: var(--canvas);
+}
+
+.outroInner {
+  display: grid;
+  gap: var(--space-5);
+  align-items: end;
+}
+
+.counter {
+  max-width: 30ch;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.75rem, 1.3rem + 1.9vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.counterNumber {
+  color: var(--wine);
+  font-size: 1em;
+}
+
+.outroCta {
   display: grid;
   justify-items: start;
-  align-content: center;
-  gap: 12px;
-  padding-block: 24px;
+  gap: var(--space-4);
 }
 
-.railOutroNumber {
-  color: var(--wine);
-  font-family: var(--font-display);
-  font-size: clamp(5rem, 10vw, 9rem);
-  line-height: 0.8;
+.outroText {
+  max-width: 44ch;
+  color: var(--muted);
 }
 
-.railOutro p:not(.railOutroNumber) {
-  max-width: 24ch;
-  font-size: 1.1875rem;
+@media (min-width: 900px) {
+  .outroInner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-7);
+  }
 }
 
+/* ---------- От 1024 px: лента в ряд ---------- */
+
+/*
+ * Размер панели считается от высоты окна и ограничивается шириной: колонка кадров шириной
+ * (высота панели − поля) × --ratio, вся панель не шире окна. Так панель целиком помещается
+ * на любом ноутбуке, а кадры не превращаются в узкие полоски.
+ */
 @media (min-width: 1024px) {
-  .railStage {
+  .rail {
+    --meta-w: clamp(280px, 23.5vw, 360px);
+    --src-w: 0px;
+    --gap: clamp(20px, 2vw, 32px);
+    --panel-pad: clamp(24px, 2.2vw, 32px);
+    --ratio: 0.85;
+    --fixed: calc(var(--meta-w) + var(--gap) + 2 * var(--panel-pad));
+    --ph-h: max(520px, min(760px, calc(100svh - var(--header-h) - 2 * var(--space-4))));
+    --ph: min(var(--ph-h), calc((100vw - 2 * var(--gutter) - var(--fixed)) / var(--ratio) + 2 * var(--panel-pad)));
+  }
+
+  .stage {
     overflow-x: auto;
   }
 
-  .railTrack {
+  .track {
     display: flex;
     align-items: center;
-    gap: clamp(28px, 3vw, 48px);
+    gap: var(--gap);
     width: max-content;
-    max-width: none;
+    padding-inline: var(--gutter);
   }
 
-  .railIntro {
-    width: 400px;
+  .intro {
+    width: 380px;
     flex-shrink: 0;
+    padding-inline: 0;
   }
 
-  .railArrow {
+  .introArrow {
     display: inline-flex;
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
+    margin-top: var(--space-6);
     align-items: center;
     justify-content: center;
-    border: 1.5px solid var(--ink);
-    border-radius: 50%;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-small);
   }
 
-  .railPanel {
-    width: min(1040px, 80vw);
-    flex-shrink: 0;
-    grid-template-columns: 280px minmax(0, 1fr);
+  .panels {
+    display: flex;
     align-items: center;
-    gap: 36px;
+    gap: var(--gap);
+    padding: 0;
+    overflow: visible;
+    scroll-snap-type: none;
   }
 
-  .railOutro {
-    width: 360px;
-    flex-shrink: 0;
+  .panel {
+    flex: none;
+    grid-template-columns: var(--meta-w) calc((var(--ph) - 2 * var(--panel-pad)) * var(--ratio));
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "meta results"
+      "sources results";
+    height: var(--ph);
+    gap: var(--space-4) var(--gap);
+    padding: var(--panel-pad);
+  }
+
+  .meta {
+    grid-area: meta;
+    align-content: center;
+    gap: var(--space-2);
+  }
+
+  .story {
+    gap: var(--space-3);
+    margin-top: var(--space-1);
+  }
+
+  .storyLine dd {
+    font-size: clamp(0.9375rem, 0.5rem + 1.25vh, 1.1875rem);
+  }
+
+  .sources {
+    grid-area: sources;
+  }
+
+  .source {
+    width: clamp(48px, 4.4vw, 64px);
+  }
+
+  .results {
+    grid-area: results;
+    min-height: 0;
+  }
+
+  .lead {
+    aspect-ratio: auto;
   }
 }
 
+/* Низкий ноутбук: номер панели не нужен, исходники мельче — история помещается целиком. */
+@media (min-width: 1024px) and (max-width: 1279px) and (max-height: 700px) {
+  .number {
+    display: none;
+  }
+
+  .source {
+    width: 44px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .rail {
+    --src-w: clamp(64px, 6vw, 96px);
+    --ratio: 1.05;
+    --fixed: calc(var(--meta-w) + var(--src-w) + 2 * var(--gap) + 2 * var(--panel-pad));
+  }
+
+  .panel {
+    grid-template-columns: var(--meta-w) var(--src-w) calc((var(--ph) - 2 * var(--panel-pad)) * var(--ratio));
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: "meta sources results";
+  }
+
+  .sources {
+    align-content: start;
+  }
+
+  .sources .label::before {
+    display: none;
+  }
+
+  .sourceList {
+    flex-direction: column;
+  }
+
+  .source {
+    width: 100%;
+  }
+}
+
+/* ---------- «Липкая» лента: только от 1024×600 и только с движком ---------- */
+
 @media (min-width: 1024px) and (min-height: 600px) {
-  :global([data-fx="on"]) .railStage {
+  :global([data-fx="on"]) .rail {
+    padding-block: 0;
+  }
+
+  :global([data-fx="on"]) .stage {
     position: sticky;
     top: var(--header-h);
     display: flex;
     align-items: center;
     height: calc(100svh - var(--header-h));
-    padding-block: 32px;
+    padding-block: var(--space-4);
     overflow: hidden;
   }
 
-  :global([data-fx="on"]) .railTrack {
+  :global([data-fx="on"]) .track {
     transform: translate3d(calc(var(--p) * var(--rail-shift, 0px) * -1), 0, 0);
     will-change: transform;
   }
 
-  :global([data-fx="on"]) .railPanel {
-    height: min(640px, calc(100svh - var(--header-h) - 64px));
+  :global([data-fx="on"]) .rail {
+    --ph-h: calc(100svh - var(--header-h) - 2 * var(--space-4));
   }
 
-  :global([data-fx="on"]) .railFrames img {
-    max-height: calc(100svh - var(--header-h) - 160px);
+  /*
+   * Проявление по прогрессу панели --pp (0 — панель у правого края окна, 1 — у левого).
+   * Исходники въезжают слева со сдвигом, готовые кадры уходят из серого и размытого в чистые,
+   * строки истории открываются по очереди. Размытие только у изображений.
+   */
+  :global([data-fx="on"]) .source {
+    --in: clamp(0, (var(--pp, 1) - 0.12 - var(--s) * 0.05) / 0.2, 1);
+    opacity: var(--in);
+    transform: translateX(calc((1 - var(--in)) * -32px));
+  }
+
+  :global([data-fx="on"]) .panel [data-develop] {
+    --dev: clamp(0, (var(--pp, 1) - 0.22 - var(--j, 0) * 0.08) / 0.3, 1);
+  }
+
+  :global([data-fx="on"]) .panel [data-develop] img {
+    filter: grayscale(calc(1 - var(--dev))) contrast(calc(0.85 + var(--dev) * 0.15)) blur(calc((1 - var(--dev)) * 8px));
+    transform: scale(calc(1.04 - var(--dev) * 0.04));
+  }
+
+  :global([data-fx="on"]) .storyLine {
+    --in: clamp(0, (var(--pp, 1) - 0.2 - var(--l) * 0.08) / 0.18, 1);
+    opacity: var(--in);
+    transform: translateY(calc((1 - var(--in)) * 12px));
   }
 }

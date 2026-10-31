@@ -1,115 +1,285 @@
-/* Блок «Задачи заказчиков». Правила перенесены из app/home.module.css без изменений. */
-
-/* Общий заголовок секции, скопирован из app/home.module.css с прежней специфичностью. */
-.sectionHead {
-  display: grid;
-  gap: 18px;
-  max-width: 760px;
-  margin-bottom: clamp(40px, 6vw, 72px);
-}
-
-.sectionHead h2 {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-}
-
-.sectionHead > p:last-child:not(:first-child) {
-  max-width: 58ch;
-  color: var(--muted);
-  font-size: 1.125rem;
-}
-
-/* ---------- 5. Задачи: стопка карточек ---------- */
+/* Блок 7 «Задачи заказчиков» · Deck. Значения — design/brief.md §7 и motion.md. */
 
 .requests {
-  padding-block: clamp(88px, 12vw, 160px);
+  padding-block: var(--space-section);
+  background: var(--canvas);
 }
 
-.requestStack {
+/* ---------- Телефон, планшет, reduced motion, без JS: заголовок, список, кнопка ---------- */
+
+.stage {
   display: grid;
-  gap: 20px;
+  gap: var(--space-head);
+}
+
+.head {
+  display: grid;
+  justify-items: start;
+}
+
+.head h2 {
+  max-width: 16ch;
+}
+
+.head :global(.lede) {
+  margin-top: var(--space-stack);
+}
+
+.cards {
+  display: grid;
+  gap: var(--space-5);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.requestCard {
+.card {
   display: grid;
-  gap: 24px;
-  padding: clamp(22px, 3vw, 40px);
+  gap: var(--space-5);
+  padding: clamp(20px, 3vw, 40px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--paper);
 }
 
-.requestText {
+.cardText {
   display: grid;
   align-content: start;
   justify-items: start;
-  gap: 14px;
+  gap: var(--space-3);
 }
 
-.requestLabel {
+.cardLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--wine);
-  font-size: 0.9375rem;
-  font-weight: 650;
+  font-size: clamp(0.75rem, 0.728rem + 0.094vw, 0.8125rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
-.requestText blockquote {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3vw, 2.625rem);
-  line-height: 1.08;
+.cardLabel::before {
+  content: "";
+  flex: none;
+  width: 24px;
+  height: 1px;
+  background: currentColor;
 }
 
-.requestText p:not(.requestLabel) {
+.quote {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.75rem, 1.3rem + 1.9vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.result {
   max-width: 44ch;
-  color: var(--muted);
 }
 
-.requestFrames {
+.cardLink {
+  margin-top: var(--space-1);
+}
+
+.cardTitle {
+  font: inherit;
+}
+
+.frames {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  align-content: center;
+  gap: var(--space-2);
 }
 
-.requestFrames img {
-  width: 100%;
+.frame {
+  position: relative;
   aspect-ratio: 3 / 4;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: var(--radius-small);
   background: var(--surface);
 }
 
-.requestFramesSquare {
+.frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Перекрас: важен цвет вещи, поэтому четыре кадра сеткой 2×2 и верх кадра. */
+.framesSquare {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* Для перекраса важен цвет вещи: показываем верх кадра. */
-.requestFramesSquare img {
+.framesSquare .frame {
   aspect-ratio: 5 / 4;
+}
+
+.framesSquare img {
   object-position: 50% 0;
 }
 
-@media (min-width: 900px) {
-  .requestCard {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    align-items: center;
-    gap: 40px;
-  }
-
+.cta {
+  display: flex;
 }
 
-@media (min-width: 900px) and (min-height: 700px) {
-  .requestStack {
-    gap: 22vh;
-    padding-bottom: 4vh;
+@media (min-width: 900px) {
+  .card {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: var(--space-7);
+  }
+}
+
+/* ---------- «Липкая» стопка: от 1024×600 и только с движком ---------- */
+
+@media (min-width: 1024px) and (min-height: 600px) {
+  :global([data-fx="on"]) .requests {
+    padding-block: 0;
   }
 
-  .requestCard {
+  /* Ход сцены: 5 карточек × 70vh плюс экран. */
+  :global([data-fx="on"]) .deck {
+    --card-h: min(560px, calc(100svh - var(--header-h) - 120px));
+    height: calc(5 * 70vh + 100vh);
+  }
+
+  :global([data-fx="on"]) .stage {
     position: sticky;
-    top: calc(var(--header-h) + 24px + var(--i) * 16px);
-    min-height: min(480px, calc(100svh - var(--header-h) - 140px));
-    box-shadow: 0 -18px 40px -28px rgb(42 29 24 / 0.35);
+    top: var(--header-h);
+    height: calc(100svh - var(--header-h));
+    grid-template-columns: minmax(260px, 4fr) minmax(0, 8fr);
+    grid-template-rows: 1fr auto auto 1fr;
+    grid-template-areas:
+      ". cards"
+      "head cards"
+      "cta cards"
+      ". cards";
+    align-items: center;
+    column-gap: clamp(32px, 4vw, 72px);
+    row-gap: var(--space-5);
+    padding-block: var(--space-4);
+    overflow: clip;
+  }
+
+  :global([data-fx="on"]) .head {
+    grid-area: head;
+  }
+
+  :global([data-fx="on"]) .head h2 {
+    font-size: clamp(2.5rem, 1.6rem + 3.6vw, min(5rem, 8.5vh));
+  }
+
+  :global([data-fx="on"]) .cta {
+    grid-area: cta;
+  }
+
+  /* Все карточки в одной ячейке; сверху место под края двух карточек в глубине (2 × 14 px). */
+  :global([data-fx="on"]) .cards {
+    grid-area: cards;
+    display: grid;
+    gap: 0;
+    padding-top: 28px;
+  }
+
+  /*
+   * Ожидающие карточки стоят ниже сцены (не меньше 110 % своей высоты и не меньше экрана),
+   * поэтому до входа их не видно и они не выглядывают в неправильном порядке.
+   * Карточка i въезжает на своём окне хода: старт a = 0,2·i − 0,16, длина 0,14 (карточка 0 стоит
+   * сразу). Глубина d — сколько карточек уже въехало поверх неё (сумма их входов). Окна совпадают
+   * с сегментами движка: карточка i впереди ровно на отрезке [0,2·i; 0,2·(i+1)).
+   */
+  /* Специфичность выше общего data-reveal="lift" (globals.css): в сцене карточкой управляет ход. */
+  :global([data-fx="on"]) .deck .cards > .card {
+    --t: clamp(0, (var(--p) - (var(--i) * 0.2 - 0.16)) / 0.14, 1);
+    --e: calc(var(--t) * (2 - var(--t)));
+    --d: calc(
+      clamp(0, (var(--p) - 0.04) / 0.14, 1) * clamp(0, 1 - var(--i), 1) + clamp(0, (var(--p) - 0.24) / 0.14, 1) * clamp(0, 2 - var(--i), 1) +
+        clamp(0, (var(--p) - 0.44) / 0.14, 1) * clamp(0, 3 - var(--i), 1) + clamp(0, (var(--p) - 0.64) / 0.14, 1) * clamp(0, 4 - var(--i), 1)
+    );
+    grid-area: 1 / 1;
+    height: var(--card-h);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: clamp(24px, 3vw, 48px);
+    padding: clamp(24px, 2.6vw, 40px);
+    overflow: hidden;
+    opacity: clamp(0, (2.5 - var(--d)) * 2, 1);
+    box-shadow: 0 20px 60px rgb(28 23 20 / calc(0.1 * clamp(0, 1 - var(--d), 1) * var(--t)));
+    filter: brightness(calc(1 - var(--d) * 0.06));
+    transform: translateY(calc((1 - var(--e)) * max(110%, 100svh) - var(--d) * 14px)) rotate(calc((1 - var(--e)) * 2deg)) scale(calc(1 - var(--d) * 0.05));
+    transform-origin: 50% 0;
+    transition: none;
+    will-change: transform;
+  }
+
+  /* Ссылки задних и ещё не вставших карточек не получают фокус: они закрыты передней. */
+  :global([data-fx="on"]) .card:not([data-active]) a {
+    visibility: hidden;
+  }
+
+  :global([data-fx="on"]) .cardText {
+    align-content: center;
+    gap: var(--space-2);
+  }
+
+  :global([data-fx="on"]) .quote {
+    font-size: clamp(1.5rem, 0.6rem + 2.2vw, min(3.25rem, 5vh));
+  }
+
+  :global([data-fx="on"]) .result {
+    font-size: clamp(0.9375rem, 0.5rem + 1.2vh, 1.0625rem);
+  }
+
+  :global([data-fx="on"]) .frames {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    min-height: 0;
+  }
+
+  :global([data-fx="on"]) .frame {
+    aspect-ratio: auto;
+  }
+
+  :global([data-fx="on"]) .frames:not(.framesSquare) .frame:first-child {
+    grid-row: 1 / span 2;
+  }
+
+  :global([data-fx="on"]) .framesSquare {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Узкий ноутбук: в карточке текст над кадрами, кадры в один ряд. */
+@media (min-width: 1024px) and (max-width: 1279px) and (min-height: 600px) {
+  :global([data-fx="on"]) .deck .cards > .card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  :global([data-fx="on"]) .cardText {
+    align-content: start;
+  }
+
+  :global([data-fx="on"]) .frames,
+  :global([data-fx="on"]) .framesSquare {
+    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  :global([data-fx="on"]) .framesSquare {
+    --cols: 4;
+  }
+
+  :global([data-fx="on"]) .frames:not(.framesSquare) .frame:first-child {
+    grid-row: auto;
   }
 }

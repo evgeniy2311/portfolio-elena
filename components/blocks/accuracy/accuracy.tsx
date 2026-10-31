@@ -1,47 +1,31 @@
-import type { Vars } from "@/components/ui/css-vars";
-import { Photo } from "@/components/ui/photo";
-import styles from "./accuracy.module.css";
 import { accuracySource, checks } from "./data";
+import { Loupe } from "./loupe";
+import styles from "./accuracy.module.css";
 
-/** 8. Точность: исходник неподвижен, детали сменяют друг друга. */
+/** 8. Сверка деталей, «Лупа». От 1024×600 «липкая» сцена 4 × 80vh: один пункт на отрезок прокрутки. */
 export function Accuracy() {
   return (
-    <section className={styles.accuracy} data-pin aria-labelledby="accuracy-title">
-      <div className={styles.accuracyStage}>
-        <div className={`shell ${styles.accuracyGrid}`}>
-          <div className={styles.accuracyCopy}>
-            <p className="eyebrow eyebrow-light">Главное отличие</p>
-            <h2 id="accuracy-title">
-              Вещь в кадре та же, <em>что приедет покупательнице</em>
-            </h2>
-            <p>Нейросеть любит «улучшать» одежду: добавить пуговицу, укоротить рукав. Я сверяю каждый кадр с оригиналом по списку и переделываю, если что-то уехало.</p>
-            <ol className={styles.checkList}>
-              {checks.map((check, index) => (
-                <li key={check.title} style={{ "--i": index } as Vars}>
-                  <span>{index + 1}</span>
-                  <div>
-                    <h3>{check.title}</h3>
-                    <p>{check.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div className={styles.accuracyCompare}>
-            <figure className={styles.accuracySource}>
-              <Photo image={accuracySource} alt="Исходник пальто: студийное фото спереди" sizes="(max-width: 1023px) 45vw, 20vw" />
-              <figcaption>Исходник</figcaption>
-            </figure>
-            <div className={styles.accuracyDetails}>
-              {checks.map((check, index) => (
-                <figure key={check.title} style={{ "--i": index } as Vars}>
-                  <Photo image={check.image} alt={`Готовый кадр: ${check.title.toLowerCase()}`} sizes="(max-width: 1023px) 45vw, 24vw" />
-                  <figcaption>Кадр: {check.title.toLowerCase()}</figcaption>
-                </figure>
-              ))}
+    <section className={styles.accuracy} id="accuracy" data-pin data-segments={checks.length} data-ground="noir" aria-labelledby="accuracy-title">
+      <div className={`shell ${styles.stage}`} data-stage>
+        <Loupe
+          source={accuracySource}
+          sourceAlt="Исходник: бордовое пальто на студийном фото"
+          checks={checks}
+          head={
+            <div className={styles.head}>
+              <p className="eyebrow eyebrow-light">Сверка деталей</p>
+              <h2 id="accuracy-title">
+                Покупательница получит ту же вещь, <em>что видела на&nbsp;фото</em>
+              </h2>
+              <p className={styles.text}>
+                Нейросеть любит дорисовать лишнюю пуговицу или укоротить рукав. Я сверяю каждый кадр с вашим исходником по списку деталей. Что-то не совпало, переделываю.
+              </p>
+              <p className={styles.hint} data-hint>
+                Сравните исходник слева и готовый кадр справа.
+              </p>
             </div>
-          </div>
-        </div>
+          }
+        />
       </div>
     </section>
   );
