@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { works } from "../lib/works";
 import { go, isPages, urlPattern } from "./helpers/navigation";
+import { scrollToPin } from "./helpers/scenes";
 
 const longestWork = [...works].sort((a, b) => b.frames.length - a.frames.length)[0];
 const routes = ["/", "/works", `/works/${longestWork.slug}`, "/works/white-wrap-blouse"];
@@ -10,15 +11,12 @@ async function expectNoOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 }
 
+/**
+ * Прокрутка к прогрессу «липкой» сцены. Точка перемеряется на каждом шаге ожидания (helpers/scenes.ts):
+ * прокрутка до гидрации или до догрузки раскладки выше сцены больше не оставляет прогресс на полпути.
+ */
 async function scrollToProgress(page: Page, selector: string, progress: number) {
-  const target = await page.locator(selector).evaluate((element, value) => {
-    const top = element.getBoundingClientRect().top + window.scrollY;
-    return top + (element.getBoundingClientRect().height - window.innerHeight) * value;
-  }, progress);
-  await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), target);
-  await expect
-    .poll(async () => Number(await page.locator(selector).evaluate((element) => getComputedStyle(element).getPropertyValue("--p"))))
-    .toBeCloseTo(progress, 1);
+  await scrollToPin(page, selector, progress);
 }
 
 const isDesktop = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1024;
@@ -59,8 +57,18 @@ test("все изображения главной загружаются", asyn
   });
   // Кадры, которые на этой ширине не рисуются (display: none, например превью сцены услуг на телефоне), браузер
   // с loading="lazy" не грузит, и это правильно: проверяются только отрисованные.
+  // Под нагрузкой быстрый проход обгоняет IntersectionObserver ленивых кадров: такой кадр так и не начал грузиться.
+  // Каждый ещё не загруженный кадр подводится к окну и ждёт там; сломанный файл всё равно останется в счёте.
   await expect
-    .poll(() => page.evaluate(() => Array.from(document.images).filter((image) => image.getClientRects().length > 0 && (!image.complete || image.naturalWidth === 0)).length), { timeout: 15_000 })
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const pending = Array.from(document.images).filter((image) => image.getClientRects().length > 0 && (!image.complete || image.naturalWidth === 0));
+          pending[0]?.scrollIntoView({ block: "center", behavior: "instant" });
+          return pending.length;
+        }),
+      { timeout: 30_000 },
+    )
     .toBe(0);
 });
 
