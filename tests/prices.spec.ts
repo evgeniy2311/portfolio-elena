@@ -139,3 +139,46 @@ test("без JavaScript: первый кадр виден, кадры листа
   await expect(card(page, "funnel").locator("[data-counter]")).toHaveCount(0);
   await context.close();
 });
+
+test("карточки появляются, как только сетка зашла на экран (дизайн-QA D6)", async ({ page }) => {
+  await go(page, "/");
+  await expect(page.locator("html")).toHaveAttribute("data-fx", "on");
+  const first = page.locator(`${section} [data-card]`).first();
+  const viewport = page.viewportSize()!;
+  // Верх сетки на 75 % высоты окна: видна только первая полоса карточки.
+  await page.evaluate((offset) => {
+    const grid = document.querySelector("#prices ul")!;
+    window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY - offset, behavior: "instant" });
+  }, viewport.height * 0.75);
+  await expect.poll(() => first.evaluate((element) => Number(getComputedStyle(element).opacity)), { timeout: 3000 }).toBeGreaterThan(0.95);
+});
+
+test("сезон: типографическая обложка 3:4 на месте примера, затем заголовок, цена и кнопка (D7)", async ({ page }) => {
+  await go(page, "/");
+  const season = card(page, "season");
+  const cover = season.locator("[aria-hidden=true]").first();
+  await expect(cover).toContainText("Сезон");
+  await expect(cover).toContainText("Коллекции · Долгие проекты · Большие объёмы");
+  const box = (await cover.boundingBox())!;
+  expect(box.width / box.height).toBeCloseTo(0.75, 1);
+  const order = await season.evaluate((element) => {
+    const y = (selector: string) => element.querySelector(selector)!.getBoundingClientRect().top;
+    return [y("[aria-hidden=true]"), y("h3"), y("[data-price]"), y("a")];
+  });
+  expect([...order].sort((a, b) => a - b)).toEqual(order);
+  // Между текстом и ценой нет пустоты: раньше там было ~400 px.
+  const gap = await season.evaluate((element) => {
+    const includes = element.querySelector("h3 + p")!.getBoundingClientRect();
+    return element.querySelector("[data-price]")!.getBoundingClientRect().top - includes.bottom;
+  });
+  expect(gap).toBeLessThan(120);
+});
+
+test("под сеткой фраза и основная кнопка стоят рядом (D23)", async ({ page }) => {
+  await go(page, "/");
+  const text = page.locator(`${section} > .shell > div:last-child p`);
+  const button = page.locator(`${section} > .shell > div:last-child a.button`);
+  const [t, b] = [(await text.boundingBox())!, (await button.boundingBox())!];
+  if (b.y < t.y + t.height) expect(b.x - (t.x + t.width)).toBeLessThanOrEqual(40);
+  else expect(Math.abs(b.x - t.x)).toBeLessThan(2);
+});

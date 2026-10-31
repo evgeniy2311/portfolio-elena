@@ -88,9 +88,40 @@
   background: var(--surface);
 }
 
-.season h3 {
-  margin-top: 0;
-  max-width: 10ch;
+/* Типографическая обложка на месте примера 3:4: внутренняя рамка 1 px с отступом 12 px, слово «Сезон» и строка-метка. */
+.seasonCover {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  aspect-ratio: 3 / 4;
+  padding: var(--space-6);
+  border-radius: var(--radius-small);
+  background: var(--surface);
+  text-align: center;
+}
+
+.seasonCover::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-small);
+  pointer-events: none;
+}
+
+.seasonWord {
+  color: var(--ink);
+  font: italic 500 3.5rem/1 var(--font-display), Georgia, serif;
+}
+
+.seasonLabel {
+  max-width: 22ch;
+  color: var(--wine);
+  font: 600 clamp(0.75rem, 0.728rem + 0.094vw, 0.8125rem)/1.5 var(--font-ui), system-ui, sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .seasonButton {
@@ -229,12 +260,13 @@
 
 /* ---------- Под сеткой ---------- */
 
+/* Фраза и основная кнопка стоят рядом, а не по краям ряда (как концовка FAQ). */
 .cta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4) var(--space-6);
+  justify-content: flex-start;
+  gap: var(--space-5);
   margin-top: var(--space-head);
 }
 
