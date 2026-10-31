@@ -7,6 +7,7 @@ import { Services } from "@/components/blocks/services/services";
 import { Transform } from "@/components/blocks/transform/transform";
 import { Requests } from "@/components/blocks/requests/requests";
 import { Accuracy } from "@/components/blocks/accuracy/accuracy";
+import { Trial } from "@/components/blocks/trial/trial";
 import { ScrollFx } from "@/components/scroll-fx";
 import type { Vars } from "@/components/ui/css-vars";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
@@ -83,17 +84,7 @@ export default function Home() {
 
         <Accuracy />
 
-        {/* 9. Бесплатная проба */}
-        <section className={styles.trial} id="trial" aria-labelledby="trial-title">
-          <div className={`shell ${styles.trialGrid}`} data-reveal>
-            <p className="eyebrow eyebrow-light">Попробуйте без риска</p>
-            <h2 id="trial-title">
-              Два кадра бесплатно. <em>На вашей вещи.</em>
-            </h2>
-            <p className={styles.trialLead}>Пришлите 2–3 фото вещи. Я сделаю 1–2 кадра, и вы увидите результат до оплаты. Не понравится, вы ничего не должны.</p>
-            <TrialLink className="button button-light" />
-          </div>
-        </section>
+        <Trial />
 
         {/* 10. Как это работает */}
         <section className={styles.process} id="process" aria-labelledby="process-title">
