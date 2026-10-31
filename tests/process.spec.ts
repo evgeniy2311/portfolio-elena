@@ -77,9 +77,23 @@ test.describe("сцена от 1024 px", () => {
   });
 
   test("прокрутка ведёт пять состояний: видно одно, шаг слева активен", async ({ page }) => {
+    const heights: number[] = [];
     for (const [index, name] of names.entries()) {
       await scrollToPin(page, section, (index + 0.6) / 5);
       await settle(page);
+      // Одна неизменная коробка 3:4, и текущий слой занимает её по высоте (дизайн-QA D3).
+      const fill = await page.locator(section).evaluate((element, layerName) => {
+        const box = element.querySelector("[data-assembly]")!.getBoundingClientRect();
+        const images = Array.from(element.querySelectorAll(`[data-layer=${layerName}] img, [data-layer=${layerName}] [data-detail]`)).map((node) => node.getBoundingClientRect());
+        const device = element.querySelector(`[data-layer=${layerName}] figure > div`)?.getBoundingClientRect();
+        const rects = layerName === "delivery" && device ? [device] : images;
+        const top = Math.max(box.top, Math.min(...rects.map((rect) => rect.top)));
+        const bottom = Math.min(box.bottom, Math.max(...rects.map((rect) => rect.bottom)));
+        return { height: box.height, ratio: box.width / box.height, covered: (bottom - top) / box.height };
+      }, name);
+      heights.push(fill.height);
+      expect(fill.ratio, name).toBeCloseTo(0.75, 2);
+      expect(fill.covered, name).toBeGreaterThan(0.85);
       const opacities = await page.locator(`${section} [data-layer]`).evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)));
       expect(opacities[index], name).toBeGreaterThan(0.95);
       expect(opacities.filter((value, i) => i !== index && value > 0.05), name).toEqual([]);
@@ -92,6 +106,7 @@ test.describe("сцена от 1024 px", () => {
       return box.bottom - stage.bottom;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+    expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(1);
   });
 });
 

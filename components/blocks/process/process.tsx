@@ -34,27 +34,27 @@ export function Process() {
                   </span>
                   {name === "source" ? (
                     <div className={styles.phone}>
-                      <Photo image={assembly.source.image} alt={assembly.source.alt} sizes="(max-width: 1023px) 50vw, 260px" />
+                      <Photo image={assembly.source.image} alt={assembly.source.alt} sizes="(max-width: 1023px) 70vw, 340px" />
                     </div>
                   ) : null}
                   {name === "trial" ? (
                     <div className={styles.scan}>
-                      {assembly.trial.map((shot) => (
-                        <Photo key={shot.image.src} image={shot.image} alt={shot.alt} sizes="(max-width: 1023px) 45vw, 240px" />
+                      {assembly.trial.map((shot, shotIndex) => (
+                        <Photo key={shot.image.src} className={shotIndex === 0 ? styles.shotA : styles.shotB} image={shot.image} alt={shot.alt} sizes="(max-width: 1023px) 70vw, 340px" />
                       ))}
                       <span className={styles.scanLine} aria-hidden="true" />
                     </div>
                   ) : null}
                   {name === "series"
                     ? assembly.series.map((shot, thumb) => (
-                        <div key={shot.image.src} className={styles.thumb} style={{ "--j": thumb, "--c": (thumb % 3) - 1, "--r": Math.floor(thumb / 3) - 0.5 } as Vars} aria-hidden="true">
-                          <Photo image={shot.image} alt="" sizes="(max-width: 1023px) 30vw, 160px" />
+                        <div key={shot.image.src} className={styles.thumb} style={{ "--j": thumb, "--c": (thumb % 2) - 0.5, "--r": Math.floor(thumb / 2) - 1 } as Vars} aria-hidden="true">
+                          <Photo image={shot.image} alt="" sizes="(max-width: 1023px) 35vw, 160px" />
                         </div>
                       ))
                     : null}
                   {name === "check" ? (
                     <div className={styles.checkFrame}>
-                      <Photo image={assembly.check.image} alt={assembly.check.alt} sizes="(max-width: 1023px) 80vw, 460px" />
+                      <Photo image={assembly.check.image} alt={assembly.check.alt} sizes="(max-width: 1023px) 100vw, 480px" />
                       <span className={styles.corners} aria-hidden="true" />
                       {assembly.details.map((detail, dot) => (
                         <span key={detail.label} className={styles.detail} data-detail="" style={{ "--x": `${detail.x}%`, "--y": `${detail.y}%`, "--j": dot } as Vars} aria-hidden="true">
