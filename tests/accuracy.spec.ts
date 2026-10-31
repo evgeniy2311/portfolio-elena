@@ -162,6 +162,30 @@ test("описание без анимации max-height, лупа идёт к 
   }
 });
 
+test("от 1024 px: описание открыто внутри текущего пункта, ожидающие пункты приглушены", async ({ page }) => {
+  test.skip(!isPinViewport(page), "Сцена «липнет» от 1024×600");
+  await ready(page);
+  for (const index of [0, 2, 3]) {
+    await scrollToPin(page, section, (index + 0.5) / 4);
+    await expect
+      .poll(() =>
+        page.locator(section).evaluate((root, index) => {
+          const items = Array.from(root.querySelectorAll<HTMLElement>("ol > li"));
+          const step = items[index].querySelector("button")!.getBoundingClientRect();
+          const text = items[index].querySelector("[data-slot=description]")!.getBoundingClientRect();
+          const next = items[index + 1]?.querySelector("button")!.getBoundingClientRect();
+          return text.top >= step.bottom - 1 && (!next || text.bottom <= next.top + 1) && text.height > 10;
+        }, index),
+      )
+      .toBe(true);
+    const colors = await page.locator(section).evaluate((root) =>
+      Array.from(root.querySelectorAll<HTMLElement>("ol > li")).map((item) => ({ state: item.dataset.state, color: getComputedStyle(item.querySelector("button")!).color })),
+    );
+    const active = colors.find((item) => item.state === "active")!.color;
+    for (const item of colors.filter((entry) => entry.state === "next")) expect(item.color).not.toBe(active);
+  }
+});
+
 test("1280×680: заголовок, список, исходник и кадр помещаются в сцену", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-1440", "Один прогон на размер");
   await page.setViewportSize({ width: 1280, height: 680 });
@@ -227,6 +251,21 @@ test("при reduced motion и без JS — четыре статические
       await expect(root.locator("[data-dot]")).toHaveCount(4);
       for (const check of checks) await expect(root.getByText(check.text)).toBeVisible();
       await expect(root.locator("[data-lens]")).toBeHidden();
+      if (viewport.width < 768) {
+        // Телефон: кадры в две колонки, подписи под фото, а не плашкой поверх.
+        const layout = await root.locator("[data-results] figure").evaluateAll((figures) =>
+          figures.map((figure) => {
+            const image = figure.querySelector("[data-clip]")!.getBoundingClientRect();
+            const caption = figure.querySelector("figcaption")!.getBoundingClientRect();
+            return { left: Math.round(image.left), width: image.width, below: caption.top >= image.bottom - 1 };
+          }),
+        );
+        expect(new Set(layout.map((item) => item.left)).size).toBe(2);
+        for (const item of layout) {
+          expect(item.below).toBe(true);
+          expect(item.width).toBeGreaterThan(140);
+        }
+      }
       await context.close();
     }
   }

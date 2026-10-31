@@ -196,6 +196,38 @@
   display: none;
 }
 
+/*
+ * Телефон без движка: исходник с номерами во всю ширину, под ним четыре готовых кадра в две колонки.
+ * Подписи под фото, а не плашкой поверх: на узкой плитке плашка переносилась по слову в строке.
+ */
+@media (max-width: 767px) {
+  :global(:root:not([data-fx="on"])) .viewer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :global(:root:not([data-fx="on"])) .results {
+    gap: var(--space-5) var(--space-3);
+  }
+
+  :global(:root:not([data-fx="on"])) .caption,
+  :global(:root:not([data-fx="on"])) .results .caption {
+    position: static;
+    max-width: none;
+    margin-top: var(--space-2);
+    padding: 0;
+    background: none;
+    color: var(--on-dark-muted);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.45;
+  }
+
+  :global(:root:not([data-fx="on"])) .captionNumber {
+    color: var(--champagne);
+    font-weight: 600;
+  }
+}
+
 /* ---------- С движком: лупа, кадр из точки, один пункт ---------- */
 
 :global([data-fx="on"]) .dot,
@@ -352,7 +384,7 @@
   border-width: 1.5px;
 }
 
-/* li в сцене — display: contents, поэтому прозрачность у кнопки пункта. */
+/* Пройденный пункт на 50 %: прозрачность у кнопки, описание пункта и так закрыто. */
 :global([data-fx="on"]) .item[data-state="done"] .step {
   opacity: 0.5;
 }
@@ -412,9 +444,12 @@
     text-align: center;
   }
 
-  :global([data-fx="on"]) .description {
+  :global([data-fx="on"]) .descriptionSlot {
     grid-row: 2;
     grid-column: 1 / -1;
+  }
+
+  :global([data-fx="on"]) .description {
     padding-left: 0;
   }
 }
@@ -469,21 +504,44 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /*
+   * Описание открывается внутри своей строки: вторая строка сетки пункта 0fr → 1fr, поэтому текст
+   * читается как пояснение именно к этому пункту. Ожидающие пункты приглушены, текущий яркий,
+   * пройденные на 50 %.
+   */
   :global([data-fx="on"]) .item {
-    display: contents;
+    display: grid;
+    grid-template-rows: auto 0fr;
+    gap: 0;
+    padding-block: 0;
+    transition: grid-template-rows 400ms var(--ease-inout);
+  }
+
+  :global([data-fx="on"]) .item[data-state="active"] {
+    grid-template-rows: auto 1fr;
+  }
+
+  :global([data-fx="on"]) .descriptionSlot {
+    min-height: 0;
+    overflow: hidden;
   }
 
   :global([data-fx="on"]) .step {
     min-height: 44px;
     padding-block: 2px;
-    border-top: 1px solid rgb(244 238 230 / 0.14);
+    color: var(--on-dark-muted);
+    transition: color var(--dur-2) var(--ease-atelier);
+  }
+
+  :global([data-fx="on"]) .item[data-state="active"] .step {
+    color: var(--on-dark);
   }
 
   :global([data-fx="on"]) .description {
-    grid-row: 5;
-    grid-column: 1;
-    min-height: 3.2em;
-    padding-top: var(--space-2);
+    padding: var(--space-1) 0 var(--space-3) 44px;
+    color: var(--on-dark-muted);
+    font-size: 0.9375rem;
+    line-height: 1.5;
   }
 
   /* Два кадра рядом, высота ограничена сценой. */

@@ -16,7 +16,8 @@ type Line = { x1: number; y1: number; x2: number; y2: number; width: number; hei
 /**
  * «Лупа»: исходник слева, лупа ×2,2 едет к точке текущей детали, справа готовый кадр открывается
  * кругом из той же относительной точки, между ними рисуется линия. Пункт списка один: его описание
- * сменяет предыдущее «по одному» (ушло, потом пришло), без анимации высоты.
+ * открывается внутри своей строки (строка сетки 0fr → 1fr) и сменяет предыдущее «по одному»
+ * (ушло, потом пришло); у самого описания высота не анимируется.
  *
  * Текущий пункт:
  * - от 1024×600 (сцена «липнет») — сегмент движка: ScrollFx ставит data-active у [data-segment],
@@ -162,9 +163,11 @@ export function Loupe({ head, source, sourceAlt, checks }: Props) {
                 </span>
                 <span className={styles.stepTitle}>{check.title}</span>
               </button>
-              <p className={styles.description} data-slot="description">
-                {check.text}
-              </p>
+              <div className={styles.descriptionSlot}>
+                <p className={styles.description} data-slot="description">
+                  {check.text}
+                </p>
+              </div>
             </li>
           ))}
         </ol>
