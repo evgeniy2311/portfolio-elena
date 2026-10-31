@@ -5,12 +5,13 @@ import { Hero } from "@/components/blocks/hero/hero";
 import { Categories } from "@/components/blocks/categories/categories";
 import { About } from "@/components/blocks/about/about";
 import { Pains } from "@/components/blocks/pains/pains";
+import { Services } from "@/components/blocks/services/services";
 import { ScrollFx } from "@/components/scroll-fx";
 import type { Vars } from "@/components/ui/css-vars";
 import { Photo } from "@/components/ui/photo";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
 import { formatPrice, packages } from "@/lib/site";
-import { frame, getWork, source, works, type Work, type WorkImage } from "@/lib/works";
+import { frame, getWork, source, works, type Work } from "@/lib/works";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
@@ -26,45 +27,6 @@ export const metadata: Metadata = {
 };
 
 const accuracySource = source("burgundy-coat-city", 0);
-
-const services: Array<{ title: string; text: string; image: WorkImage; alt: string }> = [
-  {
-    title: "Главное фото",
-    text: "Обложка с инфографикой, которая выделяет вашу карточку среди сотен похожих в выдаче.",
-    image: frame("yellow-trench", 0),
-    alt: "Жёлтый тренч на модели в городе",
-  },
-  {
-    title: "Воронка карточки",
-    text: "Серия от 8 до 20 кадров: посадка, вид сзади, детали, образы. Одна вещь, одна история от обложки до последнего кадра.",
-    image: frame("beige-windbreaker", 3),
-    alt: "Бежевая ветровка на модели у тёмной стены",
-  },
-  {
-    title: "Образы и сцены",
-    text: "Город, интерьер, студия. Одну вещь показываю в разных стилях для разных покупательниц.",
-    image: frame("brown-coat-three-looks", 0),
-    alt: "Шоколадное пальто с джинсами и рубашкой в городе",
-  },
-  {
-    title: "Новый цвет",
-    text: "Та же серия в другом цвете вещи без новой съёмки. Даже если этого цвета не было на фото.",
-    image: frame("longsleeve-colors", 3),
-    alt: "Чёрный лонгслив на модели в студии",
-  },
-  {
-    title: "Модель под вашу аудиторию",
-    text: "Другой рост, размер и типаж. Крой вещи при этом не меняется.",
-    image: frame("white-wrap-blouse", 9),
-    alt: "Белая блузка на запах с чёрной юбкой",
-  },
-  {
-    title: "Детали крупно",
-    text: "Ткань, фурнитура, швы, мех. Снимаю вопросы до покупки, а не после возврата.",
-    image: frame("grey-shearling", 1),
-    alt: "Дублёнка с мехом и каракулем крупным планом",
-  },
-];
 
 const railSlugs = ["black-coat-evening", "beige-windbreaker", "puffer-jacket", "yellow-trench", "grey-shearling", "white-wrap-blouse"] as const;
 const railWorks = railSlugs.map((slug) => getWork(slug)).filter((work): work is Work => Boolean(work));
@@ -171,40 +133,7 @@ export default function Home() {
 
         <Pains />
 
-        {/* 5. Что вы получаете: услуги сменяют друг друга при прокрутке */}
-        <section className={styles.services} id="services" data-pin aria-labelledby="services-title" style={{ "--n": services.length } as Vars}>
-          <div className={styles.servicesStage}>
-            <div className={`shell ${styles.servicesInner}`}>
-              <div className={styles.servicesHead}>
-                <p className="eyebrow">Услуги</p>
-                <h2 id="services-title">
-                  Что вы <em>получаете</em>
-                </h2>
-              </div>
-              <ol className={styles.serviceList}>
-                {services.map((service, index) => (
-                  <li key={service.title} style={{ "--i": index } as Vars}>
-                    <div className={styles.serviceText}>
-                      <span className={styles.serviceNumber}>
-                        {String(index + 1).padStart(2, "0")} / {String(services.length).padStart(2, "0")}
-                      </span>
-                      <h3>{service.title}</h3>
-                      <p>{service.text}</p>
-                    </div>
-                    <figure className={styles.serviceImage}>
-                      <Photo image={service.image} alt={service.alt} sizes="(max-width: 1023px) 92vw, 44vw" />
-                    </figure>
-                  </li>
-                ))}
-              </ol>
-              <ol className={styles.serviceDots} aria-hidden="true">
-                {services.map((service, index) => (
-                  <li key={service.title} style={{ "--i": index } as Vars} />
-                ))}
-              </ol>
-            </div>
-          </div>
-        </section>
+        <Services />
 
         {/* 6. До и после: горизонтальная лента, которую двигает вертикальная прокрутка */}
         <section className={styles.rail} id="transform" data-pin data-rail aria-labelledby="rail-title">
