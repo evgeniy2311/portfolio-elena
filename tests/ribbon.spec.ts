@@ -129,11 +129,32 @@ test("перетаскивание мышью идёт 1:1, бросок кат�
   // Пока мышь держит ленту, дрейф не добавляется: сдвиг ровно за указателем.
   expect(Math.abs(dragged + 120)).toBeLessThan(3);
   await expect(page.locator(root)).toHaveAttribute("data-dragging", "");
-  // Быстрый бросок влево и отпускание.
-  await page.mouse.move(box.x + 300, y, { steps: 3 });
+  // Быстрый бросок влево и отпускание. Скорость считается по последним 80 мс (VELOCITY_WINDOW): если между
+  // последним движением и отпусканием проходит больше, броска нет, и это правильное поведение. Под нагрузкой
+  // команды Playwright приходят с такими паузами, поэтому сам бросок идёт внутри страницы, кадр за кадром,
+  // тем же указателем (pointerId мыши), а сдвиг меряется сразу после отпускания.
+  const thrown = await page.locator(viewport).evaluate(async (element, { fromX, toX, clientY }) => {
+    const frame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+    const read = () => new DOMMatrixReadOnly(getComputedStyle(element.querySelector("[data-ribbon-track]")!).transform).m41;
+    const fire = (type: string, clientX: number) =>
+      element.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 1, pointerType: "mouse", isPrimary: true, button: 0, buttons: type === "pointerup" ? 0 : 1, clientX, clientY }));
+    const steps = 4;
+    for (let step = 1; step <= steps; step += 1) {
+      await frame();
+      fire("pointermove", fromX + ((toX - fromX) * step) / steps);
+    }
+    fire("pointerup", toX);
+    const dragging = element.closest("[data-ribbon]")!.hasAttribute("data-dragging");
+    const before = read();
+    const start = performance.now();
+    while (performance.now() - start < 200) await frame();
+    return { dragging, delta: read() - before };
+  }, { fromX: box.x + 470, toX: box.x + 300, clientY: y });
+  expect(thrown.dragging).toBe(false);
+  expect(unwrap(thrown.delta, await copyWidth(page))).toBeLessThan(-20);
+  // Настоящее отпускание мыши: жест уже закончен, клик после перетаскивания отменён.
   await page.mouse.up();
   await expect(page.locator(root)).not.toHaveAttribute("data-dragging", "");
-  expect(await travel(page, 200)).toBeLessThan(-20);
   expect(await page.evaluate(() => (window as unknown as { __clicks: number }).__clicks)).toBe(0);
 });
 
