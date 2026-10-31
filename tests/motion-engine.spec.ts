@@ -9,12 +9,19 @@ import { framesDuring, instrument, isPinViewport, listenerCounts, pinGeometry, r
  */
 
 /**
- * Слушатель visibilitychange держит только ticker, пока у него есть подписчики, поэтому его число
- * зависит от момента замера: проверяется, что он не больше одного, а остальные сравниваются точно.
+ * visibilitychange слушают ticker (только пока у него есть подписчики, поэтому его вклад 0 или 1
+ * в зависимости от момента замера) и блоки со своими таймерами: автосмена «Как это работает»
+ * (по одному на [data-assembly-controls]) и ролики (один на набор, если есть [data-video-toggle]).
+ * Число блоков берётся из DOM: утечка при повторном монтировании даёт больше «блоки + 1».
  */
 async function stableCounts(page: Page) {
   const counts = await listenerCounts(page);
-  expect(counts["document:visibilitychange"] ?? 0).toBeLessThanOrEqual(1);
+  const owners = await page.evaluate(
+    () => document.querySelectorAll("[data-assembly-controls]").length + (document.querySelector("[data-video-toggle]") ? 1 : 0),
+  );
+  const visibility = counts["document:visibilitychange"] ?? 0;
+  expect(visibility).toBeGreaterThanOrEqual(owners);
+  expect(visibility).toBeLessThanOrEqual(owners + 1);
   delete counts["document:visibilitychange"];
   return counts;
 }
@@ -223,8 +230,19 @@ test.describe("сцены страницы", () => {
       await expect(page.locator("#qa-segments [data-segment][data-active]")).toHaveCount(1);
       await expect(page.locator("#qa-segments [data-segment]").nth(k)).toHaveAttribute("data-active", "");
     }
-    // Сцена стоит в самом конце страницы: при дробной высоте страницы прокрутка упирается на доли пикселя раньше.
-    expect(Number(await readVar(page, "#qa-segments", "--t"))).toBeCloseTo(1, 2);
+    // Сцена стоит в самом конце страницы: при дробной высоте страницы прокрутка упирается на доли пикселя раньше,
+    // и --p останавливается чуть ниже 1. В последнем из 7 сегментов --t усиливает этот недоход в 7 раз, поэтому
+    // --t сверяется с фактическим --p через segmentOf, а близость к концу проверяется отдельно.
+    await expect
+      .poll(async () => {
+        const [p, t] = await page.locator("#qa-segments").evaluate((element) => {
+          const style = getComputedStyle(element);
+          return [Number(style.getPropertyValue("--p")), Number(style.getPropertyValue("--t"))];
+        });
+        return Math.abs(t - segmentOf(p, 7).t);
+      })
+      .toBeLessThan(0.005);
+    expect(Number(await readVar(page, "#qa-segments", "--t"))).toBeGreaterThan(0.95);
   });
 });
 
