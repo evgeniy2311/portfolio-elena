@@ -57,8 +57,10 @@ test("все изображения главной загружаются", asyn
       await new Promise((resolve) => setTimeout(resolve, 40));
     }
   });
+  // Кадры, которые на этой ширине не рисуются (display: none, например превью сцены услуг на телефоне), браузер
+  // с loading="lazy" не грузит, и это правильно: проверяются только отрисованные.
   await expect
-    .poll(() => page.evaluate(() => Array.from(document.images).filter((image) => !image.complete || image.naturalWidth === 0).length), { timeout: 15_000 })
+    .poll(() => page.evaluate(() => Array.from(document.images).filter((image) => image.getClientRects().length > 0 && (!image.complete || image.naturalWidth === 0)).length), { timeout: 15_000 })
     .toBe(0);
 });
 
@@ -116,15 +118,15 @@ test("первый экран сразу показывает работы, ус
   test.skip(!isDesktop(page), "Сцена услуг работает от 1024 px");
   await expect(page.locator("html")).toHaveAttribute("data-fx", "on");
   const services = "#services";
-  const items = page.locator(`${services} ol:first-of-type > li`);
-  const opacityOfText = (index: number) => items.nth(index).locator("h3").evaluate((element) => Number(getComputedStyle(element.parentElement!).opacity));
+  const slots = page.locator(`${services} [data-text-slot]`);
+  const opacityOfText = (index: number) => slots.nth(index).evaluate((element) => Number(getComputedStyle(element).opacity));
 
   await scrollToProgress(page, services, 0);
   expect(await opacityOfText(0)).toBeGreaterThan(0.95);
-  expect(await opacityOfText(5)).toBeLessThan(0.05);
+  expect(await opacityOfText(6)).toBeLessThan(0.05);
 
   await scrollToProgress(page, services, 1);
-  expect(await opacityOfText(5)).toBeGreaterThan(0.95);
+  expect(await opacityOfText(6)).toBeGreaterThan(0.95);
   expect(await opacityOfText(0)).toBeLessThan(0.05);
   await expectNoOverflow(page);
 });
@@ -160,8 +162,9 @@ test("при reduced motion всё показано сразу и без «ли�
   await go(page, "/");
   await expect(page.locator("html")).not.toHaveAttribute("data-fx", "on");
   const servicesHeight = await page.locator("#services").evaluate((element) => element.getBoundingClientRect().height);
-  expect(servicesHeight).toBeLessThan((page.viewportSize()?.height ?? 800) * 6);
-  expect(await page.locator("#services ol:first-of-type > li h3").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element.parentElement!).opacity)))).toEqual([1, 1, 1, 1, 1, 1]);
+  // Семь услуг списком на телефоне: заметно короче сцены (7 × 75vh + 100vh), но длиннее шести экранов.
+  expect(servicesHeight).toBeLessThan((page.viewportSize()?.height ?? 800) * 7);
+  expect(await page.locator("#services [data-text-slot]").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)))).toEqual([1, 1, 1, 1, 1, 1, 1]);
   for (const opacity of await page.locator("main figure").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)))) {
     expect(opacity).toBe(1);
   }

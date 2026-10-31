@@ -13,7 +13,8 @@ import { QA_SENTINEL, qaVideoRoute } from "./fixtures/site";
  * Production и export с флагом не собираются, а в готовой сборке нет следов тестовых данных.
  */
 const root = path.resolve(__dirname, "..");
-const qaOrigin = "http://127.0.0.1:3001";
+// PLAYWRIGHT_QA_URL — свой стенд, когда тесты идут против уже запущенного сервера (PLAYWRIGHT_BASE_URL).
+const qaOrigin = process.env.PLAYWRIGHT_QA_URL ?? "http://127.0.0.1:3001";
 
 test.describe("dev-сервер с тестовыми данными", () => {
   test.use({ baseURL: qaOrigin });
@@ -62,8 +63,13 @@ test.describe("dev-сервер с тестовыми данными", () => {
     }
   });
 
-  // DEVIATION: блок «Видео из фото» появляется на этапе 9; там проверка рендера четырёх <video> включается.
-  test.fixme("videos: блок показывает четыре настоящих HTML video", async () => {});
+  test("videos: блок показывает четыре настоящих HTML video", async ({ page }) => {
+    await page.goto("/");
+    const videos = page.locator("#video video");
+    await expect(videos).toHaveCount(4);
+    for (const video of await videos.all()) await expect(video.locator("source")).toHaveCount(2);
+    await expect(page.locator("#video")).not.toContainText("Ролики скоро");
+  });
 });
 
 test.describe("защита сборки", () => {

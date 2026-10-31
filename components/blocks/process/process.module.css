@@ -1,96 +1,551 @@
-/* Блок «Как это работает». Правила перенесены из app/home.module.css без изменений. */
+/* Блок 10 «Как это работает» · «Assembly Line» · фон paper (design/brief.md). */
 
-/* Общий заголовок секции, скопирован из app/home.module.css с прежней специфичностью. */
-.sectionHead {
-  display: grid;
-  gap: 18px;
-  max-width: 760px;
-  margin-bottom: clamp(40px, 6vw, 72px);
+/* Ход внутреннего движения состояния 0..1. Зарегистрировано, чтобы в режиме «по времени» шло transition. */
+@property --al-s {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
 }
-
-.sectionHead h2 {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-}
-
-.sectionHead > p:last-child:not(:first-child) {
-  max-width: 58ch;
-  color: var(--muted);
-  font-size: 1.125rem;
-}
-
-/* ---------- 9. Как работаю ---------- */
 
 .process {
-  padding-block: clamp(88px, 12vw, 160px);
+  background: var(--paper);
+  padding-block: var(--space-section);
 }
 
-.processGrid {
+.grid {
   display: grid;
+  grid-template-areas: "head" "visual" "steps";
+  gap: var(--space-head);
 }
 
-.processList {
-  --p: 1;
+.head {
+  grid-area: head;
+}
+
+.head h2 {
+  max-width: 16ch;
+}
+
+.visual {
+  grid-area: visual;
+  min-width: 0;
+}
+
+.stepsBlock {
+  display: grid;
+  grid-area: steps;
+  justify-items: start;
+  gap: var(--space-5);
+}
+
+/* ---------- Шаги ---------- */
+
+.track {
   position: relative;
+  width: 100%;
+}
+
+.rail {
+  display: none;
+}
+
+.steps {
   display: grid;
-  gap: 28px;
+  gap: var(--space-5);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.processLine {
-  position: absolute;
-  left: 23px;
-  top: 24px;
-  bottom: 24px;
-  width: 2px;
-  background: var(--wine);
-  transform: scaleY(min(1, calc(var(--p) * 1.9)));
-  transform-origin: top;
-}
-
-.processList li {
-  position: relative;
+.step {
   display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 20px;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--space-3);
+  transition: color var(--dur-3) var(--ease-atelier);
 }
 
-.processList li > span {
-  display: inline-flex;
-  width: 48px;
-  height: 48px;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid var(--wine);
-  border-radius: 50%;
-  background: var(--canvas);
+.stepNumber {
+  padding-top: 0.2em;
   color: var(--wine);
-  font-weight: 700;
+  font-size: 0.9375rem;
+  line-height: 1.2;
 }
 
-.processList h3 {
-  margin: 10px 0 6px;
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 500;
-  line-height: 1.05;
-}
-
-.processList p {
-  max-width: 46ch;
+.step p {
+  max-width: 44ch;
+  margin-top: var(--space-1);
   color: var(--muted);
 }
 
+/* ---------- Сцена: статичные пять кадров со стрелками (без JS и при reduced motion) ---------- */
+
+.assembly {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: var(--space-7);
+}
+
+.layer {
+  position: relative;
+  width: min(100%, 320px);
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-small);
+  background: var(--canvas);
+}
+
+.layer:not(:last-child)::after {
+  content: "↓";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + var(--space-7) / 2);
+  color: var(--wine);
+  font-weight: 600;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+.layerNumber {
+  position: absolute;
+  left: var(--space-2);
+  top: var(--space-2);
+  z-index: 4;
+  padding: 2px 6px;
+  border-radius: var(--radius-small);
+  background: var(--paper);
+  color: var(--wine);
+  font-size: 0.8125rem;
+}
+
+.layer img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 1. Исходник в нейтральной рамке телефона, наклон −4°. */
+.phone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56%;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border: 6px solid var(--ink);
+  border-radius: 22px;
+  background: var(--surface);
+  transform: translate(-50%, -50%) rotate(calc(-4deg * var(--al-s)));
+}
+
+/* 2. Два бесплатных кадра проявляются сверху вниз за линией сканирования. */
+.scan {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 50%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4%;
+  transform: translateY(-50%);
+}
+
+/* <picture> кадра прозрачен для раскладки (display: contents), его <source> не должны занимать ячейки сетки. */
+.scan source {
+  display: none;
+}
+
+.scan img {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-small);
+  clip-path: inset(0 0 calc((1 - var(--al-s)) * 100%) 0);
+}
+
+.scanLine {
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: calc(var(--al-s) * 100%);
+  height: 2px;
+  background: var(--wine);
+  opacity: clamp(0, (1 - var(--al-s)) * 8, 1);
+}
+
+/* 3. Серия: шесть кадров раскрываются веером из стопки в сетку 3 × 2. */
+.thumb {
+  position: absolute;
+  left: 35%;
+  top: 35%;
+  width: 30%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: var(--radius-small);
+  box-shadow: 0 0 0 2px var(--paper);
+  transform: translate(calc(var(--c) * 108% * var(--al-s)), calc(var(--r) * 112% * var(--al-s))) rotate(calc((var(--j) - 2.5) * 5deg * (1 - var(--al-s))));
+}
+
+/* 4. Сверка: уголки кадра и три точки на поясе, манжете и пряжке. */
+.checkFrame {
+  position: absolute;
+  inset: 5%;
+}
+
+.checkFrame img {
+  border-radius: var(--radius-small);
+}
+
+.corners {
+  position: absolute;
+  inset: -6px;
+  background:
+    linear-gradient(var(--wine), var(--wine)) top left / 24px 2px no-repeat,
+    linear-gradient(var(--wine), var(--wine)) top left / 2px 24px no-repeat,
+    linear-gradient(var(--wine), var(--wine)) top right / 24px 2px no-repeat,
+    linear-gradient(var(--wine), var(--wine)) top right / 2px 24px no-repeat,
+    linear-gradient(var(--wine), var(--wine)) bottom left / 24px 2px no-repeat,
+    linear-gradient(var(--wine), var(--wine)) bottom left / 2px 24px no-repeat,
+    linear-gradient(var(--wine), var(--wine)) bottom right / 24px 2px no-repeat,
+    linear-gradient(var(--wine), var(--wine)) bottom right / 2px 24px no-repeat;
+  opacity: var(--al-s);
+  transform: scale(calc(1.06 - 0.06 * var(--al-s)));
+}
+
+.detail {
+  --ds: clamp(0, (var(--al-s) - var(--j) * 0.2) / 0.4, 1);
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--wine);
+  border-radius: 50%;
+  background: rgb(255 253 250 / 0.6);
+  opacity: var(--ds);
+  transform: translate(-50%, -50%) scale(calc(0.6 + 0.4 * var(--ds)));
+}
+
+.detail span {
+  position: absolute;
+  left: calc(100% + 6px);
+  top: 50%;
+  padding: 2px 6px;
+  border-radius: var(--radius-small);
+  background: var(--paper);
+  color: var(--ink);
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+
+/* 5. Выдача: кадр уменьшается в нейтральную карточку на телефоне, внутри листается серия 12 кадров. */
+/* Классы слоёв: по ним выбирается текущее состояние в режиме «по времени»; isolation держит наложение кадров внутри слоя. */
+.source,
+.trial,
+.series,
+.check,
+.delivery {
+  isolation: isolate;
+}
+
+.deliveryCard {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.device {
+  display: grid;
+  gap: 6px;
+  width: 50%;
+  min-width: 120px;
+  padding: 6px 6px 12px;
+  border: 5px solid var(--ink);
+  border-radius: 22px;
+  background: var(--paper);
+  transform: scale(calc(1.15 - 0.15 * var(--al-s)));
+}
+
+.screen {
+  aspect-ratio: 9 / 13;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.strip {
+  display: grid;
+  gap: 4px;
+  transform: translateY(calc(var(--al-s) * -86%));
+}
+
+.strip img {
+  aspect-ratio: 3 / 4;
+  height: auto;
+}
+
+.skeleton {
+  display: block;
+  width: 80%;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--line);
+}
+
+.skeleton + .skeleton {
+  width: 45%;
+}
+
+.deliveryCard figcaption {
+  max-width: 90%;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Точки и пауза режима «по времени». */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.controls[hidden] {
+  display: none;
+}
+
+.controls [data-assembly-dots] {
+  display: flex;
+}
+
+.controls button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.controls [data-assembly-dots] button::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background-color var(--dur-2) var(--ease-atelier), transform var(--dur-2) var(--ease-atelier);
+}
+
+.controls [data-assembly-dots] button[aria-current="step"]::after {
+  background: var(--wine);
+  transform: scale(1.25);
+}
+
+.controls [data-assembly-pause] {
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-small);
+}
+
 @media (min-width: 1024px) {
-  .processGrid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    gap: 72px;
-    align-items: start;
+  .assembly {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-6);
   }
 
-  .processGrid .sectionHead {
+  .layer {
+    width: 100%;
+  }
+
+  .layer:not(:last-child)::after {
+    content: "→";
+    left: calc(100% + var(--space-6) / 2);
+    top: 50%;
+  }
+
+  .steps {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  .step {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Режим «по времени»: телефон, планшет, низкое окно ---------- */
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly {
+  position: relative;
+  display: block;
+  width: min(100%, 440px);
+  aspect-ratio: 3 / 4;
+  margin-inline: auto;
+}
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .steps {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .step {
+  grid-template-columns: 32px minmax(0, 1fr);
+}
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .layer {
+  --al-s: 0;
+  position: absolute;
+  inset: 0;
+  width: auto;
+  background: none;
+  opacity: 0;
+  transition:
+    opacity 400ms var(--ease-atelier),
+    --al-s 1000ms var(--ease-inout);
+}
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .delivery {
+  transition:
+    opacity 400ms var(--ease-atelier),
+    --al-s 1400ms linear;
+}
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly[data-phase="0"] .source,
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly[data-phase="1"] .trial,
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly[data-phase="2"] .series,
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly[data-phase="3"] .check,
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .assembly[data-phase="4"] .delivery {
+  --al-s: 1;
+  opacity: 1;
+}
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .layer::after,
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .layerNumber {
+  display: none;
+}
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .step {
+  color: var(--muted);
+}
+
+:global([data-fx="on"]) .process:not([data-pinned="on"]) .step[data-current] {
+  color: var(--ink);
+}
+
+/* ---------- Сцена от 1024 × 600: секция 5 × 80vh, состояния по --k/--t движка ---------- */
+@media (min-width: 1024px) and (min-height: 600px) {
+  .process[data-pinned="on"] {
+    height: calc(5 * 80vh);
+    padding-block: 0;
+  }
+
+  .process[data-pinned="on"] .stage {
     position: sticky;
-    top: calc(var(--header-h) + 48px);
+    top: var(--header-h);
+    height: calc(100vh - var(--header-h));
+    padding-block: var(--space-4);
+    overflow: clip;
+  }
+
+  .process[data-pinned="on"] .grid {
+    grid-template-areas: "head visual" "steps visual";
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: var(--space-5) var(--space-8);
+    height: 100%;
+  }
+
+  .process[data-pinned="on"] .head h2 {
+    font-size: min(clamp(2.5rem, 1.6rem + 3.6vw, 5rem), 8vh);
+  }
+
+  .process[data-pinned="on"] .stepsBlock {
+    align-content: start;
+    gap: var(--space-4);
+    min-height: 0;
+  }
+
+  .process[data-pinned="on"] .visual {
+    display: grid;
+    place-items: center;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .process[data-pinned="on"] .assembly {
+    position: relative;
+    display: block;
+    height: min(640px, 100%);
+    max-width: 100%;
+    aspect-ratio: 3 / 4;
+  }
+
+  .process[data-pinned="on"] .layer {
+    --d: calc(var(--k, 0) + var(--t, 0) - var(--i));
+    --al-s: clamp(0, var(--d) / 0.6, 1);
+    --in: clamp(0, (var(--d) + 0.08) / 0.16, 1);
+    --out: clamp(0, (var(--d) - 0.92) / 0.16, 1);
+    position: absolute;
+    inset: 0;
+    width: auto;
+    background: none;
+    opacity: calc(var(--in) * (1 - var(--out)));
+  }
+
+  .process[data-pinned="on"] .layer:first-child {
+    --in: 1;
+  }
+
+  .process[data-pinned="on"] .layer:last-child {
+    --out: 0;
+  }
+
+  .process[data-pinned="on"] .layer::after,
+  .process[data-pinned="on"] .layerNumber {
+    display: none;
+  }
+
+  .process[data-pinned="on"] .track {
+    padding-left: var(--space-5);
+  }
+
+  /* Шкала хода: 1 px вина растёт сверху вниз по --p сцены. */
+  .process[data-pinned="on"] .rail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    display: block;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .process[data-pinned="on"] .rail::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--wine);
+    transform: scaleY(var(--p, 0));
+    transform-origin: top;
+  }
+
+  .process[data-pinned="on"] .steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .process[data-pinned="on"] .step {
+    grid-template-columns: 32px minmax(0, 1fr);
+    color: var(--muted);
+  }
+
+  .process[data-pinned="on"] .step[data-active] {
+    color: var(--ink);
   }
 }

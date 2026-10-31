@@ -7,6 +7,7 @@ import { Services } from "@/components/blocks/services/services";
 import { Transform } from "@/components/blocks/transform/transform";
 import { Requests } from "@/components/blocks/requests/requests";
 import { Accuracy } from "@/components/blocks/accuracy/accuracy";
+import { Video } from "@/components/blocks/video/video";
 import { Process } from "@/components/blocks/process/process";
 import { Prices } from "@/components/blocks/prices/prices";
 import { Faq } from "@/components/blocks/faq/faq";
@@ -43,6 +44,7 @@ export default function Home() {
         <Transform />
         <Requests />
         <Accuracy />
+        <Video />
         <Process />
         <Prices />
         <Faq />
