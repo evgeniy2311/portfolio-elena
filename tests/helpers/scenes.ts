@@ -33,11 +33,30 @@ export async function pinGeometry(page: Page, selector: string) {
   });
 }
 
-/** Прокручивает к прогрессу sticky-хода и ждёт, пока сглаженное --p догонит. */
+/**
+ * Прокручивает к прогрессу sticky-хода и ждёт, пока сглаженное --p догонит.
+ * Геометрия перемеряется на каждом шаге ожидания: если прокрутка пришлась до гидрации (движок ещё не
+ * смонтирован) или раскладка выше сцены доехала позже (картинки, шрифты), страница докручивается
+ * к новой точке, а не ждёт прогресса от устаревшей.
+ */
 export async function scrollToPin(page: Page, selector: string, progress: number) {
-  const { start, end } = await pinGeometry(page, selector);
-  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), start + (end - start) * progress);
-  await expect.poll(async () => Number(await readVar(page, selector, "--p")), { timeout: 5000 }).toBeCloseTo(progress, 2);
+  const scrollThere = async () => {
+    const { start, end } = await pinGeometry(page, selector);
+    const target = start + (end - start) * progress;
+    await page.evaluate((y) => {
+      if (Math.abs(window.scrollY - y) > 1) window.scrollTo({ top: y, behavior: "instant" });
+    }, target);
+  };
+  await scrollThere();
+  await expect
+    .poll(
+      async () => {
+        await scrollThere();
+        return Number(await readVar(page, selector, "--p"));
+      },
+      { timeout: 8000 },
+    )
+    .toBeCloseTo(progress, 2);
 }
 
 /**
