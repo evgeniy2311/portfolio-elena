@@ -49,6 +49,8 @@ test("в текстах сайта нет длинного тире и DEMO-по
 
 test("все изображения главной загружаются", async ({ page }) => {
   await go(page, "/");
+  // Прокрутка до гидрации обгоняет ScrollFx: ленту «исходник → карточка» тогда никто не двигает.
+  await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/);
   await page.evaluate(async () => {
     for (let y = 0; y < document.body.scrollHeight; y += window.innerHeight / 2) {
       window.scrollTo(0, y);
