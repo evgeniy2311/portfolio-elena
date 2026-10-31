@@ -44,6 +44,15 @@ test("порядок accuracy → video → process; noir-панель на surf
   expect(await block.locator("[data-video-panel]").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(26, 24, 23)");
   // Акцент заголовка на noir — шампань, не вино (контраст 1,56 запрещён).
   expect(await block.locator("h2 em").evaluate((element) => getComputedStyle(element).color)).toBe("rgb(217, 184, 146)");
+  // На любой ширине панель отстоит от краёв окна на --gutter и скруглена: не во всю ширину рядом с noir-блоком выше.
+  const panel = await block.locator("[data-video-panel]").evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const gutter = parseFloat(getComputedStyle(element.parentElement!).paddingLeft);
+    return { left: box.left, right: window.innerWidth - box.right, gutter, radius: getComputedStyle(element).borderTopLeftRadius };
+  });
+  expect(panel.left).toBeGreaterThanOrEqual(panel.gutter - 1);
+  expect(panel.right).toBeGreaterThanOrEqual(panel.gutter - 1);
+  expect(panel.radius).toBe("12px");
 });
 
 test("раскладка: 2 × 2 на компьютере, на телефоне лента 88 % с привязкой и точками 44 px", async ({ page }) => {
