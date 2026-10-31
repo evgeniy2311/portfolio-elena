@@ -87,6 +87,17 @@ export function AssemblyControls({ count, labels, className }: Props) {
       { threshold: 0.35 },
     );
     observer.observe(stage);
+    // Кадры ленты выдачи лежат за краем «экрана» телефона (overflow: hidden), и ленивая загрузка до них
+    // не доходит. Когда сцена в двух экранах от окна, все её кадры грузятся сразу.
+    const preload = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        for (const image of section.querySelectorAll<HTMLImageElement>("img[loading='lazy']")) image.loading = "eager";
+        preload.disconnect();
+      },
+      { rootMargin: "200% 0px" },
+    );
+    preload.observe(section);
     const attributes = new MutationObserver(refresh);
     attributes.observe(section, { attributes: true, attributeFilter: ["data-pinned"] });
     attributes.observe(root, { attributes: true, attributeFilter: ["data-fx"] });
@@ -96,6 +107,7 @@ export function AssemblyControls({ count, labels, className }: Props) {
     return () => {
       window.clearTimeout(timer);
       observer.disconnect();
+      preload.disconnect();
       attributes.disconnect();
       document.removeEventListener("visibilitychange", schedule);
       api.current = { go: () => {}, setPaused: () => {} };
