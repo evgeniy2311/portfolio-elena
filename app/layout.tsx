@@ -2,13 +2,23 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "./globals.css";
 
-// Шрифты версии 3 (design/brief.md): Cormorant Garamond 500/600 и курсив, Manrope 400/500/600.
+// Шрифты версии 3 (design/brief.md): Cormorant Garamond 500/600 и курсив 500, Manrope 400/500/600.
 const display = Cormorant_Garamond({
   subsets: ["cyrillic", "latin"],
   weight: ["500", "600"],
-  style: ["normal", "italic"],
+  style: ["normal"],
   variable: "--font-display",
   display: "swap",
+});
+
+// Курсив только 500 и отдельным файлом без preload: акценты в заголовках не стоят предзагрузки всех начертаний.
+const displayItalic = Cormorant_Garamond({
+  subsets: ["cyrillic", "latin"],
+  weight: ["500"],
+  style: ["italic"],
+  variable: "--font-display-italic",
+  display: "swap",
+  preload: false,
 });
 
 const ui = Manrope({
@@ -32,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru" className={`${display.variable} ${ui.variable}`}>
+    <html lang="ru" className={`${display.variable} ${displayItalic.variable} ${ui.variable}`}>
       <body>
         {/* Неудачная загрузка кадра: вместо значка битой картинки остаётся плитка --surface того же размера. */}
         <script dangerouslySetInnerHTML={{ __html: imageFailureScript }} />

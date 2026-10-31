@@ -147,7 +147,9 @@ h2 {
 h1 em,
 h2 em,
 .display em {
+  font-family: var(--font-display-italic), var(--font-display), Georgia, serif;
   font-style: italic;
+  font-weight: 500;
   color: var(--wine);
 }
 
@@ -426,12 +428,12 @@ main:focus {
   transform: translateX(4px);
 }
 
-/* Шапка: canvas 96 % и линия снизу после 40 px прокрутки; без JS сразу в этом виде. */
+/* Шапка: сплошной canvas и линия снизу после 40 px прокрутки; без JS сразу в этом виде. */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgb(246 242 236 / 0.96);
+  background: var(--canvas);
   border-bottom: 1px solid var(--line);
   transition: background-color var(--dur-2) var(--ease-atelier), border-color var(--dur-2) var(--ease-atelier);
 }
@@ -581,7 +583,7 @@ main:focus {
   align-items: center;
   min-height: calc(64px + env(safe-area-inset-bottom));
   padding: 8px var(--gutter) calc(8px + env(safe-area-inset-bottom));
-  background: rgb(246 242 236 / 0.96);
+  background: var(--canvas);
   border-top: 1px solid var(--line);
   transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), visibility 0s;
 }
