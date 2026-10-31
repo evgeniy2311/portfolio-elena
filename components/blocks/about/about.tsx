@@ -48,7 +48,7 @@ export function About() {
             </span>
           </h2>
           <div className={styles.body} data-reveal="body">
-            <SlotWord intro={aboutCopy.intro} full={aboutCopy.full} before={aboutCopy.slotBefore} words={aboutCopy.slotWords} />
+            <SlotWord full={aboutCopy.full} before={aboutCopy.slotBefore} words={aboutCopy.slotWords} />
             {about.experience ? <p className={styles.experience}>{about.experience}</p> : null}
             <ul className={styles.points}>
               {aboutPoints.map((point) => (

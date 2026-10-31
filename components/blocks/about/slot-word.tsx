@@ -13,9 +13,9 @@ import styles from "./about.module.css";
 
 const INTERVAL = 2400;
 
-type Props = { intro: string; full: string; before: string; words: string[] };
+type Props = { full: string; before: string; words: string[] };
 
-export function SlotWord({ intro, full, before, words }: Props) {
+export function SlotWord({ full, before, words }: Props) {
   const motion = useMotionAllowed() && words.length > 1;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -40,7 +40,7 @@ export function SlotWord({ intro, full, before, words }: Props) {
   return (
     <>
       <p className={`lede ${styles.lead}`} ref={line} data-slot={motion ? "on" : "off"}>
-        {intro} <span className={styles.slotFull}>{full}</span>
+        <span className={styles.slotFull}>{full}</span>
         <span className={styles.slotLine} aria-hidden="true">
           {before}{" "}
           <span className={styles.slot} data-slot-word>

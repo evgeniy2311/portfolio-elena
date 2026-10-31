@@ -72,6 +72,12 @@ test("Slot Word: слово меняется, ширина прорези пос
   expect(await slot.locator("[data-state='active']").innerText()).toBe(stopped);
 });
 
+test("лид не повторяет строку героя «Работаю прежде всего с брендами одежды» (D16)", async ({ page }) => {
+  await go(page, "/");
+  await expect(page.locator(`${section} .lede`)).not.toContainText("Работаю прежде всего");
+  await expect(page.locator(`${section} .lede`)).toContainText("Делаю кадры для");
+});
+
 test("reduced motion: полная фраза обычным текстом, изображение и заголовок в финальном виде", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await go(page, "/");
