@@ -478,17 +478,29 @@
     position: sticky;
     top: var(--header-h);
     display: flex;
-    align-items: center;
+    align-items: stretch;
     height: calc(100svh - var(--header-h));
     padding-block: var(--space-4);
     overflow: clip;
   }
 
+  /*
+   * Сцена заполнена по высоте на любом окне (владелец против больших пустых полей): заголовок прижат
+   * к верху, список пунктов к низу, кадры по центру между ними. На высоком окне свободное место уходит
+   * в промежуток рядом с кадрами, а не в полосы над и под всем блоком.
+   */
   :global([data-fx="on"]) .grid {
     width: 100%;
+    height: 100%;
   }
 
   :global([data-fx="on"]) .copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-self: center;
+    /* Не ниже сцены; на низком окне колонка выше сцены и, как раньше, выходит в её поля поровну сверху и снизу. */
+    min-height: 100%;
     gap: clamp(12px, 2.4vh, 24px);
   }
 
