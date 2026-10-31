@@ -8,6 +8,17 @@ import { framesDuring, instrument, isPinViewport, listenerCounts, pinGeometry, r
  * прогресс по фактическому sticky-ходу, сегменты, cleanup при повторном монтировании.
  */
 
+/**
+ * Слушатель visibilitychange держит только ticker, пока у него есть подписчики, поэтому его число
+ * зависит от момента замера: проверяется, что он не больше одного, а остальные сравниваются точно.
+ */
+async function stableCounts(page: Page) {
+  const counts = await listenerCounts(page);
+  expect(counts["document:visibilitychange"] ?? 0).toBeLessThanOrEqual(1);
+  delete counts["document:visibilitychange"];
+  return counts;
+}
+
 /** Ждёт, пока сглаживание догонит и общий цикл остановится (подписчиков ticker нет). */
 async function idle(page: Page) {
   await expect.poll(() => framesDuring(page, 300), { timeout: 8000 }).toBeLessThanOrEqual(1);
@@ -89,7 +100,7 @@ test.describe("сцены страницы", () => {
 
   test("ниже 1024 px сцены не «липнут»", async ({ page }) => {
     await go(page, "/");
-    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/);
+    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
     const pinned = page.locator("[data-pin][data-pinned]");
     if (isPinViewport(page)) await expect(pinned).toHaveCount(await page.locator("[data-pin]").count());
     else await expect(pinned).toHaveCount(0);
@@ -134,7 +145,7 @@ test.describe("один ticker и cleanup", () => {
   test("в покое кадры не идут; прокрутка запускает и останавливает цикл", async ({ page }) => {
     await instrument(page);
     await go(page, "/");
-    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/);
+    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
     await page.waitForTimeout(800);
     expect(await framesDuring(page, 500)).toBeLessThanOrEqual(1);
     await page.mouse.wheel(0, 600);
@@ -145,24 +156,25 @@ test.describe("один ticker и cleanup", () => {
   test("повторное монтирование, resize и visibilitychange не добавляют слушателей и циклов", async ({ page }) => {
     await instrument(page);
     await go(page, "/");
-    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/);
+    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
     await idle(page);
-    const initial = await listenerCounts(page);
+    const initial = await stableCounts(page);
 
     // Клиентский переход на архив и обратно: ScrollFx размонтируется и монтируется заново.
     await page.locator("header nav a[href$='/works'], header nav a[href$='/works/']").first().click({ force: true }).catch(async () => {
       await page.evaluate(() => (document.querySelector("header a[href*='/works']") as HTMLAnchorElement).click());
     });
-    await expect(page.locator("main h1")).toContainText("вещей");
+    // Первый заход на страницу dev-сервер компилирует, под нагрузкой это дольше 5 с.
+    await expect(page.locator("main h1")).toContainText("вещей", { timeout: 30_000 });
     await page.locator("header a.wordmark").click();
-    await expect(page.locator("#services")).toHaveCount(1);
-    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/);
+    await expect(page.locator("#services")).toHaveCount(1, { timeout: 30_000 });
+    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
     await idle(page);
-    expect(await listenerCounts(page)).toEqual(initial);
+    expect(await stableCounts(page)).toEqual(initial);
 
     await page.setViewportSize({ width: page.viewportSize()!.width - 40, height: page.viewportSize()!.height });
     await idle(page);
-    expect(await listenerCounts(page)).toEqual(initial);
+    expect(await stableCounts(page)).toEqual(initial);
 
     // Скрытая вкладка: кадров нет, после возврата цикл снова работает.
     await page.evaluate(() => {
@@ -178,13 +190,13 @@ test.describe("один ticker и cleanup", () => {
     await page.mouse.wheel(0, 300);
     expect(await framesDuring(page, 300)).toBeGreaterThan(0);
     await idle(page);
-    expect(await listenerCounts(page)).toEqual(initial);
+    expect(await stableCounts(page)).toEqual(initial);
   });
 
   test("reduced motion включён во время работы: data-fx снят, циклы стоят, всё видно", async ({ page }) => {
     await instrument(page);
     await go(page, "/");
-    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/);
+    await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
     test.skip((await page.locator("html").getAttribute("data-fx")) !== "on", "Движение уже выключено");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expect(page.locator("html")).not.toHaveAttribute("data-fx", "on");
