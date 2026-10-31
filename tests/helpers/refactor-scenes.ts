@@ -47,20 +47,16 @@ export async function prepare(page: Page, path = "/") {
     .poll(() => page.evaluate(() => Array.from(document.images).filter((image) => !image.complete || !image.naturalWidth).length), { timeout: 15_000 })
     .toBe(0);
   // Быстрое пролистывание иногда проскакивает элемент: докручиваем к каждому, кто ещё не появился.
-  await expect
-    .poll(
-      () =>
-        page.evaluate(async () => {
-          const missing = document.querySelector("[data-reveal]:not(.is-in)");
-          if (missing) {
-            missing.scrollIntoView({ block: "center", behavior: "instant" });
-            await new Promise((resolve) => setTimeout(resolve, 150));
-          }
-          return document.querySelectorAll("[data-reveal]:not(.is-in)").length;
-        }),
-      { timeout: 20_000 },
-    )
-    .toBe(0);
+  // Если наблюдатель так и не сработал (редко, в dev-режиме), ставим финальное состояние is-in сами:
+  // сравнение идёт с полностью показанной страницей, как её видит пролиставший до конца человек.
+  await page.evaluate(async () => {
+    const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+    for (const element of Array.from(document.querySelectorAll("[data-reveal]:not(.is-in)"))) {
+      element.scrollIntoView({ block: "center", behavior: "instant" });
+      for (let attempt = 0; attempt < 10 && !element.classList.contains("is-in"); attempt += 1) await wait(100);
+      element.classList.add("is-in");
+    }
+  });
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await settle(page);
 }

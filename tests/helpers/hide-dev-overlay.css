@@ -1,0 +1,4 @@
+/* Значок и всплывашка «Compiling…» dev-сервера Next не часть сайта: на снимках проверки рефакторинга скрыты. */
+nextjs-portal {
+  display: none !important;
+}

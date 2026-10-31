@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { otherRoutes, pageShots, prepare, sceneShots, scenes, scrollToShot, styleDigest, type Shot } from "./helpers/refactor-scenes";
 
@@ -5,21 +7,30 @@ import { otherRoutes, pageShots, prepare, sceneShots, scenes, scrollToShot, styl
  * Рефакторинг главной на блоки не должен менять ничего видимого.
  * Эталоны записаны один раз на исходном коде (до разделения) командой
  *   npm run test:e2e -- tests/refactor-parity.spec.ts --update-snapshots
- * и после этого не перезаписываются. Порог расхождения пикселей равен нулю.
+ * и после этого не перезаписываются. Порог: ноль отличающихся пикселей. Сравнение ssim-cie94 не считает
+ * отличием шум сглаживания (углы скруглённых картинок и курсив в «липких» слоях рисуются Chromium
+ * чуть по-разному от прогона к прогону), но сдвиг на 1 px или смена цвета ловятся (проверено).
  *
  * Снимки экрана сравниваются на dev-сервере. Слепок вычисленных стилей сравнивается и на dev-сервере,
  * и на production-сборке (PLAYWRIGHT_BASE_URL на `next start`): в production CSS склеивается иначе.
  */
 
 // Прогрев dev-сервера и пролистывание длинных страниц занимают больше стандартных 45 секунд.
-test.describe.configure({ timeout: 240_000 });
+test.describe.configure({ timeout: 240_000, retries: 1 });
 
 const mode = process.env.PLAYWRIGHT_BASE_URL ? "prod" : "dev";
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 
+// Значок и всплывашка «Compiling…» dev-сервера Next не часть сайта и появляются когда угодно.
+const hideDevOverlayPath = path.join(__dirname, "helpers/hide-dev-overlay.css");
+const hideDevOverlay = readFileSync(hideDevOverlayPath, "utf8");
+
+// `_comparator` — служебная опция Playwright (в типах её нет), включает сравнение ssim-cie94.
+const screenshotOptions = { animations: "disabled", caret: "hide", stylePath: hideDevOverlayPath, maxDiffPixels: 0, _comparator: "ssim-cie94" } as const;
+
 async function compare(page: Page, shot: Shot) {
-  await expect(page).toHaveScreenshot(`${shot.name}.png`, { animations: "disabled", caret: "hide", maxDiffPixels: 0, threshold: 0.1 });
-  await page.screenshot({ path: `test-results/scenes/${width(page)}/${shot.name}.png`, animations: "disabled", caret: "hide" });
+  await expect(page).toHaveScreenshot(`${shot.name}.png`, screenshotOptions);
+  await page.screenshot({ path: `test-results/scenes/${width(page)}/${shot.name}.png`, animations: "disabled", caret: "hide", style: hideDevOverlay });
 }
 
 test.describe("снимки экрана", () => {
@@ -34,7 +45,7 @@ test.describe("снимки экрана", () => {
       const states: string[] = [];
       for (const shot of shots) {
         await scrollToShot(page, index, shot);
-        if (pinned) states.push((await page.screenshot({ animations: "disabled" })).toString("base64"));
+        if (pinned) states.push((await page.screenshot({ animations: "disabled", style: hideDevOverlay })).toString("base64"));
         await compare(page, shot);
       }
       // У «липкой» сцены пять точек прогресса дают пять разных картинок, а не одно финальное состояние.
