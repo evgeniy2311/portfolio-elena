@@ -7,6 +7,8 @@
 
 .about {
   padding-block: var(--space-section);
+  /* Последняя строка блока — ссылка-стрелка с зоной касания 44 px: её запас под текстом входит в нижнее поле. */
+  padding-bottom: calc(var(--space-section) - 12px);
   background: var(--paper);
 }
 
