@@ -126,7 +126,8 @@ export function Ribbon({ tiles, heading, label }: Props) {
         velocity = drift + momentum;
         x += (velocity * dt) / 1000;
         // Лента стоит (пауза, наведение или фокус) и успокоилась: кадры больше не нужны до следующего действия.
-        if (still && drift === 0 && momentum === 0) {
+        // Пока кнопка нажата (жест ещё не стал перетаскиванием), цикл не засыпает: после отпускания нужна инерция.
+        if (still && drift === 0 && momentum === 0 && !gesture) {
           x = wrap(x, width);
           paint(0);
           sleep();
@@ -193,6 +194,10 @@ export function Ribbon({ tiles, heading, label }: Props) {
       if (dragging) {
         momentum = cancelled ? 0 : releaseVelocity(gesture.samples, event.timeStamp);
         suppressClick = !cancelled && gesture.moved > CLICK_SLOP;
+        // Бросок катится и тогда, когда курсор остаётся над лентой: цикл будится, а первый кадр после
+        // отпускания не считается «после перерыва» (иначе он обнулил бы инерцию как у стоящей ленты).
+        lastNow = performance.now();
+        wake();
       }
       dragging = false;
       dragVelocity = 0;
