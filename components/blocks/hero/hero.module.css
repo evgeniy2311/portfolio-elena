@@ -238,6 +238,10 @@
     padding: 10px;
     background: var(--canvas);
     box-shadow: var(--shadow);
+  }
+
+  /* Появление только с движением: без JS «крупный план» виден сразу. */
+  :global([data-fx="on"]) .callout {
     animation: callout-in var(--dur-3) var(--ease-atelier) 300ms both;
   }
 

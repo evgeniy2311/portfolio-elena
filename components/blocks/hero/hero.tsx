@@ -28,10 +28,10 @@ export function Hero() {
 
       <HeroWall columns={heroWall} speeds={wallSpeeds} label={heroCopy.wallLabel} />
 
-      {/* «Крупный план»: статичная фигура, не ссылка. На телефоне её нет. */}
+      {/* «Крупный план»: статичная фигура, не ссылка. На телефоне скрыт; кадр 320 px грузится сразу, чтобы не висеть недогруженным. */}
       <figure className={styles.callout} data-callout>
         <div className={styles.calloutLens} style={{ "--zoom": heroCallout.zoom, "--focus": heroCallout.focus } as Vars}>
-          <Photo image={heroCallout.image} alt="Пуговицы бордового пальто крупно" sizes="300px" className={styles.calloutImage} />
+          <Photo image={heroCallout.image} alt="Пуговицы бордового пальто крупно" sizes="300px" className={styles.calloutImage} eager />
           <span className={styles.calloutGuide} aria-hidden="true" />
         </div>
         <figcaption className={styles.calloutCaption}>

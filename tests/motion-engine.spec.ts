@@ -202,8 +202,11 @@ test.describe("один ticker и cleanup", () => {
       Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
       document.dispatchEvent(new Event("visibilitychange"));
     });
+    // Счёт кадров начинается до прокрутки: у первого экрана нет сцен со сглаживанием, и движку
+    // может хватить одного кадра, который иначе прошёл бы до начала замера.
+    const counted = framesDuring(page, 400);
     await page.mouse.wheel(0, 300);
-    expect(await framesDuring(page, 300)).toBeGreaterThan(0);
+    expect(await counted).toBeGreaterThan(0);
     await idle(page);
     expect(await stableCounts(page)).toEqual(initial);
   });
