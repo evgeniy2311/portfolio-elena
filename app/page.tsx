@@ -4,6 +4,7 @@ import { ArrowIcon } from "@/components/arrow-icon";
 import { Hero } from "@/components/blocks/hero/hero";
 import { Categories } from "@/components/blocks/categories/categories";
 import { About } from "@/components/blocks/about/about";
+import { Pains } from "@/components/blocks/pains/pains";
 import { ScrollFx } from "@/components/scroll-fx";
 import type { Vars } from "@/components/ui/css-vars";
 import { Photo } from "@/components/ui/photo";
@@ -25,30 +26,6 @@ export const metadata: Metadata = {
 };
 
 const accuracySource = source("burgundy-coat-city", 0);
-
-const pains: Array<{ title: string; text: string; image: WorkImage; alt: string; caption: string }> = [
-  {
-    title: "Фото с белого фона теряется в выдаче.",
-    text: "Покупательница листает сотни похожих вещей и не останавливается на плоском кадре.",
-    image: source("beige-windbreaker", 0),
-    alt: "Исходное фото ветровки на белом фоне",
-    caption: "Обычное фото с белого фона",
-  },
-  {
-    title: "Фотосессия долгая и дорогая.",
-    text: "Студия, модель, стилист, неделя ожидания. И всё заново на каждый новый цвет.",
-    image: frame("beige-windbreaker", 0),
-    alt: "Та же ветровка на модели в городе",
-    caption: "Этот кадр сделан без фотосессии",
-  },
-  {
-    title: "Нейросеть рисует похожую, но другую вещь.",
-    text: "Меняет пуговицы, длину, карманы. Потом приходят возвраты с причиной «не соответствует фото».",
-    image: frame("burgundy-coat-city", 2),
-    alt: "Крупный план двубортной застёжки пальто",
-    caption: "Пуговицы как на оригинале",
-  },
-];
 
 const services: Array<{ title: string; text: string; image: WorkImage; alt: string }> = [
   {
@@ -192,33 +169,7 @@ export default function Home() {
 
         <About />
 
-        {/* 4. Почему вещь продаётся плохо */}
-        <section className={styles.pains} aria-labelledby="pains-title">
-          <div className="shell">
-            <p className="eyebrow eyebrow-light" data-reveal>
-              Почему так бывает
-            </p>
-            <h2 id="pains-title" className={styles.painsTitle} data-reveal>
-              Хорошая вещь, а продаётся <em>плохо.</em>
-            </h2>
-            <ol className={styles.painList}>
-              {pains.map((pain, index) => (
-                <li key={pain.title} data-reveal style={{ "--d": `${index * 90}ms` } as Vars}>
-                  <figure>
-                    <Photo image={pain.image} alt={pain.alt} sizes="(max-width: 899px) 92vw, 30vw" />
-                    <figcaption>{pain.caption}</figcaption>
-                  </figure>
-                  <span>0{index + 1}</span>
-                  <h3>{pain.title}</h3>
-                  <p>{pain.text}</p>
-                </li>
-              ))}
-            </ol>
-            <p className={styles.painsAnswer} data-reveal>
-              Я делаю кадры, которые останавливают взгляд на вашей карточке. Без фотосессии и без подмены вещи.
-            </p>
-          </div>
-        </section>
+        <Pains />
 
         {/* 5. Что вы получаете: услуги сменяют друг друга при прокрутке */}
         <section className={styles.services} id="services" data-pin aria-labelledby="services-title" style={{ "--n": services.length } as Vars}>
