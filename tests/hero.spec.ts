@@ -103,8 +103,8 @@ test("вне экрана и в скрытой вкладке стена сто�
   await page.waitForTimeout(400);
   expect(await moved(page, 500)).toBeLessThan(0.5);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-  await page.waitForTimeout(300);
-  expect(await moved(page, 500)).toBeGreaterThan(2);
+  // Под нагрузкой кадры редкие (dt ограничен 100 мс), поэтому ждём, пока стена снова поедет, а не меряем один отрезок.
+  await expect.poll(() => moved(page, 500), { timeout: 10_000 }).toBeGreaterThan(2);
 
   await page.evaluate(() => {
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
@@ -116,7 +116,7 @@ test("вне экрана и в скрытой вкладке стена сто�
     Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
     document.dispatchEvent(new Event("visibilitychange"));
   });
-  expect(await moved(page, 500)).toBeGreaterThan(2);
+  await expect.poll(() => moved(page, 500), { timeout: 10_000 }).toBeGreaterThan(2);
 });
 
 test("reduced motion: одна неподвижная копия в том же порядке", async ({ page }) => {
