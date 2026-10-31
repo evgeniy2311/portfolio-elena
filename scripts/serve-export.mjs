@@ -7,6 +7,7 @@
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
+import zlib from "node:zlib";
 
 const port = Number(process.env.PORT ?? 3100);
 const host = process.env.HOST ?? "127.0.0.1";
@@ -56,19 +57,27 @@ function isDirectory(file) {
   }
 }
 
-function send(response, status, file, method) {
-  const body = fs.readFileSync(file);
+// Как Pages: текстовые файлы уходят сжатыми gzip, если браузер их принимает. Картинки, шрифты и видео уже сжаты.
+const compressible = new Set([".html", ".txt", ".js", ".css", ".json", ".xml", ".svg", ".map"]);
+
+function send(response, status, file, method, request) {
+  const raw = fs.readFileSync(file);
+  const ext = path.extname(file).toLowerCase();
+  const gzip = compressible.has(ext) && /\bgzip\b/.test(String(request?.headers["accept-encoding"] ?? ""));
+  const body = gzip ? zlib.gzipSync(raw) : raw;
   response.writeHead(status, {
-    "Content-Type": types[path.extname(file).toLowerCase()] ?? "application/octet-stream",
+    "Content-Type": types[ext] ?? "application/octet-stream",
     "Content-Length": body.length,
     "X-Content-Type-Options": "nosniff",
+    ...(gzip ? { "Content-Encoding": "gzip" } : {}),
+    Vary: "Accept-Encoding",
   });
   response.end(method === "HEAD" ? undefined : body);
 }
 
-function notFound(response, method) {
+function notFound(response, method, request) {
   const page = path.join(root, "404.html");
-  if (isFile(page)) return send(response, 404, page, method);
+  if (isFile(page)) return send(response, 404, page, method, request);
   response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
   response.end(method === "HEAD" ? undefined : "404");
 }
@@ -101,7 +110,7 @@ const server = http.createServer((request, response) => {
   if (method !== "GET" && method !== "HEAD") return reject(response, 405);
   const resolved = resolveRequest(request.url ?? "/");
   if (resolved.status === 400) return reject(response, 400);
-  if (resolved.status === 404) return notFound(response, method);
+  if (resolved.status === 404) return notFound(response, method, request);
   const { target, trailing } = resolved;
 
   if (isDirectory(target)) {
@@ -112,11 +121,11 @@ const server = http.createServer((request, response) => {
       return response.end();
     }
     const index = path.join(target, "index.html");
-    return isFile(index) ? send(response, 200, index, method) : notFound(response, method);
+    return isFile(index) ? send(response, 200, index, method, request) : notFound(response, method, request);
   }
-  if (isFile(target)) return send(response, 200, target, method);
-  if (!trailing && isFile(`${target}.html`)) return send(response, 200, `${target}.html`, method);
-  return notFound(response, method);
+  if (isFile(target)) return send(response, 200, target, method, request);
+  if (!trailing && isFile(`${target}.html`)) return send(response, 200, `${target}.html`, method, request);
+  return notFound(response, method, request);
 });
 
 server.listen(port, host, () => {

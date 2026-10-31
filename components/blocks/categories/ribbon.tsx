@@ -34,6 +34,9 @@ export function Ribbon({ tiles, heading, label }: Props) {
   const motion = useMotionAllowed() && canLoop(tiles.length);
   const [copies, setCopies] = useState(tiles.length > 1 ? 2 : tiles.length);
   const [paused, setPaused] = useState(false);
+  // Кадры ленты не запрашиваются, пока лента далеко от окна: ленивая загрузка Chrome взяла бы их
+  // ещё на первом экране (лента ниже сгиба). За полэкрана до ленты кадры включаются и больше не выключаются.
+  const [near, setNear] = useState(false);
   const pausedRef = useRef(false);
   const stepRef = useRef<(direction: 1 | -1) => void>(() => {});
   const wakeRef = useRef<() => void>(() => {});
@@ -42,6 +45,16 @@ export function Ribbon({ tiles, heading, label }: Props) {
     pausedRef.current = paused;
     wakeRef.current();
   }, [paused]);
+
+  useEffect(() => {
+    const element = viewport.current;
+    if (!element || near) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) setNear(true);
+    }, { rootMargin: "50% 0px" });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [near]);
 
   // Обычная прокрутка (без движения): кнопки листают на одну плитку.
   useEffect(() => {
@@ -310,7 +323,7 @@ export function Ribbon({ tiles, heading, label }: Props) {
                 <li key={tile.label} className={tile.image ? styles.tile : `${styles.tile} ${styles.tileText}`} data-tile data-temp={tile.temp}>
                   <figure>
                     {tile.image ? (
-                      <Photo image={tile.image} alt="" sizes="(max-width: 767px) 200px, (max-width: 1023px) 240px, 300px" eager={copy === 0} />
+                      <Photo image={tile.image} alt="" sizes="(max-width: 767px) 200px, (max-width: 1023px) 240px, 300px" defer={!near} />
                     ) : (
                       // TEMP: типографическая плитка вместо кадра обуви, пока владелец не одобрит изображение.
                       <span className={styles.tileWord} aria-hidden="true">

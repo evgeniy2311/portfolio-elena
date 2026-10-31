@@ -284,5 +284,9 @@ test("без JavaScript: одна копия и обычная прокрутк�
   await expect(page.locator(`${track} [data-copy="0"] [data-tile]`)).toHaveCount(9);
   await expect(page.locator(`${track} [data-copy="1"]`)).toBeHidden();
   expect(await page.locator(viewport).evaluate((element) => getComputedStyle(element).overflowX)).toBe("auto");
+  // Отложенные кадры без JS: заглушка скрыта, на её месте обычный кадр из <noscript>.
+  const image = page.locator(`${track} [data-copy="0"] [data-tile] img[data-photo]:visible`).first();
+  await image.scrollIntoViewIfNeeded();
+  await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && /\.avif$/.test(element.currentSrc))).toBe(true);
   await context.close();
 });

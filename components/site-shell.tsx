@@ -10,7 +10,8 @@ export function SiteHeader({ current }: HeaderProps) {
     <header className="site-header">
       <span className="site-progress" aria-hidden="true" />
       <div className="shell site-header-row">
-        <Link className="wordmark" href="/" aria-label="Елена Бадьина, на главную">
+        {/* На главной ссылка ведёт на эту же страницу: её предзагрузка (~23 KB данных) ничего не даёт первому экрану. */}
+        <Link className="wordmark" href="/" prefetch={current === "home" ? false : undefined} aria-label="Елена Бадьина, на главную">
           Елена Бадьина
           <small>одежда и обувь для маркетплейсов</small>
         </Link>

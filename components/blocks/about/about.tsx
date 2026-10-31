@@ -3,10 +3,10 @@ import Link from "next/link";
 import { ArrowIcon } from "@/components/arrow-icon";
 import { ContactLink } from "@/components/ui/contact-link";
 import type { Vars } from "@/components/ui/css-vars";
-import { Photo } from "@/components/ui/photo";
 import { about } from "@/lib/site";
 import styles from "./about.module.css";
-import { aboutCollage, aboutCopy, aboutPoints } from "./data";
+import { AboutCollage } from "./collage";
+import { aboutCopy, aboutPoints } from "./data";
 import { SlotWord } from "./slot-word";
 
 /** 3. Обо мне: «Portrait Unveil» для изображения и строк заголовка, «Slot Word» в лиде (блок 13). */
@@ -21,14 +21,7 @@ export function About() {
             <Image src={about.photo.src} width={about.photo.width} height={about.photo.height} alt="Елена Бадьина" sizes="(max-width: 1023px) 90vw, 36vw" />
           </figure>
         ) : (
-          // TEMP: коллаж из моих кадров вместо портрета, пока нет фото Елены.
-          <figure className={`${styles.portrait} ${styles.collage}`} role="img" aria-label="Кадры из моих работ" data-collage>
-            {aboutCollage.map((print) => (
-              <span className={styles.print} key={print.image.src} style={{ "--r": `${print.rotate}deg` } as Vars}>
-                <Photo image={print.image} alt="" sizes="(max-width: 1023px) 50vw, 20vw" />
-              </span>
-            ))}
-          </figure>
+          <AboutCollage />
         )}
         </div>
 

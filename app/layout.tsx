@@ -1,32 +1,6 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { display, displayItalic, ui } from "./fonts";
 import "./globals.css";
-
-// Шрифты версии 3 (design/brief.md): Cormorant Garamond 500/600 и курсив 500, Manrope 400/500/600.
-const display = Cormorant_Garamond({
-  subsets: ["cyrillic", "latin"],
-  weight: ["500", "600"],
-  style: ["normal"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-// Курсив только 500 и отдельным файлом без preload: акценты в заголовках не стоят предзагрузки всех начертаний.
-const displayItalic = Cormorant_Garamond({
-  subsets: ["cyrillic", "latin"],
-  weight: ["500"],
-  style: ["italic"],
-  variable: "--font-display-italic",
-  display: "swap",
-  preload: false,
-});
-
-const ui = Manrope({
-  subsets: ["cyrillic", "latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-ui",
-  display: "swap",
-});
 
 // Срабатывает до гидрации, поэтому ловит и ошибки первых кадров. Узлы не удаляет: только атрибуты.
 const imageFailureScript = `document.addEventListener("error",function(e){var i=e.target;if(!(i instanceof HTMLImageElement)||i.hasAttribute("data-failed"))return;i.setAttribute("data-failed","");var w=i.getAttribute("width"),h=i.getAttribute("height");if(w&&h)i.style.aspectRatio=w+" / "+h;var p=i.parentElement;if(p&&p.tagName==="PICTURE"){p.querySelectorAll("source").forEach(function(s){s.removeAttribute("srcset")})}i.removeAttribute("srcset");i.src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%271%27 height=%271%27/%3E"},true);`;

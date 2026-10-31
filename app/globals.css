@@ -685,3 +685,17 @@ html:not([data-cta="show"]) .mobile-cta {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Photo с defer (components/ui/photo.tsx): без JavaScript заглушку никто не заменит, поэтому она скрыта,
+   а кадр из <noscript> встаёт на её место. */
+@media (scripting: none) {
+  /* У picture.photo display: contents, поэтому прячется и сама заглушка. */
+  picture[data-deferred-photo],
+  picture[data-deferred-photo] img {
+    display: none;
+  }
+
+  noscript {
+    display: contents;
+  }
+}

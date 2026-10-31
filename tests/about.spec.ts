@@ -18,6 +18,11 @@ test("без фото Елены: коллаж из моих кадров, бе�
   await expect(collage.locator("img")).toHaveCount(3);
   expect(await page.locator(`${section} img[alt*='Елена']`).count()).toBe(0);
   await expect(page.locator(section)).not.toContainText("Фото скоро обновится");
+  // Кадры коллажа запрашиваются, только когда он подходит к окну (бюджет первого экрана).
+  const first = collage.locator("img").first();
+  expect(await first.evaluate((image: HTMLImageElement) => image.currentSrc || image.src)).toMatch(/^data:image\/svg/);
+  await collage.scrollIntoViewIfNeeded();
+  await expect.poll(() => first.evaluate((image: HTMLImageElement) => image.complete && /\.avif$/.test(image.currentSrc))).toBe(true);
   const sources = await collage.locator("img").evaluateAll((images) => images.map((image) => (image as HTMLImageElement).currentSrc || image.getAttribute("src")));
   expect(sources.join(" ")).toMatch(/yellow-trench\/frame-02/);
   expect(sources.join(" ")).toMatch(/burgundy-coat-city\/frame-03/);
