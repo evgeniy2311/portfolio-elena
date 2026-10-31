@@ -95,7 +95,7 @@ if (fs.existsSync(path.join(root, "lib", "works-media.json"))) {
 if (!fs.existsSync(nextBin)) fail(`не найден установленный Next: ${path.relative(root, nextBin)}. Выполните npm ci.`);
 acquireLock();
 
-if (exportMode && fs.existsSync(backupFile)) {
+if (fs.existsSync(backupFile)) {
   releaseLock();
   fail(`найдена резервная копия proxy.ts от прерванной сборки: ${path.basename(backupFile)}. Верните её вручную (mv ${path.basename(backupFile)} proxy.ts), сборка ничего не перезаписывает.`);
 }
@@ -125,6 +125,7 @@ child.on("exit", (code, signal) => {
   if (signal) fail(`сборка прервана сигналом ${signal}`, 130);
   if (code !== 0) fail(`next build завершился с кодом ${code}`, code ?? 1);
   const scanDirs = [path.join(root, ".next"), ...(exportMode ? [path.join(root, "out")] : [])].filter((dir) => fs.existsSync(dir));
+  if (exportMode && !fs.existsSync(path.join(root, "out"))) fail("export-сборка завершилась, но папки out/ нет: публиковать нечего", 5);
   if (scanDirs.length === 0) return;
   const scan = spawnSync(process.execPath, [cleanCheck, ...scanDirs], { cwd: root, stdio: "inherit" });
   if (scan.status !== 0) fail("в сборке найдены тестовые данные, публиковать её нельзя", 4);

@@ -120,6 +120,24 @@ test.describe("сборка", () => {
     expect(fs.readFileSync(path.join(dir, ".proxy.ts.export-backup"), "utf8")).toBe("export const backup = true;\n");
   });
 
+  test("резервная копия proxy.ts останавливает и обычную сборку", () => {
+    const dir = fakeProject(`process.exit(0);`);
+    fs.writeFileSync(path.join(dir, ".proxy.ts.export-backup"), "export const backup = true;\n");
+    const result = runBuild(dir);
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("резервная копия");
+    expect(fs.readFileSync(path.join(dir, ".proxy.ts.export-backup"), "utf8")).toBe("export const backup = true;\n");
+  });
+
+  test("export-сборка без папки out/ не считается успешной", () => {
+    const dir = fakeProject(`process.exit(0);`);
+    const result = runBuild(dir, { NEXT_PUBLIC_BASE_PATH: "/portfolio-elena" });
+    expect(result.status).toBe(5);
+    expect(result.stderr).toContain("out/");
+    expect(fs.readFileSync(path.join(dir, "proxy.ts"), "utf8")).toBe("export const original = true;\n");
+    expect(fs.existsSync(path.join(dir, ".build-site.lock"))).toBe(false);
+  });
+
   test("вторая сборка во время первой получает понятный отказ", () => {
     const dir = fakeProject(`process.exit(0);`);
     fs.writeFileSync(path.join(dir, ".build-site.lock"), "123");
