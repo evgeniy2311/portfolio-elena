@@ -1,24 +1,27 @@
-import { faq } from "./data";
+import { ContactLink } from "@/components/ui/contact-link";
+import { Accordion } from "./accordion";
+import { faq, faqCopy } from "./data";
 import styles from "./faq.module.css";
 
-/** 12. Частые вопросы на нативных details. */
+/** 14. Частые вопросы: десять безопасных ответов, «Breathing Accordion», вторичная кнопка «Задать вопрос». */
 export function Faq() {
   return (
-    <section className={styles.faq} id="faq" aria-labelledby="faq-title">
-      <div className={`shell ${styles.faqGrid}`}>
-        <div className={styles.sectionHead} data-reveal>
-          <p className="eyebrow">Вопросы</p>
+    <section className={styles.faq} id="faq" data-ground="canvas" aria-labelledby="faq-title">
+      <div className={`shell ${styles.grid}`}>
+        <div className={styles.head}>
+          <p className="eyebrow">{faqCopy.eyebrow}</p>
           <h2 id="faq-title">
-            Часто задаваемые <em>вопросы</em>
+            Что обычно <em>спрашивают</em>
           </h2>
         </div>
-        <div className={styles.faqList}>
-          {faq.map((item) => (
-            <details key={item.q} data-reveal>
-              <summary>{item.q}</summary>
-              <p>{item.a}</p>
-            </details>
-          ))}
+        <div className={styles.body}>
+          <Accordion items={faq} />
+          <div className={styles.end}>
+            <p className="lede">{faqCopy.end}</p>
+            <ContactLink intent="question" className="button button-ghost">
+              {faqCopy.button}
+            </ContactLink>
+          </div>
         </div>
       </div>
     </section>

@@ -1,82 +1,177 @@
-/* Блок «Частые вопросы». Правила перенесены из app/home.module.css без изменений. */
-
-/* Общий заголовок секции, скопирован из app/home.module.css с прежней специфичностью. */
-.sectionHead {
-  display: grid;
-  gap: 18px;
-  max-width: 760px;
-  margin-bottom: clamp(40px, 6vw, 72px);
-}
-
-.sectionHead h2 {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-}
-
-.sectionHead > p:last-child:not(:first-child) {
-  max-width: 58ch;
-  color: var(--muted);
-  font-size: 1.125rem;
-}
-
-/* ---------- 11. Вопросы ---------- */
+/*
+ * 14. Частые вопросы. Компьютер: сетка 4/8, заголовок слева прилипает под шапкой. Телефон: друг под другом.
+ * Высота ответа раскрывается приёмом grid-template-rows 0fr → 1fr (accordion.tsx ставит data-acc и data-state).
+ */
 
 .faq {
-  padding-block: clamp(88px, 12vw, 160px);
+  padding-block: var(--space-section);
+  background: var(--canvas);
 }
 
-.faqGrid {
+.grid {
   display: grid;
+  gap: var(--space-head);
+  align-items: start;
 }
 
-.faqList {
-  border-top: 1.5px solid var(--ink);
+.head h2 {
+  max-width: 12ch;
 }
 
-.faqList details {
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.list > li {
   border-bottom: 1px solid var(--line);
 }
 
-.faqList summary {
+.item {
+  position: relative;
+  transition: background-color var(--dur-2) var(--ease-atelier);
+}
+
+.item[open]:not([data-state="closing"]) {
+  background: var(--paper);
+}
+
+.summary {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  min-height: 64px;
-  padding-block: 16px;
-  font-size: 1.1875rem;
-  font-weight: 650;
-  cursor: pointer;
+  gap: var(--space-4);
+  min-height: 56px;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  font: 600 1.0625rem/1.4 var(--font-ui), system-ui, sans-serif;
   list-style: none;
+  cursor: pointer;
 }
 
-.faqList summary::-webkit-details-marker {
+.summary::-webkit-details-marker {
   display: none;
 }
 
-.faqList summary::after {
-  content: "+";
-  flex-shrink: 0;
-  color: var(--wine);
-  font-family: var(--font-display);
-  font-size: 2rem;
-  line-height: 1;
-  transition: transform 250ms var(--ease);
+.summary > span:first-child {
+  transition: transform var(--dur-2) var(--ease-atelier);
 }
 
-.faqList details[open] summary::after {
+/* Плюс поворачивается в крестик. */
+.plus {
+  position: relative;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  transition: transform var(--dur-2) var(--ease-atelier);
+}
+
+.plus::before,
+.plus::after {
+  content: "";
+  position: absolute;
+  inset: 7px 0 auto;
+  height: 2px;
+  background: currentColor;
+}
+
+.plus::after {
+  transform: rotate(90deg);
+}
+
+.item[open]:not([data-state="closing"]) .plus {
   transform: rotate(45deg);
 }
 
-.faqList details p {
-  max-width: 60ch;
-  padding-bottom: 22px;
+.answer {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.answerInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.answerInner p {
+  max-width: 62ch;
+  padding: 0 var(--space-4) var(--space-5);
   color: var(--muted);
 }
 
+/* С движением: дыхание высоты и проявление текста через 120 мс. */
+.list[data-acc="on"] .answer {
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 320ms var(--ease-atelier);
+}
+
+.list[data-acc="on"] .answerInner p {
+  opacity: 0;
+  transition: opacity 200ms var(--ease-atelier);
+}
+
+.list[data-acc="on"] .item[data-state="open"] .answer {
+  grid-template-rows: 1fr;
+}
+
+.list[data-acc="on"] .item[data-state="open"] .answerInner p {
+  opacity: 1;
+  transition-delay: 120ms;
+}
+
+.end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-5);
+  margin-top: var(--space-head);
+}
+
+.end p {
+  color: var(--ink);
+}
+
+/* Наведение (только точный указатель): строка сдвигается на 6 px, слева растёт винная полоса. */
+@media (hover: hover) and (pointer: fine) {
+  .summary::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    width: 2px;
+    background: var(--wine);
+    transform: scaleY(0);
+    transition: transform var(--dur-2) var(--ease-atelier);
+  }
+
+  .summary:hover::before {
+    transform: scaleY(1);
+  }
+
+  .summary:hover > span:first-child {
+    transform: translateX(6px);
+  }
+}
+
 @media (min-width: 1024px) {
-  .faqGrid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 72px;
-    align-items: start;
+  .grid {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: var(--space-7);
+  }
+
+  .head {
+    position: sticky;
+    top: calc(var(--header-h) + var(--space-6));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .plus,
+  .summary > span:first-child {
+    transition: none;
   }
 }
