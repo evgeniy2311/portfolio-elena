@@ -36,7 +36,7 @@ export function Pains() {
                 <p>{pain.text}</p>
               </div>
               <figure className={styles.figure}>
-                <Photo image={pain.image} alt={pain.alt} sizes="(max-width: 767px) 72vw, (max-width: 1023px) 40vw, 280px" />
+                <Photo image={pain.image} alt={pain.alt} sizes="(max-width: 767px) 72vw, (max-width: 1023px) 40vw, 33vw" />
                 <figcaption className="small">{pain.caption}</figcaption>
               </figure>
             </li>
