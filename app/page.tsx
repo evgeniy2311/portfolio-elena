@@ -9,10 +9,9 @@ import { Requests } from "@/components/blocks/requests/requests";
 import { Accuracy } from "@/components/blocks/accuracy/accuracy";
 import { Trial } from "@/components/blocks/trial/trial";
 import { Process } from "@/components/blocks/process/process";
+import { Prices } from "@/components/blocks/prices/prices";
 import { ScrollFx } from "@/components/scroll-fx";
-import type { Vars } from "@/components/ui/css-vars";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
-import { formatPrice, packages } from "@/lib/site";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
@@ -81,32 +80,7 @@ export default function Home() {
 
         <Process />
 
-        {/* 11. Цены */}
-        <section className={styles.prices} id="prices" aria-labelledby="prices-title">
-          <div className="shell">
-            <div className={styles.sectionHead} data-reveal>
-              <p className="eyebrow">Цены</p>
-              <h2 id="prices-title">
-                Платите за кадры, <em>а не за студию</em>
-              </h2>
-              <p>Без аренды студии, гонорара модели и стилиста. Точную цену назову, когда увижу вещь и задачу.</p>
-            </div>
-            <ul className={styles.priceGrid}>
-              {packages.map((item, index) => (
-                <li key={item.name} className={item.featured ? styles.priceFeatured : undefined} data-reveal style={{ "--d": `${index * 70}ms` } as Vars}>
-                  {item.featured ? <p className={styles.priceBadge}>Чаще всего берут</p> : null}
-                  <h3>{item.name}</h3>
-                  <p>{item.includes}</p>
-                  {item.priceFrom !== null ? <p className={styles.priceValue}>{formatPrice(item.priceFrom)}</p> : null}
-                </li>
-              ))}
-            </ul>
-            <div className={styles.priceCta} data-reveal>
-              <p>Начните с двух бесплатных кадров, а цену серии обсудим после.</p>
-              <TrialLink />
-            </div>
-          </div>
-        </section>
+        <Prices />
 
         {/* 12. Вопросы */}
         <section className={styles.faq} id="faq" aria-labelledby="faq-title">

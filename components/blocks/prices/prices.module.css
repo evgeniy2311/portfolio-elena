@@ -1,0 +1,114 @@
+/* Блок «Цены». Правила перенесены из app/home.module.css без изменений. */
+
+/* Общий заголовок секции, скопирован из app/home.module.css с прежней специфичностью. */
+.sectionHead {
+  display: grid;
+  gap: 18px;
+  max-width: 760px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.sectionHead h2 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+}
+
+.sectionHead > p:last-child:not(:first-child) {
+  max-width: 58ch;
+  color: var(--muted);
+  font-size: 1.125rem;
+}
+
+/* ---------- 10. Цены ---------- */
+
+.prices {
+  background: var(--surface);
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.priceGrid {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.priceGrid li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 28px 24px;
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.priceGrid h3 {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.priceGrid p {
+  color: var(--muted);
+}
+
+.priceGrid .priceValue {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.priceFeatured {
+  background: var(--ink) !important;
+  color: var(--on-dark);
+}
+
+.priceGrid .priceFeatured p {
+  color: var(--on-dark-muted);
+}
+
+.priceGrid .priceFeatured .priceValue {
+  border-color: #4a3f39;
+  color: var(--on-dark);
+}
+
+.priceGrid .priceBadge,
+.priceGrid .priceFeatured .priceBadge {
+  justify-self: start;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--camel);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.priceCta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.priceCta p {
+  max-width: 44ch;
+  font-size: 1.1875rem;
+}
+
+@media (min-width: 640px) {
+  .priceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .priceGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
