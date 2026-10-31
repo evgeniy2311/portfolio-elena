@@ -55,6 +55,15 @@ test("пять карточек, включая лонгслив 2×2, и тек
     await expect(cards.nth(index).locator("img")).toHaveCount(card.frames.length);
   }
   expect(deckCards[2].frames).toHaveLength(4);
+  // Одна метка «Задача» у всех; «» только у дословного запроса заказчика.
+  for (const [index, card] of deckCards.entries()) {
+    expect(card.label).toBe("Задача");
+    await expect(cards.nth(index).locator("blockquote")).toHaveText(card.verbatim ? `«${card.quote}»` : card.quote);
+    if (!card.verbatim) expect(card.quote).not.toMatch(/[«»]/);
+  }
+  // Бордовое пальто: кадры 1 и 14 почти одинаковые — в карточке три разных снимка.
+  expect(deckCards[0].frames).toEqual([0, 9, 3]);
+  for (const card of deckCards) expect(new Set(card.frames).size).toBe(card.frames.length);
   await expect(page.locator(section).getByRole("link", { name: /Обсудить проект/ })).toHaveCount(1);
 });
 
@@ -119,6 +128,13 @@ test("от 1024 px: равные высоты, без подъёма карто�
   const pastEnd = forward.find((sample) => sample.y === geometry.end + 1)!;
   atEnd.tops.forEach((top, card) => expect(Math.abs(pastEnd.tops[card] - top)).toBeLessThanOrEqual(4));
   expect(Math.abs(atEnd.stageTop - pastEnd.stageTop)).toBeLessThanOrEqual(4);
+  // После того как последняя карточка встала (--p ≥ 0,9), до выхода ничего не движется: покой ≤ 10 % хода.
+  for (const sample of forward.filter((item) => item.p >= 0.9 && item.p <= 1)) {
+    sample.tops.forEach((top, card) => expect(Math.abs(top - atEnd.tops[card]), `покой в конце, карточка ${card + 1}, p=${sample.p}`).toBeLessThanOrEqual(1));
+  }
+  // В начале покой не больше 5 %: к --p = 0,06 вторая карточка уже въезжает.
+  const early = forward.filter((item) => item.p >= 0.06 && item.p < 0.2);
+  for (const sample of early) expect(sample.tops[1]).toBeLessThan(before.tops[1] - 1);
   const released = forward.filter((sample) => sample.y > geometry.end);
   for (const sample of released) sample.tops.forEach((top, card) => expect(Math.abs(top - atEnd.tops[card]), `после выхода, карточка ${card + 1}`).toBeLessThanOrEqual(1));
   // Глубина не нарушает порядок: у последней карточки (впереди) верх ниже всех видимых задних.
@@ -172,6 +188,32 @@ for (const size of [
       }),
     );
     expect(clipped).toEqual([]);
+  });
+}
+
+test("после вывода «До и после» блок без второго верхнего поля", async ({ page }) => {
+  await ready(page);
+  const outroFollowed = await page.locator(section).evaluate((element) => element.previousElementSibling?.hasAttribute("data-rail-outro") ?? false);
+  expect(outroFollowed).toBe(true);
+  expect(await page.locator(section).evaluate((element) => getComputedStyle(element).paddingTop)).toBe("0px");
+});
+
+for (const size of [
+  { width: 1440, height: 900 },
+  { width: 1024, height: 768 },
+]) {
+  test(`${size.width}×${size.height}: карточка заполняет сцену, поля сверху и снизу не больше 34 px`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop-1440", "Один прогон на размер");
+    await page.setViewportSize(size);
+    await ready(page);
+    const geometry = await pinGeometry(page, deck);
+    const sample = await sampleAt(page, geometry.start + 1, geometry);
+    const bottom = await page.locator(`${deck} [data-card]`).first().evaluate((card) => {
+      const stage = card.closest("[data-stage]")!.getBoundingClientRect();
+      return stage.bottom - card.getBoundingClientRect().bottom;
+    });
+    expect(sample.tops[0]).toBeLessThanOrEqual(34);
+    expect(bottom).toBeLessThanOrEqual(34);
   });
 }
 

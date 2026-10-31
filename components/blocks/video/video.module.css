@@ -5,13 +5,17 @@
   padding-block: var(--space-section);
 }
 
-/* Noir-панель: на телефоне во всю ширину с полями 24 px, с 768 px — отступ --gutter и скругление 12 px. */
+/*
+ * Noir-панель на любой ширине отстоит от краёв на --gutter (поля .shell) и скруглена на 12 px: во всю
+ * ширину рядом с noir-блоком «Сверка деталей» полоса фона между ними выглядела сбоем. Поля 24 px,
+ * с 768 px — --space-8.
+ */
 .panel {
   --focus-color: var(--champagne);
   display: grid;
   gap: var(--space-7);
-  margin-inline: calc(-1 * var(--gutter));
-  padding: var(--space-7) 24px;
+  padding: 24px;
+  border-radius: var(--radius);
   background: var(--noir);
   color: var(--on-dark);
 }
@@ -201,9 +205,7 @@
 
 @media (min-width: 768px) {
   .panel {
-    margin-inline: 0;
     padding: var(--space-8);
-    border-radius: var(--radius);
   }
 
   .row {
