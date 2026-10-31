@@ -1,50 +1,71 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowIcon } from "@/components/arrow-icon";
-import { TrialLink } from "@/components/site-shell";
+import { ContactLink } from "@/components/ui/contact-link";
 import type { Vars } from "@/components/ui/css-vars";
+import { Photo } from "@/components/ui/photo";
 import { about } from "@/lib/site";
 import styles from "./about.module.css";
-import { aboutPoints } from "./data";
+import { aboutCollage, aboutCopy, aboutPoints } from "./data";
+import { SlotWord } from "./slot-word";
 
-/** 3. Обо мне. Пока нет фото Елены, вместо него монограмма. */
+/** 3. Обо мне: «Portrait Unveil» для изображения и строк заголовка, «Slot Word» в лиде (блок 13). */
 export function About() {
   return (
-    <section className={styles.about} id="about" aria-labelledby="about-title">
-      <div className={`shell ${styles.aboutGrid}`}>
-        <figure className={`${styles.aboutPhoto} ${about.photo ? "" : styles.aboutPhotoEmpty}`} data-reveal>
-          {about.photo ? (
-            <Image src={about.photo.src} width={about.photo.width} height={about.photo.height} alt="Елена Бадьина" sizes="(max-width: 899px) 80vw, 34vw" />
-          ) : (
-            <span className={styles.aboutMonogram} aria-hidden="true">
-              ЕБ
-            </span>
-          )}
-        </figure>
-        <div className={styles.aboutText}>
-          <p className="eyebrow" data-reveal>
-            Обо мне
-          </p>
-          <h2 id="about-title" data-reveal>
-            Я Елена. <em>Делаю визуал для карточек</em> одежды и обуви.
-          </h2>
-          <p className={styles.aboutLead} data-reveal>
-            Помогаю продавцам на Wildberries и Ozon показать вещь так, чтобы её захотели купить: на модели, в городе, в интерьере. Без студии и без подмены товара.
-            {about.experience ? ` ${about.experience}` : ""}
-          </p>
-          <ul className={styles.aboutPoints}>
-            {aboutPoints.map((point, index) => (
-              <li key={point.title} data-reveal style={{ "--d": `${index * 80}ms` } as Vars}>
-                <h3>{point.title}</h3>
-                <p>{point.text}</p>
-              </li>
+    <section className={styles.about} id="about" data-ground="paper" aria-labelledby="about-title">
+      <div className={`shell ${styles.grid}`}>
+        {/* Наблюдатель появления смотрит на обёртку: у самой фигуры clip-path, и её видимая доля до раскрытия нулевая. */}
+        <div className={styles.unveil} data-reveal="unveil">
+        {about.photo ? (
+          <figure className={styles.portrait}>
+            <Image src={about.photo.src} width={about.photo.width} height={about.photo.height} alt="Елена Бадьина" sizes="(max-width: 1023px) 90vw, 36vw" />
+          </figure>
+        ) : (
+          // TEMP: коллаж из моих кадров вместо портрета, пока нет фото Елены.
+          <figure className={`${styles.portrait} ${styles.collage}`} role="img" aria-label="Кадры из моих работ" data-collage>
+            {aboutCollage.map((print) => (
+              <span className={styles.print} key={print.image.src} style={{ "--r": `${print.rotate}deg` } as Vars}>
+                <Photo image={print.image} alt="" sizes="(max-width: 1023px) 50vw, 20vw" />
+              </span>
             ))}
-          </ul>
-          <div className={styles.aboutActions} data-reveal>
-            <TrialLink />
-            <Link className="text-link" href="#contact">
-              Мои контакты <ArrowIcon />
-            </Link>
+          </figure>
+        )}
+        </div>
+
+        <div className={styles.text}>
+          <p className="eyebrow">{aboutCopy.eyebrow}</p>
+          <h2 id="about-title" className={styles.title} data-reveal="lines">
+            <span className={styles.line} style={{ "--i": 0 } as Vars}>
+              <span>Я&nbsp;Елена.</span>
+            </span>{" "}
+            <span className={styles.line} style={{ "--i": 1 } as Vars}>
+              <span>
+                <em>Делаю визуал для карточек</em>
+              </span>
+            </span>{" "}
+            <span className={styles.line} style={{ "--i": 2 } as Vars}>
+              <span>одежды и&nbsp;обуви</span>
+            </span>
+          </h2>
+          <div className={styles.body} data-reveal="body">
+            <SlotWord intro={aboutCopy.intro} full={aboutCopy.full} before={aboutCopy.slotBefore} words={aboutCopy.slotWords} />
+            {about.experience ? <p className={styles.experience}>{about.experience}</p> : null}
+            <ul className={styles.points}>
+              {aboutPoints.map((point) => (
+                <li key={point.title}>
+                  <h3>{point.title}</h3>
+                  <p>{point.text}</p>
+                </li>
+              ))}
+            </ul>
+            <div className={styles.actions}>
+              <ContactLink intent="season" className="button button-ghost">
+                {aboutCopy.season}
+              </ContactLink>
+              <Link className="text-link" href="/works">
+                {aboutCopy.works} <ArrowIcon />
+              </Link>
+            </div>
           </div>
         </div>
       </div>

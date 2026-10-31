@@ -110,22 +110,36 @@ export function contactLinks(source: Pick<Contact, "telegram" | "whatsapp" | "em
   return { telegram: telegramHref(intent, source.telegram), whatsapp: whatsappHref(intent, source.whatsapp), email };
 }
 
+/** Стабильные идентификаторы пакетов: по ним блок цен подбирает примеры работ. */
+export type PackageId = "cover" | "short" | "funnel" | "color" | "video" | "season";
+
 export type Package = {
+  id: PackageId;
   name: string;
   includes: string;
-  /** Цена «от» в рублях. null, пока Елена не утвердила. */
+  /** Цена «от» в рублях. null, пока Елена не утвердила; никогда не подменяется нулём. */
   priceFrom: number | null;
+  /** Цена договорная: вместо суммы «Обсудим отдельно» (видео и сезон, council/SYNTHESIS.md). */
+  negotiable?: boolean;
   featured?: boolean;
 };
 
+// Тексты пакетов: copy.md [11]. Полная воронка как услуга: 10–12 кадров.
 export const packages: Package[] = [
-  { name: "Главное фото", includes: "Обложка с инфографикой, которая выделяет карточку в выдаче.", priceFrom: null },
-  { name: "Короткая серия", includes: "3–5 кадров одной вещи: обложка, посадка, детали крупно.", priceFrom: null },
-  { name: "Полная воронка", includes: "15–20 кадров: обложка, детали, вид сзади, образы и сцены.", priceFrom: null, featured: true },
-  { name: "Новый цвет", includes: "Та же серия в другом цвете вещи, даже если его нет на фото.", priceFrom: null },
+  { id: "cover", name: "Главное фото", includes: "Обложка с инфографикой. Первый кадр, который видят в выдаче.", priceFrom: null },
+  { id: "short", name: "Короткая серия", includes: "3–5 кадров одной вещи: обложка, посадка, детали крупно.", priceFrom: null },
+  { id: "funnel", name: "Полная воронка", includes: "10–12 кадров: обложка, посадка, вид сзади, детали, образы и сцены.", priceFrom: null, featured: true },
+  { id: "color", name: "Новый цвет", includes: "Та же серия в другом цвете, даже если его нет на фото.", priceFrom: null },
+  { id: "video", name: "Видео из фото", includes: "Короткие ролики из готовых кадров. Вещь в движении не меняется.", priceFrom: null, negotiable: true },
+  { id: "season", name: "Сезон и большие объёмы", includes: "Коллекция к сезону или долгий проект с брендом. Условия обсудим отдельно.", priceFrom: null, negotiable: true },
 ];
 
 export function formatPrice(value: number | null): string {
   if (value === null) return "Цену назову по вашей задаче";
   return `от ${value.toLocaleString("ru-RU")} ₽`;
+}
+
+/** Строка цены пакета: договорная — «Обсудим отдельно», иначе formatPrice. */
+export function priceLabel(item: Pick<Package, "priceFrom" | "negotiable">): string {
+  return item.negotiable ? "Обсудим отдельно" : formatPrice(item.priceFrom);
 }
