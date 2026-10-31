@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type MouseEvent } from "react";
+import { useEffect, useRef, type MouseEvent, type SyntheticEvent } from "react";
 import { useMotionAllowed } from "@/components/fx/use-client-state";
 import type { Vars } from "@/components/ui/css-vars";
 import styles from "./faq.module.css";
@@ -11,6 +11,8 @@ import styles from "./faq.module.css";
  * при закрытии сначала анимация (data-state="closing"), и только после её конца снимается open,
  * так что ответ остаётся в дереве доступности до конца визуального закрытия. Быстрые повторные
  * нажатия отменяют отложенный шаг. Без JS и при reduced motion — обычные details.
+ * Если details раскрыл или закрыл сам браузер (поиск по странице, якорь), без клика по summary,
+ * вид догоняет нативное состояние по событию toggle, иначе ответ остался бы на 0fr и прозрачным.
  */
 
 const DURATION = 320;
@@ -57,11 +59,25 @@ export function Accordion({ items }: { items: Item[] }) {
     }
   };
 
+  // Нативное переключение мимо onToggle-клика: состояние вида приводится к open без анимации.
+  const onNativeToggle = (event: SyntheticEvent<HTMLDetailsElement>) => {
+    if (!motion) return;
+    const details = event.currentTarget;
+    const state = details.dataset.state;
+    if (details.open && state !== "opening" && state !== "open" && state !== "closing") details.dataset.state = "open";
+    else if (!details.open && state) {
+      const timer = timers.current.get(details);
+      if (timer) window.clearTimeout(timer);
+      timers.current.delete(details);
+      delete details.dataset.state;
+    }
+  };
+
   return (
     <ul className={styles.list} data-acc={motion ? "on" : undefined}>
       {items.map((item, index) => (
         <li key={item.q} data-reveal style={{ "--d": `${Math.min(index, 5) * 50}ms` } as Vars}>
-          <details className={styles.item}>
+          <details className={styles.item} onToggle={onNativeToggle}>
             <summary className={styles.summary} onClick={onToggle}>
               <span>{item.q}</span>
               <span className={styles.plus} aria-hidden="true" />

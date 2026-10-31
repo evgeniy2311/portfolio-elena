@@ -86,6 +86,27 @@ test("быстрые повторные нажатия: open и вид совп�
   await settled(page, 2, false);
 });
 
+test("браузер сам раскрыл ответ (поиск по странице): ответ виден, повторное нажатие закрывает", async ({ page }) => {
+  await go(page, "/");
+  await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
+  await expect(page.locator(`${section} ul[data-acc="on"]`)).toHaveCount(1);
+  const details = page.locator(`${section} details`).nth(4);
+  await details.scrollIntoViewIfNeeded();
+  // Так раскрывает details поиск по странице (auto-expand): open без клика по summary.
+  await details.evaluate((element) => ((element as HTMLDetailsElement).open = true));
+  await expect(details).toHaveAttribute("data-state", "open");
+  await expect.poll(() => details.locator("p").evaluate((element) => Number(getComputedStyle(element).opacity))).toBe(1);
+  await settled(page, 4, true);
+  await details.locator("summary").click();
+  await settled(page, 4, false);
+  await expect(details).not.toHaveAttribute("data-state", /.+/);
+  // И наоборот: браузер сам закрыл открытый ответ — состояние не остаётся «open».
+  await details.locator("summary").click();
+  await settled(page, 4, true);
+  await details.evaluate((element) => ((element as HTMLDetailsElement).open = false));
+  await expect(details).not.toHaveAttribute("data-state", /.+/);
+});
+
 test("reduced motion и без JS: обычные details, ответы доступны", async ({ page, browser }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await go(page, "/");
