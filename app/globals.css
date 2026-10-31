@@ -611,6 +611,43 @@ html:not([data-cta="show"]) .mobile-cta {
   transform: none;
 }
 
+/*
+ * Разные виды появления (значение data-reveal), чтобы блоки не повторяли один fade-up.
+ * Порог срабатывания у элемента можно задать data-reveal-threshold (0..1).
+ */
+[data-fx="on"] [data-reveal="fade"] {
+  transform: none;
+  transition: opacity var(--dur-3) var(--ease-atelier) var(--d, 0ms);
+}
+
+[data-fx="on"] [data-reveal="mask"] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path var(--dur-5) var(--ease-expo) var(--d, 0ms);
+}
+
+[data-fx="on"] [data-reveal="mask"].is-in {
+  clip-path: inset(0);
+}
+
+[data-fx="on"] [data-reveal="line"] {
+  opacity: 1;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 900ms var(--ease-atelier) var(--d, 0ms);
+}
+
+[data-fx="on"] [data-reveal="lift"] {
+  transform: translateY(48px) scale(0.97);
+  transition: opacity 700ms var(--ease-atelier) var(--d, 0ms), transform 700ms var(--ease-atelier) var(--d, 0ms);
+}
+
+[data-fx="on"] [data-reveal="line"].is-in,
+[data-fx="on"] [data-reveal="lift"].is-in {
+  transform: none;
+}
+
 /* 404 */
 .not-found {
   display: grid;
