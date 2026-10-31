@@ -7,10 +7,14 @@
  * Статичный export не поддерживает Proxy (docs: static-exports.md), поэтому на время такой сборки
  * proxy.ts переименовывается и всегда возвращается на место: в finally, при сигнале и при ошибке Next.
  * Если от прерванной сборки осталась резервная копия, сборка не начинается и ничего не перезаписывает.
+ *
+ * Тестовый стенд состояний (NEXT_PUBLIC_QA_FIXTURE) запрещён в любой сборке: она останавливается до запуска Next.
+ * После успешной сборки scripts/assert-production-clean.mjs проверяет, что тестовых данных в ней нет.
  */
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const root = process.cwd();
 const exportMode = Boolean(process.env.NEXT_PUBLIC_BASE_PATH);
@@ -18,6 +22,7 @@ const proxyFile = path.join(root, "proxy.ts");
 const backupFile = path.join(root, ".proxy.ts.export-backup");
 const lockFile = path.join(root, ".build-site.lock");
 const nextBin = path.join(root, "node_modules", "next", "dist", "bin", "next");
+const cleanCheck = fileURLToPath(new URL("./assert-production-clean.mjs", import.meta.url));
 
 function fail(message, code = 1) {
   console.error(`build-site: ${message}`);
@@ -75,6 +80,10 @@ process.on("exit", () => {
   }
 });
 
+if (process.env.NEXT_PUBLIC_QA_FIXTURE) {
+  fail(`NEXT_PUBLIC_QA_FIXTURE=${process.env.NEXT_PUBLIC_QA_FIXTURE} задан: тестовые данные запрещены в production и export-сборке. Уберите переменную.`, 2);
+}
+
 if (!fs.existsSync(nextBin)) fail(`не найден установленный Next: ${path.relative(root, nextBin)}. Выполните npm ci.`);
 acquireLock();
 
@@ -107,4 +116,8 @@ child.on("exit", (code, signal) => {
   if (restoreError) fail(restoreError, 3);
   if (signal) fail(`сборка прервана сигналом ${signal}`, 130);
   if (code !== 0) fail(`next build завершился с кодом ${code}`, code ?? 1);
+  const scanDirs = [path.join(root, ".next"), ...(exportMode ? [path.join(root, "out")] : [])].filter((dir) => fs.existsSync(dir));
+  if (scanDirs.length === 0) return;
+  const scan = spawnSync(process.execPath, [cleanCheck, ...scanDirs], { cwd: root, stdio: "inherit" });
+  if (scan.status !== 0) fail("в сборке найдены тестовые данные, публиковать её нельзя", 4);
 });

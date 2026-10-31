@@ -33,3 +33,4 @@ tests/refactor-parity.spec.ts-snapshots/*.png
 # Служебные файлы обёртки сборки (scripts/build-site.mjs)
 .build-site.lock
 .proxy.ts.export-backup
+.next-qa/

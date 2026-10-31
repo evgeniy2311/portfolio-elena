@@ -1,12 +1,52 @@
 // Единое место для контактов, услуг и цен.
 // Пока ссылка или цена не подтверждены Еленой, поле остаётся null и сайт показывает честную заглушку.
 
-export const contact = {
+import type { WorkImage } from "@/lib/works";
+
+/*
+ * Стенд состояний для тестов: NEXT_PUBLIC_QA_FIXTURE=contacts | videos | contacts,videos.
+ * Работает только в `next dev`. Production и export-сборка с непустым флагом останавливаются
+ * (scripts/build-site.mjs и next.config.ts), тестовые данные в сборку не попадают.
+ */
+export const qaFixtureNames = ["contacts", "videos"] as const;
+export type QaFixture = (typeof qaFixtureNames)[number];
+
+export function parseQaFixture(value: string | undefined): Set<QaFixture> {
+  const names = (value ?? "").split(",").map((name) => name.trim()).filter(Boolean);
+  for (const name of names) {
+    if (!(qaFixtureNames as readonly string[]).includes(name)) {
+      throw new Error(`NEXT_PUBLIC_QA_FIXTURE: неизвестное значение «${name}». Допустимо: ${qaFixtureNames.join(", ")}.`);
+    }
+  }
+  return new Set(names as QaFixture[]);
+}
+
+type Fixtures = typeof import("../tests/fixtures/site");
+const qa = process.env.NODE_ENV === "development" ? parseQaFixture(process.env.NEXT_PUBLIC_QA_FIXTURE) : new Set<QaFixture>();
+// Только dev: в production ветка вырезается сборщиком, файл тестов в граф сборки не входит.
+const fixtures: Fixtures | null =
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  process.env.NODE_ENV === "development" && qa.size > 0 ? (require("../tests/fixtures/site") as Fixtures) : null;
+
+type Contact = {
   /** Полная ссылка вида https://t.me/<ник>. null, пока Елена не подтвердила адрес. */
-  telegram: null as string | null,
+  telegram: string | null;
+  /** Ссылка вида https://wa.me/<номер>. Номер на странице не показывается. null, пока не подтверждён. */
+  whatsapp: string | null;
+  /** Почта, если Елена захочет её показать. */
+  email: string | null;
   /** Запасной канал для клиентов из РФ (Telegram там ограничен): MAX, e-mail или VK. */
-  backup: null as { label: string; href: string } | null,
+  backup: { label: string; href: string } | null;
 };
+
+const confirmedContact: Contact = { telegram: null, whatsapp: null, email: null, backup: null };
+
+export const contact: Contact = fixtures && qa.has("contacts") ? { ...confirmedContact, ...fixtures.qaContacts } : confirmedContact;
+
+export type VideoClip = { label: string; poster: WorkImage; sources: { src: string; type: string }[] };
+
+/** Ролики «видео из фото». Пока настоящих нет, список пуст и блок показывает постеры с «Ролики скоро». */
+export const videos: VideoClip[] = fixtures && qa.has("videos") ? fixtures.qaVideos : [];
 
 /** Блок «Обо мне». Фото и опыт Елена присылает сама; пока null, блок показывает монограмму и не пишет про опыт. */
 export const about = {
