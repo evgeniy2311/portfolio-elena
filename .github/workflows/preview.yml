@@ -27,6 +27,7 @@ jobs:
           cache: npm
       - run: npm ci
       # Та же обёртка, что и локально: убирает proxy.ts только на время export-сборки и возвращает его.
+      # Обёртка сначала строит адаптивные AVIF/WebP (scripts/build-images.mjs, sharp из devDependencies).
       # QA-флаг NEXT_PUBLIC_QA_FIXTURE здесь не задаётся никогда; сборка с ним завершается ошибкой.
       - run: npm run build
         env:

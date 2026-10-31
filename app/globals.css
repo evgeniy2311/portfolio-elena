@@ -97,6 +97,17 @@ img {
   height: auto;
 }
 
+/* <picture> кадра не участвует в раскладке: стили блоков по-прежнему относятся к самому <img>. */
+picture.photo {
+  display: contents;
+}
+
+/* Пока кадр грузится или если он не загрузился — плитка --surface с теми же пропорциями. */
+img[data-photo],
+img[data-failed] {
+  background-color: var(--surface);
+}
+
 /* Типографика */
 h1,
 h2,

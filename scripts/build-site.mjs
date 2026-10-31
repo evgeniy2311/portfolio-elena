@@ -9,6 +9,7 @@
  * Если от прерванной сборки осталась резервная копия, сборка не начинается и ничего не перезаписывает.
  *
  * Тестовый стенд состояний (NEXT_PUBLIC_QA_FIXTURE) запрещён в любой сборке: она останавливается до запуска Next.
+ * Перед Next строятся адаптивные изображения (scripts/build-images.mjs).
  * После успешной сборки scripts/assert-production-clean.mjs проверяет, что тестовых данных в ней нет.
  */
 import { spawn, spawnSync } from "node:child_process";
@@ -82,6 +83,13 @@ process.on("exit", () => {
 
 if (process.env.NEXT_PUBLIC_QA_FIXTURE) {
   fail(`NEXT_PUBLIC_QA_FIXTURE=${process.env.NEXT_PUBLIC_QA_FIXTURE} задан: тестовые данные запрещены в production и export-сборке. Уберите переменную.`, 2);
+}
+
+// Адаптивные версии кадров (public/works/_r) строятся до Next: сборка и export ссылаются на них.
+const imagesScript = fileURLToPath(new URL("./build-images.mjs", import.meta.url));
+if (fs.existsSync(path.join(root, "lib", "works-media.json"))) {
+  const images = spawnSync(process.execPath, [imagesScript], { cwd: root, stdio: "inherit" });
+  if (images.status !== 0) fail("адаптивные изображения не построены, сборка остановлена", images.status ?? 1);
 }
 
 if (!fs.existsSync(nextBin)) fail(`не найден установленный Next: ${path.relative(root, nextBin)}. Выполните npm ci.`);

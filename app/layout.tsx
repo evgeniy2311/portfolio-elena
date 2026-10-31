@@ -18,6 +18,9 @@ const ui = Manrope({
   display: "swap",
 });
 
+// Срабатывает до гидрации, поэтому ловит и ошибки первых кадров. Узлы не удаляет: только атрибуты.
+const imageFailureScript = `document.addEventListener("error",function(e){var i=e.target;if(!(i instanceof HTMLImageElement)||i.hasAttribute("data-failed"))return;i.setAttribute("data-failed","");var w=i.getAttribute("width"),h=i.getAttribute("height");if(w&&h)i.style.aspectRatio=w+" / "+h;var p=i.parentElement;if(p&&p.tagName==="PICTURE"){p.querySelectorAll("source").forEach(function(s){s.removeAttribute("srcset")})}i.removeAttribute("srcset");i.src="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%271%27 height=%271%27/%3E"},true);`;
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://elena-badyina.example"),
   title: { default: "Елена Бадьина: карточки одежды для WB и Ozon", template: "%s | Елена Бадьина" },
@@ -31,6 +34,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ru" className={`${display.variable} ${ui.variable}`}>
       <body>
+        {/* Неудачная загрузка кадра: вместо значка битой картинки остаётся плитка --surface того же размера. */}
+        <script dangerouslySetInnerHTML={{ __html: imageFailureScript }} />
         <a className="skip-link" href="#main">К основному содержанию</a>
         {children}
       </body>

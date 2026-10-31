@@ -34,3 +34,6 @@ tests/refactor-parity.spec.ts-snapshots/*.png
 .build-site.lock
 .proxy.ts.export-backup
 .next-qa/
+
+# Адаптивные версии кадров строит scripts/build-images.mjs перед dev и сборкой
+public/works/_r/

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/build-images.mjs && next dev",
     "build": "node scripts/build-site.mjs",
     "start": "next start",
     "lint": "eslint .",
@@ -11,7 +11,8 @@
     "test:e2e": "playwright test",
     "test:pages": "playwright test --config playwright.pages.config.ts",
     "serve:export": "node scripts/serve-export.mjs",
-    "screenshots": "node scripts/capture-screenshots.mjs"
+    "screenshots": "node scripts/capture-screenshots.mjs",
+    "images": "node scripts/build-images.mjs"
   },
   "dependencies": {
     "next": "16.3.2",
@@ -26,6 +27,7 @@
     "@types/react-dom": "19.2.4",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.2",
+    "sharp": "0.35.3",
     "typescript": "6.0.3"
   }
 }
