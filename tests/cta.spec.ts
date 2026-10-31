@@ -134,7 +134,8 @@ test("главная: основной оффер ровно три раза (п
   await go(page, "/");
   const primary = page.locator("main a.button:not(.button-ghost):not(.button-light)", { hasText: "2 кадра бесплатно" });
   await expect(primary).toHaveCount(3);
-  for (const where of ["[data-first-screen]", "#transform", "#prices"]) await expect(page.locator(where).locator("a.button:not(.button-ghost)", { hasText: "2 кадра бесплатно" }), where).toHaveCount(1);
+  // У «До и после» кнопка стоит в выводе после липкой сцены ([data-rail-outro], бриф: outro в обычном потоке).
+  for (const where of ["[data-first-screen]", "[data-rail-outro]", "#prices"]) await expect(page.locator(where).locator("a.button:not(.button-ghost)", { hasText: "2 кадра бесплатно" }), where).toHaveCount(1);
   // Шапка, «Обо мне», вопросы и контакты не повторяют оффер кнопкой.
   for (const where of ["header", "#about", "#faq", "#contact"]) await expect(page.locator(where).getByText("2 кадра бесплатно"), where).toHaveCount(0);
   await expect(page.locator("[data-mobile-cta] a", { hasText: "2 кадра бесплатно" })).toHaveCount(1);
