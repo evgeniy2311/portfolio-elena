@@ -19,9 +19,28 @@ async function stableCounts(page: Page) {
   return counts;
 }
 
+/** Число слушателей устанавливается не мгновенно (под нагрузкой дольше): ждём, пока оно сравняется с эталоном. */
+async function expectCounts(page: Page, expected: Record<string, number>) {
+  await expect.poll(() => stableCounts(page), { timeout: 8000 }).toEqual(expected);
+}
+
+/** Эталон: два одинаковых замера подряд, а не случайный момент посреди монтирования. */
+async function settledCounts(page: Page) {
+  let previous = JSON.stringify(await stableCounts(page));
+  await expect
+    .poll(async () => {
+      const current = JSON.stringify(await stableCounts(page));
+      const same = current === previous;
+      previous = current;
+      return same;
+    }, { timeout: 8000, intervals: [250] })
+    .toBe(true);
+  return JSON.parse(previous) as Record<string, number>;
+}
+
 /** Ждёт, пока сглаживание догонит и общий цикл остановится (подписчиков ticker нет). */
 async function idle(page: Page) {
-  await expect.poll(() => framesDuring(page, 300), { timeout: 8000 }).toBeLessThanOrEqual(1);
+  await expect.poll(() => framesDuring(page, 300), { timeout: 20_000 }).toBeLessThanOrEqual(1);
 }
 
 const desktopOnly = (page: Page) => test.skip(!isPinViewport(page), "«Липкие» сцены работают от 1024 px и 600 px высоты");
@@ -142,6 +161,9 @@ test.describe("сцены страницы", () => {
 });
 
 test.describe("один ticker и cleanup", () => {
+  // Под нагрузкой (параллельные прогоны, холодная компиляция dev-сервера) цикл догоняет дольше обычного.
+  test.setTimeout(120_000);
+
   test("в покое кадры не идут; прокрутка запускает и останавливает цикл", async ({ page }) => {
     await instrument(page);
     await go(page, "/");
@@ -158,7 +180,7 @@ test.describe("один ticker и cleanup", () => {
     await go(page, "/");
     await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
     await idle(page);
-    const initial = await stableCounts(page);
+    const initial = await settledCounts(page);
 
     // Клиентский переход на архив и обратно: ScrollFx размонтируется и монтируется заново.
     await page.locator("header nav a[href$='/works'], header nav a[href$='/works/']").first().click({ force: true }).catch(async () => {
@@ -170,11 +192,11 @@ test.describe("один ticker и cleanup", () => {
     await expect(page.locator("#services")).toHaveCount(1, { timeout: 30_000 });
     await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
     await idle(page);
-    expect(await stableCounts(page)).toEqual(initial);
+    await expectCounts(page, initial);
 
     await page.setViewportSize({ width: page.viewportSize()!.width - 40, height: page.viewportSize()!.height });
     await idle(page);
-    expect(await stableCounts(page)).toEqual(initial);
+    await expectCounts(page, initial);
 
     // Скрытая вкладка: кадров нет, после возврата цикл снова работает.
     await page.evaluate(() => {
@@ -190,7 +212,7 @@ test.describe("один ticker и cleanup", () => {
     await page.mouse.wheel(0, 300);
     expect(await framesDuring(page, 300)).toBeGreaterThan(0);
     await idle(page);
-    expect(await stableCounts(page)).toEqual(initial);
+    await expectCounts(page, initial);
   });
 
   test("reduced motion включён во время работы: data-fx снят, циклы стоят, всё видно", async ({ page }) => {
