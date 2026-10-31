@@ -106,7 +106,7 @@ export function whatsappHref(intent: ContactIntent = "project", address: string 
 
 /** Что показывает блок контактов: готовые ссылки или честно выключенные кнопки. */
 export function contactLinks(source: Pick<Contact, "telegram" | "whatsapp" | "email"> = contact, intent: ContactIntent = "project") {
-  const email = source.email && /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(source.email) ? source.email : null;
+  const email = source.email && /^[^\s@<>"?&#%]+@[^\s@<>"?&#%]+\.[^\s@<>"?&#%]+$/.test(source.email) ? source.email : null;
   return { telegram: telegramHref(intent, source.telegram), whatsapp: whatsappHref(intent, source.whatsapp), email };
 }
 

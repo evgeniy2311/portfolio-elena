@@ -63,6 +63,10 @@ test.describe("правила адресов", () => {
     expect(contactLinks({ telegram: null, whatsapp: null, email: "" }).email).toBeNull();
     expect(contactLinks({ telegram: null, whatsapp: null, email: "not an email" }).email).toBeNull();
     expect(contactLinks({ telegram: null, whatsapp: null, email: "elena@example.com" }).email).toBe("elena@example.com");
+    // ? и & открывают заголовки mailto (cc, bcc, body): такой адрес отвергается.
+    for (const bad of ["elena@example.com?cc=x@y.ru", "elena@example.com?bcc=x@y.ru&body=hi", "a&b@example.com", "elena@exa&mple.com", "elena@example.com#x", "el%0Aena@example.com"]) {
+      expect(contactLinks({ telegram: null, whatsapp: null, email: bad }).email, bad).toBeNull();
+    }
   });
 });
 
