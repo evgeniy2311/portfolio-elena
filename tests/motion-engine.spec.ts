@@ -88,14 +88,25 @@ test.describe("сцены страницы", () => {
     }
   });
 
-  test("лента: панели получают --pp, последняя доезжает до 1", async ({ page }) => {
+  test("лента: панели получают --pp, последняя доезжает до своего конечного места", async ({ page }) => {
     desktopOnly(page);
     await go(page, "/");
     await scrollToPin(page, "#transform", 1);
     const panels = page.locator("#transform [data-panel]");
     const count = await panels.count();
     test.skip(count === 0, "Панели ленты размечаются при переделке блока (этап 8)");
-    await expect.poll(async () => Number(await panels.last().evaluate((element) => getComputedStyle(element).getPropertyValue("--pp")))).toBeGreaterThan(0.95);
+    // Панель уже окна не может дойти левым краем до левого края окна: её конечное место — правый край у края ленты.
+    // --pp там равен (ширина окна − left) / ширина окна, и панель целиком в окне.
+    const last = panels.last();
+    await expect
+      .poll(() =>
+        last.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const expected = (window.innerWidth - rect.left) / window.innerWidth;
+          return rect.right <= window.innerWidth + 1 && Math.abs(Number(getComputedStyle(element).getPropertyValue("--pp")) - expected) < 0.01;
+        }),
+      )
+      .toBe(true);
   });
 
   test("ниже 1024 px сцены не «липнут»", async ({ page }) => {
@@ -137,7 +148,8 @@ test.describe("сцены страницы", () => {
       await expect(page.locator("#qa-segments [data-segment][data-active]")).toHaveCount(1);
       await expect(page.locator("#qa-segments [data-segment]").nth(k)).toHaveAttribute("data-active", "");
     }
-    expect(Number(await readVar(page, "#qa-segments", "--t"))).toBe(1);
+    // Сцена стоит в самом конце страницы: при дробной высоте страницы прокрутка упирается на доли пикселя раньше.
+    expect(Number(await readVar(page, "#qa-segments", "--t"))).toBeCloseTo(1, 2);
   });
 });
 
