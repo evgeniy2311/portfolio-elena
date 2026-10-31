@@ -1,0 +1,211 @@
+/* Блок «Сверка деталей». Правила перенесены из app/home.module.css без изменений. */
+
+/* ---------- 6. Точность ---------- */
+
+.accuracy {
+  --p: 1;
+  position: relative;
+  background: var(--cocoa);
+  color: var(--on-dark);
+}
+
+.accuracyStage {
+  padding-block: clamp(88px, 12vw, 160px);
+}
+
+.accuracyGrid {
+  display: grid;
+  gap: 40px;
+}
+
+.accuracyCopy {
+  display: grid;
+  align-content: center;
+  gap: 18px;
+}
+
+.accuracyCopy h2 {
+  max-width: 15ch;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.accuracyCopy h2 em {
+  color: var(--camel);
+}
+
+.accuracyCopy > p {
+  max-width: 50ch;
+  color: var(--on-dark-muted);
+  font-size: 1.125rem;
+}
+
+.checkList {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checkList li {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  padding-block: 12px;
+  border-top: 1px solid var(--cocoa-soft);
+}
+
+.checkList span {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--camel);
+  border-radius: 50%;
+  color: var(--camel);
+  font-weight: 650;
+}
+
+.checkList h3 {
+  font-size: 1.0625rem;
+}
+
+.checkList p {
+  color: var(--on-dark-muted);
+  font-size: 0.9688rem;
+}
+
+.accuracyCompare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.accuracyCompare figure {
+  position: relative;
+  margin: 0;
+}
+
+.accuracyCompare img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-small);
+  background: var(--cocoa-soft);
+}
+
+.accuracyCompare figcaption {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.accuracyDetails {
+  display: contents;
+}
+
+@media (min-width: 1024px) {
+  .accuracyGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: clamp(32px, 4vw, 72px);
+  }
+
+  .accuracyCompare {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .accuracySource {
+    grid-row: span 2;
+    align-self: center;
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 600px) {
+  :global([data-fx="on"]) .accuracy {
+    height: 320vh;
+  }
+
+  :global([data-fx="on"]) .accuracyStage {
+    position: sticky;
+    top: var(--header-h);
+    display: flex;
+    align-items: center;
+    height: calc(100svh - var(--header-h));
+    padding-block: 32px;
+    overflow: clip;
+  }
+
+  :global([data-fx="on"]) .accuracyCompare {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    align-items: center;
+    gap: 20px;
+    max-height: calc(100svh - var(--header-h) - 96px);
+  }
+
+  :global([data-fx="on"]) .accuracySource {
+    grid-row: auto;
+  }
+
+  :global([data-fx="on"]) .accuracyDetails {
+    display: grid;
+    position: relative;
+  }
+
+  :global([data-fx="on"]) .accuracyDetails figure {
+    grid-area: 1 / 1;
+  }
+
+  :global([data-fx="on"]) .accuracyCompare img {
+    max-height: calc(100svh - var(--header-h) - 120px);
+  }
+
+  /* Каждый пункт активен на своей четверти прокрутки; последний остаётся. */
+  :global([data-fx="on"]) .checkList li,
+  :global([data-fx="on"]) .accuracyDetails figure {
+    --s: calc(var(--i) * 0.24);
+    --in: clamp(0, (var(--p) - var(--s) + 0.06) / 0.06, 1);
+    --out: clamp(0, (var(--p) - var(--s) - 0.24) / 0.06, 1);
+    --on: calc(var(--in) - var(--out));
+  }
+
+  :global([data-fx="on"]) .checkList li:last-child,
+  :global([data-fx="on"]) .accuracyDetails figure:last-child {
+    --out: 0;
+  }
+
+  :global([data-fx="on"]) .checkList li {
+    opacity: calc(0.36 + var(--on) * 0.64);
+    padding-block: 8px;
+  }
+
+  /* Описание раскрывается только у активного пункта, поэтому список помещается в экран ноутбука. */
+  :global([data-fx="on"]) .checkList p {
+    max-height: calc(var(--on) * 3.2em);
+    overflow: hidden;
+  }
+
+  :global([data-fx="on"]) .accuracyCopy h2 {
+    font-size: clamp(2.25rem, min(4.4vw, 6.5vh), 4.5rem);
+  }
+
+  :global([data-fx="on"]) .accuracyCopy > p {
+    font-size: 1.0625rem;
+  }
+
+  :global([data-fx="on"]) .accuracyCopy {
+    gap: 14px;
+  }
+
+  :global([data-fx="on"]) .accuracyDetails figure {
+    opacity: var(--on);
+    transform: scale(calc(1.05 - var(--on) * 0.05));
+  }
+}
