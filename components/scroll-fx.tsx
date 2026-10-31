@@ -14,7 +14,8 @@ import { subscribeTicker } from "@/components/fx/ticker";
  * [data-segments]  у [data-pin]: --k (номер сегмента), --t (прогресс внутри), data-active у [data-segment]
  * [data-view]      --p 0..1 от появления элемента снизу до ухода вверх
  * [data-rail]      горизонтальная лента внутри [data-pin]: высота секции подгоняется под ширину ленты;
- *                  её [data-panel] получают --pp (0 — панель у правого края окна, 1 — у левого)
+ *                  её [data-panel] получают --pp (0 — панель у правого края окна, 1 — у левого);
+ *                  кадры ленты начинают грузиться заранее, когда она в двух экранах от окна
  * [data-reveal]    получает класс is-in один раз при появлении; значение атрибута выбирает вид
  *                  появления в CSS, data-reveal-threshold — свой порог срабатывания
  *
@@ -66,6 +67,20 @@ export function ScrollFx() {
       return observer;
     }
 
+    // Кадры горизонтальной ленты лежат за правым краем окна, и ленивая загрузка браузера до них
+    // может не дойти при быстрой прокрутке. Когда лента приближается (за два экрана), они грузятся сразу.
+    const railImages = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          for (const image of entry.target.querySelectorAll<HTMLImageElement>("[data-rail-track] img[loading='lazy']")) image.loading = "eager";
+          railImages.unobserve(entry.target);
+        }
+      },
+      { rootMargin: "200% 0px" },
+    );
+    for (const rail of document.querySelectorAll("[data-rail]")) railImages.observe(rail);
+
     let tracked: Tracked[] = [];
     let unsubscribe: (() => void) | null = null;
     let motion = false;
@@ -88,10 +103,10 @@ export function ScrollFx() {
       }
     }
 
-    function targetOf(item: Tracked, viewport: number) {
+    function targetOf(item: Tracked, viewport: number, everywhere = false) {
       const rect = item.element.getBoundingClientRect();
-      // Далеко за экраном значение не нужно: frame() ставит его сразу при возвращении.
-      if (rect.bottom < -viewport || rect.top > viewport * 2) return null;
+      // Далеко за экраном значение на каждом кадре не нужно: frame() ставит его при возвращении.
+      if (!everywhere && (rect.bottom < -viewport || rect.top > viewport * 2)) return null;
       if (item.kind === "view") return viewProgress(rect.top, rect.height, viewport);
       if (item.stage) {
         const stageTop = parseFloat(getComputedStyle(item.stage).top) || 0;
@@ -179,11 +194,11 @@ export function ScrollFx() {
       }
     }
 
-    /** Первый кадр после настройки: без сглаживания, сразу в положение прокрутки. */
+    /** Первый кадр после настройки: без сглаживания, сразу в положение прокрутки, для всех сцен страницы. */
     function snap() {
       const viewport = window.innerHeight;
       for (const item of tracked) {
-        const target = targetOf(item, viewport);
+        const target = targetOf(item, viewport, true);
         if (target === null) continue;
         item.current = item.target = target;
         publish(item);
@@ -288,6 +303,7 @@ export function ScrollFx() {
       pinMedia.removeEventListener("change", onResize);
       for (const observer of revealObservers.values()) observer.disconnect();
       ctaObserver.disconnect();
+      railImages.disconnect();
       for (const item of tracked) delete item.element.dataset.pinned;
       delete root.dataset.fx;
       delete root.dataset.cta;
