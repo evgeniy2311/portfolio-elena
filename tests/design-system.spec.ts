@@ -233,10 +233,8 @@ test.describe("шапка", () => {
     await expect(page.locator("html")).toHaveAttribute("data-header", "top");
     await page.evaluate(() => window.scrollTo({ top: 120, behavior: "instant" }));
     await expect(page.locator("html")).toHaveAttribute("data-header", "scrolled");
-    await expect.poll(async () => (await look()).bg).toBe("rgba(246, 242, 236, 0.96)");
-    const scrolled = await look();
-    expect(scrolled.border).toBe("rgb(221, 211, 199)");
-    expect(scrolled.width).toBe("1px");
+    // Переход фона и линии идёт --dur-2, ждём конечное состояние.
+    await expect.poll(look).toEqual({ bg: "rgba(246, 242, 236, 0.96)", border: "rgb(221, 211, 199)", width: "1px" });
   });
 
   test("уже 900 px: нет навигации, знак и кнопка помещаются", async ({ page }) => {
