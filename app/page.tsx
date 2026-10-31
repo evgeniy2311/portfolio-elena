@@ -6,12 +6,13 @@ import { Categories } from "@/components/blocks/categories/categories";
 import { About } from "@/components/blocks/about/about";
 import { Pains } from "@/components/blocks/pains/pains";
 import { Services } from "@/components/blocks/services/services";
+import { Transform } from "@/components/blocks/transform/transform";
 import { ScrollFx } from "@/components/scroll-fx";
 import type { Vars } from "@/components/ui/css-vars";
 import { Photo } from "@/components/ui/photo";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
 import { formatPrice, packages } from "@/lib/site";
-import { frame, getWork, source, works, type Work } from "@/lib/works";
+import { frame, getWork, source } from "@/lib/works";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
@@ -27,9 +28,6 @@ export const metadata: Metadata = {
 };
 
 const accuracySource = source("burgundy-coat-city", 0);
-
-const railSlugs = ["black-coat-evening", "beige-windbreaker", "puffer-jacket", "yellow-trench", "grey-shearling", "white-wrap-blouse"] as const;
-const railWorks = railSlugs.map((slug) => getWork(slug)).filter((work): work is Work => Boolean(work));
 
 const requests: Array<{ slug: string; label: string; quote: string; verbatim: boolean; note: string; frames: number[]; square?: boolean }> = [
   {
@@ -118,7 +116,6 @@ const faq = [
 ];
 
 export default function Home() {
-  const frameCount = works.reduce((sum, work) => sum + work.frames.length, 0);
   return (
     <div className={styles.page}>
       <ScrollFx />
@@ -135,56 +132,7 @@ export default function Home() {
 
         <Services />
 
-        {/* 6. До и после: горизонтальная лента, которую двигает вертикальная прокрутка */}
-        <section className={styles.rail} id="transform" data-pin data-rail aria-labelledby="rail-title">
-          <div className={styles.railStage}>
-            <div className={styles.railTrack} data-rail-track>
-              <div className={styles.railIntro}>
-                <p className="eyebrow">До и после</p>
-                <h2 id="rail-title">
-                  Что вы присылаете. <em>Что получаете.</em>
-                </h2>
-                <p className={styles.railIntroText}>Слева фото от заказчика и его задача, справа готовые кадры.</p>
-                <span className={styles.railArrow} aria-hidden="true">
-                  <ArrowIcon />
-                </span>
-              </div>
-              {railWorks.map((work, index) => (
-                <article className={styles.railPanel} key={work.slug} aria-labelledby={`rail-${work.slug}`}>
-                  <div className={styles.railMeta}>
-                    <span className={styles.railNumber}>
-                      {String(index + 1).padStart(2, "0")} / {String(railWorks.length).padStart(2, "0")}
-                    </span>
-                    <h3 id={`rail-${work.slug}`}>{work.title}</h3>
-                    <p className={styles.railLabel}>Прислали</p>
-                    <div className={styles.railSources}>
-                      {work.source.slice(0, 3).map((image, sourceIndex) => (
-                        <Photo key={image.src} image={image} alt={`${work.title}: исходное фото ${sourceIndex + 1}`} sizes="(max-width: 1023px) 28vw, 8vw" />
-                      ))}
-                    </div>
-                    <p className={styles.railLabel}>Задача</p>
-                    <p className={styles.railBrief}>{work.request ? `«${work.request}»` : work.brief}</p>
-                    <Link className="text-link" href={`/works/${work.slug}`}>
-                      Все {work.frames.length} кадров <ArrowIcon />
-                    </Link>
-                  </div>
-                  <div className={styles.railFrames}>
-                    {work.frames.slice(0, 3).map((image, frameIndex) => (
-                      <Photo key={image.src} image={image} alt={`${work.title}: кадр ${frameIndex + 1} из готовой воронки`} sizes="(max-width: 1023px) 45vw, 18vw" />
-                    ))}
-                  </div>
-                </article>
-              ))}
-              <div className={styles.railOutro}>
-                <p className={styles.railOutroNumber}>{works.length}</p>
-                <p>вещей и {frameCount} кадров в портфолио: пальто, дублёнки, ветровки, трикотаж.</p>
-                <Link className="button" href="/works">
-                  Все работы <ArrowIcon />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Transform />
 
         {/* 7. Задачи клиентов: карточки складываются стопкой */}
         <section className={styles.requests} aria-labelledby="requests-title">

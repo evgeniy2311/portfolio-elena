@@ -1,0 +1,202 @@
+/* Блок «До и после». Правила перенесены из app/home.module.css без изменений. */
+
+/* ---------- 4. Лента «исходник → карточка» ---------- */
+
+.rail {
+  --p: 0;
+  position: relative;
+  background: var(--surface);
+}
+
+.railStage {
+  padding-block: clamp(72px, 10vw, 120px);
+}
+
+.railTrack {
+  display: grid;
+  gap: 24px;
+  padding-inline: var(--gutter);
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+.railIntro {
+  display: grid;
+  gap: 18px;
+  align-content: center;
+}
+
+.railIntro h2 {
+  font-size: clamp(2.5rem, 5.5vw, 4.75rem);
+}
+
+.railIntroText {
+  max-width: 38ch;
+  color: var(--muted);
+  font-size: 1.125rem;
+}
+
+.railArrow {
+  display: none;
+}
+
+.railPanel {
+  display: grid;
+  gap: 24px;
+  padding: clamp(20px, 3vw, 36px);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.railMeta {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.railNumber {
+  color: var(--wine);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+.railMeta h3 {
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(1.875rem, 2.6vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.02;
+}
+
+.railLabel {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.railSources {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.railSources img {
+  width: 64px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.railBrief {
+  max-width: 30ch;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+.railFrames {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.railFrames img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-small);
+  background: var(--surface);
+}
+
+.railFrames img:nth-child(2) {
+  transform: translateY(18px);
+}
+
+.railOutro {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: 12px;
+  padding-block: 24px;
+}
+
+.railOutroNumber {
+  color: var(--wine);
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 10vw, 9rem);
+  line-height: 0.8;
+}
+
+.railOutro p:not(.railOutroNumber) {
+  max-width: 24ch;
+  font-size: 1.1875rem;
+}
+
+@media (min-width: 1024px) {
+  .railStage {
+    overflow-x: auto;
+  }
+
+  .railTrack {
+    display: flex;
+    align-items: center;
+    gap: clamp(28px, 3vw, 48px);
+    width: max-content;
+    max-width: none;
+  }
+
+  .railIntro {
+    width: 400px;
+    flex-shrink: 0;
+  }
+
+  .railArrow {
+    display: inline-flex;
+    width: 56px;
+    height: 56px;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+  }
+
+  .railPanel {
+    width: min(1040px, 80vw);
+    flex-shrink: 0;
+    grid-template-columns: 280px minmax(0, 1fr);
+    align-items: center;
+    gap: 36px;
+  }
+
+  .railOutro {
+    width: 360px;
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 600px) {
+  :global([data-fx="on"]) .railStage {
+    position: sticky;
+    top: var(--header-h);
+    display: flex;
+    align-items: center;
+    height: calc(100svh - var(--header-h));
+    padding-block: 32px;
+    overflow: hidden;
+  }
+
+  :global([data-fx="on"]) .railTrack {
+    transform: translate3d(calc(var(--p) * var(--rail-shift, 0px) * -1), 0, 0);
+    will-change: transform;
+  }
+
+  :global([data-fx="on"]) .railPanel {
+    height: min(640px, calc(100svh - var(--header-h) - 64px));
+  }
+
+  :global([data-fx="on"]) .railFrames img {
+    max-height: calc(100svh - var(--header-h) - 160px);
+  }
+}
