@@ -1,43 +1,35 @@
-export const requests: Array<{ slug: string; label: string; quote: string; verbatim: boolean; note: string; frames: number[]; square?: boolean }> = [
-  {
-    slug: "burgundy-coat-city",
-    label: "Запрос заказчика",
-    quote: "Пальто 42 размера. Сделать 48–50 размер на худой девушке, оверсайз стиль.",
-    verbatim: true,
-    note: "Модель и посадку меняю, крой, пуговицы, пояс и длина остаются как на исходнике.",
-    frames: [0, 9, 13],
-  },
-  {
-    slug: "burgundy-coat-interior",
-    label: "Запрос заказчика",
-    quote: "То же пальто, но в интерьерной студии, в минималистичном стиле.",
-    verbatim: true,
-    note: "Вторая серия для той же вещи: другой свет, другая сцена, тот же товар.",
-    frames: [0, 4, 9],
-  },
-  {
-    slug: "longsleeve-colors",
-    label: "Запрос заказчика",
-    quote: "Лонгслив в четырёх цветах. И сделать чёрный, которого нет на фото.",
-    verbatim: true,
-    note: "Одна модель, четыре цвета. Карточки разных цветов выглядят как одна коллекция.",
-    frames: [0, 1, 5, 3],
-    square: true,
-  },
-  {
-    slug: "brown-coat-three-looks",
-    label: "Задача",
-    quote: "Одно пальто, три разных образа.",
-    verbatim: false,
-    note: "С джинсами и рубашкой, с белым жилетом, с кожаной юбкой. Каждая покупательница видит себя.",
-    frames: [0, 7, 10],
-  },
-  {
-    slug: "reversible-sheepskin",
-    label: "Задача",
-    quote: "Дублёнка двусторонняя. Покупатель должен понять, что это две вещи в одной.",
-    verbatim: false,
-    note: "В одной серии вещь показана мехом наружу и кожей наружу.",
-    frames: [0, 3, 6],
-  },
+import { quoteOf, storyFor } from "@/lib/work-stories";
+import { getWork, type Work } from "@/lib/works";
+
+/*
+ * Пять карточек «Задачи заказчиков» (copy.md [6]): тексты из историй работ (lib/work-stories.ts).
+ * Дословный запрос показывается в «», у работ без него — задача своими словами, без кавычек.
+ * frames — номера готовых кадров; у лонгслива четыре цвета сеткой 2×2.
+ */
+const specs: Array<{ slug: string; frames: number[]; square?: boolean }> = [
+  { slug: "burgundy-coat-city", frames: [0, 9, 13] },
+  { slug: "burgundy-coat-interior", frames: [0, 4, 9] },
+  { slug: "longsleeve-colors", frames: [0, 1, 5, 3], square: true },
+  { slug: "brown-coat-three-looks", frames: [0, 7, 10] },
+  { slug: "reversible-sheepskin", frames: [0, 3, 6] },
 ];
+
+export type DeckCard = { work: Work; label: string; quote: string; verbatim: boolean; result: string; frames: number[]; square: boolean };
+
+export const deckCards: DeckCard[] = specs.flatMap((spec) => {
+  const work = getWork(spec.slug);
+  if (!work) return [];
+  const story = storyFor(work);
+  const quote = quoteOf(story);
+  return [
+    {
+      work,
+      label: quote ? "Запрос заказчика" : "Задача",
+      quote: quote ?? story.task,
+      verbatim: Boolean(quote),
+      result: story.result,
+      frames: spec.frames.filter((index) => work.frames[index]),
+      square: Boolean(spec.square),
+    },
+  ];
+});
