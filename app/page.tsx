@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowIcon } from "@/components/arrow-icon";
 import { Hero } from "@/components/blocks/hero/hero";
+import { Categories } from "@/components/blocks/categories/categories";
 import { ScrollFx } from "@/components/scroll-fx";
 import type { Vars } from "@/components/ui/css-vars";
 import { Photo } from "@/components/ui/photo";
@@ -24,18 +25,6 @@ export const metadata: Metadata = {
 };
 
 const accuracySource = source("burgundy-coat-city", 0);
-
-// С какими вещами работаю: бегущая лента категорий с моими кадрами.
-const categories: Array<{ label: string; image: WorkImage }> = [
-  { label: "Пальто", image: frame("burgundy-coat-interior", 0) },
-  { label: "Тренчи", image: frame("yellow-trench", 2) },
-  { label: "Куртки", image: frame("puffer-jacket", 1) },
-  { label: "Дублёнки", image: frame("long-sheepskin", 0) },
-  { label: "Ветровки", image: frame("mint-windbreaker", 0) },
-  { label: "Полупальто", image: frame("brown-pea-coat", 0) },
-  { label: "Блузки", image: frame("white-wrap-blouse", 9) },
-  { label: "Лонгсливы", image: frame("grey-longsleeve", 0) },
-];
 
 const pains: Array<{ title: string; text: string; image: WorkImage; alt: string; caption: string }> = [
   {
@@ -205,27 +194,7 @@ export default function Home() {
       <main id="main" tabIndex={-1}>
         <Hero />
 
-        {/* 2. С какими вещами работаю: бегущая лента категорий */}
-        <section className={styles.categories} aria-labelledby="categories-title">
-          <h2 id="categories-title" className={`shell ${styles.categoriesTitle}`}>
-            С чем работаю
-          </h2>
-          <div className={styles.marquee}>
-            {[0, 1].map((copy) => (
-              <ul className={styles.marqueeTrack} key={copy} aria-hidden={copy === 1 ? true : undefined}>
-                {categories.map((item) => (
-                  <li key={item.label}>
-                    <Photo image={item.image} alt="" sizes="200px" eager />
-                    <span>{item.label}</span>
-                  </li>
-                ))}
-                <li className={styles.marqueeText}>
-                  <span>и обувь</span>
-                </li>
-              </ul>
-            ))}
-          </div>
-        </section>
+        <Categories />
 
         {/* 3. Обо мне */}
         <section className={styles.about} id="about" aria-labelledby="about-title">
