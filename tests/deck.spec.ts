@@ -19,7 +19,7 @@ async function ready(page: Page) {
   await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/, { timeout: 30_000 });
 }
 
-type Sample = { y: number; p: number; stageTop: number; tops: number[]; heights: number[]; opacity: number[] };
+type Sample = { y: number; p: number; stageTop: number; stageHeight: number; tops: number[]; heights: number[]; opacity: number[] };
 
 /** Прокрутка в точку и ожидание, пока сглаженное --p догонит прокрутку. */
 async function sampleAt(page: Page, y: number, geometry: { start: number; end: number }): Promise<Sample> {
@@ -34,6 +34,7 @@ async function sampleAt(page: Page, y: number, geometry: { start: number; end: n
       y: scroll,
       p: Number(getComputedStyle(element).getPropertyValue("--p")),
       stageTop,
+      stageHeight: stage.getBoundingClientRect().height,
       tops: cards.map((card) => card.getBoundingClientRect().top - stageTop),
       heights: cards.map((card) => card.offsetHeight),
       opacity: cards.map((card) => Number(getComputedStyle(card).opacity)),
@@ -80,6 +81,10 @@ test("от 1024 px: равные высоты, без подъёма карто�
       if (sample.opacity[index] > 0.05 && top <= 2) expect(top, `карточка ${index + 1} при y=${sample.y}`).toBeGreaterThanOrEqual(-14 * 3 - 2);
     });
   }
+
+  // До входа следующие карточки целиком ниже сцены: не выглядывают и не стоят в обратном порядке.
+  const before = forward.find((sample) => sample.p === 0)!;
+  before.tops.slice(1).forEach((top, card) => expect(top, `карточка ${card + 2} до входа`).toBeGreaterThanOrEqual(before.stageHeight - 1));
 
   // Вперёд: ни одна карточка не опускается; назад: ни одна не поднимается. Вход снизу и глубина
   // монотонны, а «подъём» v2 нарушал бы оба направления у припаркованной карточки.

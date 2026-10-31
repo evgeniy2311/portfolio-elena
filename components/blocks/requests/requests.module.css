@@ -189,6 +189,8 @@
   }
 
   /*
+   * Ожидающие карточки стоят ниже сцены (не меньше 110 % своей высоты и не меньше экрана),
+   * поэтому до входа их не видно и они не выглядывают в неправильном порядке.
    * Карточка i въезжает на своём окне хода: старт a = 0,2·i − 0,16, длина 0,14 (карточка 0 стоит
    * сразу). Глубина d — сколько карточек уже въехало поверх неё (сумма их входов). Окна совпадают
    * с сегментами движка: карточка i впереди ровно на отрезке [0,2·i; 0,2·(i+1)).
@@ -212,7 +214,7 @@
     opacity: clamp(0, (2.5 - var(--d)) * 2, 1);
     box-shadow: 0 20px 60px rgb(28 23 20 / calc(0.1 * clamp(0, 1 - var(--d), 1) * var(--t)));
     filter: brightness(calc(1 - var(--d) * 0.06));
-    transform: translateY(calc((1 - var(--e)) * 110% - var(--d) * 14px)) rotate(calc((1 - var(--e)) * 2deg)) scale(calc(1 - var(--d) * 0.05));
+    transform: translateY(calc((1 - var(--e)) * max(110%, 100svh) - var(--d) * 14px)) rotate(calc((1 - var(--e)) * 2deg)) scale(calc(1 - var(--d) * 0.05));
     transform-origin: 50% 0;
     transition: none;
     will-change: transform;
