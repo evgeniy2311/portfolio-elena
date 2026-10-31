@@ -1,95 +1,133 @@
-/* Блок «Почему так бывает». Правила перенесены из app/home.module.css без изменений. */
-
-/* ---------- 2. Боль ---------- */
+/* Блок 4 «Почему так бывает» · «Ink Line» · фон blush (design/brief.md). */
 
 .pains {
   background: var(--blush);
   color: var(--ink);
-  padding-block: clamp(88px, 12vw, 168px);
+  padding-block: var(--space-section);
 }
 
-.painsTitle {
+.title {
   max-width: 14ch;
-  font-size: clamp(3rem, 8vw, 7.5rem);
+  margin: 0;
 }
 
-.painsTitle em {
-  color: var(--wine);
-}
-
-.painList {
+.list {
   display: grid;
-  gap: 0;
-  margin: clamp(48px, 7vw, 96px) 0 0;
+  gap: var(--space-7);
+  margin: var(--space-head) 0 0;
   padding: 0;
   list-style: none;
 }
 
-.painList li {
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+}
+
+/* Линия над строкой: 1 px чернила 20 %, рисуется слева направо. */
+.rule {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: rgb(28 23 20 / 0.2);
+  transform-origin: left center;
+}
+
+.number {
+  color: var(--wine);
+  font-size: 0.9375rem;
+  line-height: 1.2;
+}
+
+.text {
   display: grid;
   align-content: start;
-  gap: 10px;
-  padding-block: 28px;
+  gap: var(--space-3);
 }
 
-.painList figure {
-  position: relative;
-  margin: 0 0 12px;
-  overflow: hidden;
-  border-radius: var(--radius);
-  background: var(--surface);
-}
-
-.painList img {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-}
-
-.painList figcaption {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  max-width: calc(100% - 20px);
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: var(--paper);
-  color: var(--ink);
-  font-size: 0.875rem;
-  font-weight: 650;
-}
-
-.painList span {
-  color: var(--wine);
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-}
-
-.painList h3 {
-  font-family: var(--font-display);
-  font-size: clamp(1.625rem, 2.6vw, 2.25rem);
-  font-weight: 500;
-  line-height: 1.1;
-}
-
-.painList p {
-  max-width: 44ch;
+.text p {
+  max-width: 52ch;
   color: var(--muted);
 }
 
-.painsAnswer {
-  max-width: 24ch;
-  margin-top: clamp(48px, 7vw, 96px);
-  color: var(--wine);
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  font-style: italic;
-  line-height: 1.08;
+.figure {
+  width: 72%;
+  margin: var(--space-2) 0 0;
 }
 
-@media (min-width: 900px) {
-  .painList {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 40px;
+.figure img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: var(--radius-small);
+}
+
+.figure figcaption {
+  margin-top: var(--space-2);
+  color: var(--muted);
+}
+
+@media (min-width: 768px) {
+  .row {
+    grid-template-columns: 56px minmax(0, 1fr) 220px;
+    column-gap: var(--space-5);
   }
+
+  .number {
+    padding-top: 0.5em;
+  }
+
+  .figure {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .list {
+    gap: var(--space-6);
+  }
+
+  .row {
+    grid-template-columns: 80px minmax(0, 1fr) 280px;
+    column-gap: var(--space-6);
+  }
+}
+
+/* Заголовок читается по словам: каждое слово от .18 до 1 по ходу --p заголовка. */
+:global([data-fx="on"]) .title [data-word] {
+  --s: clamp(0, (var(--p, 1) - 0.12) / 0.33, 1);
+  opacity: calc(0.18 + 0.82 * clamp(0, var(--s) * var(--n) - var(--w), 1));
+}
+
+/* Строка: линия рисуется 900 мс, номер и текст поднимаются на 8 px через 400 мс. */
+:global([data-fx="on"]) .row[data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+:global([data-fx="on"]) .row .rule {
+  transform: scaleX(0);
+  transition: transform 900ms var(--ease-atelier);
+}
+
+:global([data-fx="on"]) .row .number,
+:global([data-fx="on"]) .row .text {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--dur-3) var(--ease-atelier) 400ms,
+    transform var(--dur-3) var(--ease-atelier) 400ms;
+}
+
+:global([data-fx="on"]) .row:global(.is-in) .rule,
+:global([data-fx="on"]) .row:global(.is-in) .number,
+:global([data-fx="on"]) .row:global(.is-in) .text {
+  opacity: 1;
+  transform: none;
 }
