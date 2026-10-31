@@ -17,10 +17,10 @@ export function ContactBlock() {
         <p className="eyebrow eyebrow-light">Связаться</p>
         <h2 id="contact-title" className={`display ${styles.contactTitle}`} data-reveal>
           <span className={styles.line}>
-            <span>Расскажите о своей вещи,</span>
+            <span>Расскажите о&nbsp;своей вещи,</span>
           </span>{" "}
           <span className={styles.line}>
-            <em>а я предложу, как её показать</em>
+            <em>а&nbsp;я&nbsp;предложу, как её показать</em>
           </span>
         </h2>
         <p className={styles.contactLead}>
