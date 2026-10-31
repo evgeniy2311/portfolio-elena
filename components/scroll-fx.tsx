@@ -89,12 +89,39 @@ export function ScrollFx() {
       if (!frame) frame = window.requestAnimationFrame(update);
     }
 
-    // Липкая кнопка на телефоне прячется, пока виден первый экран. Работает и при reduced motion.
     // Шапка прозрачна у самого верха и получает фон и линию после 40 px прокрутки.
-    function updateCta() {
-      root.dataset.cta = window.scrollY > window.innerHeight * 0.7 ? "show" : "hide";
+    function updateHeader() {
       root.dataset.header = window.scrollY > 40 ? "scrolled" : "top";
     }
+
+    /*
+     * Липкая панель «2 кадра бесплатно» (телефон и планшет, components/ui/mobile-trial-bar.tsx).
+     * Показывается, когда посетитель дошёл до блока услуг (#services), а на страницах без него —
+     * когда первый экран ([data-first-screen]) ушёл вверх. Скрыта, пока виден первый экран или #contact.
+     * Состояния — по IntersectionObserver, работает и при reduced motion.
+     */
+    const ctaGate = document.getElementById("services");
+    const firstScreen = document.querySelector("[data-first-screen]");
+    const contactBlock = document.getElementById("contact");
+    const cta = { firstVisible: Boolean(firstScreen), firstPassed: !firstScreen, reached: false, contactVisible: false };
+    function applyCta() {
+      const reached = ctaGate ? cta.reached : cta.firstPassed;
+      root.dataset.cta = reached && !cta.firstVisible && !cta.contactVisible ? "show" : "hide";
+    }
+    const ctaObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        const above = !entry.isIntersecting && entry.boundingClientRect.bottom <= 0;
+        if (entry.target === firstScreen) {
+          cta.firstVisible = entry.isIntersecting;
+          cta.firstPassed = above;
+        }
+        if (entry.target === ctaGate) cta.reached = entry.isIntersecting || above;
+        if (entry.target === contactBlock) cta.contactVisible = entry.isIntersecting;
+      }
+      applyCta();
+    });
+    for (const element of [firstScreen, ctaGate, contactBlock]) if (element) ctaObserver.observe(element);
+    applyCta();
 
     function onResize() {
       measureRails();
@@ -126,8 +153,8 @@ export function ScrollFx() {
     }
 
     setup();
-    updateCta();
-    window.addEventListener("scroll", updateCta, { passive: true });
+    updateHeader();
+    window.addEventListener("scroll", updateHeader, { passive: true });
     reduced.addEventListener("change", setup);
     railMedia.addEventListener("change", onResize);
     // Шрифты и картинки могут изменить ширину ленты после первого замера.
@@ -138,7 +165,8 @@ export function ScrollFx() {
       window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", updateCta);
+      window.removeEventListener("scroll", updateHeader);
+      ctaObserver.disconnect();
       reduced.removeEventListener("change", setup);
       railMedia.removeEventListener("change", onResize);
       revealObserver.disconnect();

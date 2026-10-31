@@ -7,13 +7,13 @@ import { Services } from "@/components/blocks/services/services";
 import { Transform } from "@/components/blocks/transform/transform";
 import { Requests } from "@/components/blocks/requests/requests";
 import { Accuracy } from "@/components/blocks/accuracy/accuracy";
-import { Trial } from "@/components/blocks/trial/trial";
 import { Process } from "@/components/blocks/process/process";
 import { Prices } from "@/components/blocks/prices/prices";
 import { Faq } from "@/components/blocks/faq/faq";
 import { ContactBlock } from "@/components/blocks/contact/contact";
 import { ScrollFx } from "@/components/scroll-fx";
-import { SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
+import { SiteFooter, SiteHeader } from "@/components/site-shell";
+import { MobileTrialBar } from "@/components/ui/mobile-trial-bar";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
@@ -43,7 +43,6 @@ export default function Home() {
         <Transform />
         <Requests />
         <Accuracy />
-        <Trial />
         <Process />
         <Prices />
         <Faq />
@@ -51,9 +50,7 @@ export default function Home() {
       </main>
 
       <SiteFooter />
-      <div className="mobile-cta">
-        <TrialLink className="button" />
-      </div>
+      <MobileTrialBar />
     </div>
   );
 }

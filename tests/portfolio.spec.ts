@@ -176,20 +176,9 @@ test("без JavaScript главная показывает весь конте�
   await context.close();
 });
 
-test("кнопка «2 кадра бесплатно» появляется на телефоне после первого экрана и ведёт к контакту", async ({ page }) => {
+// Правила липкой панели «2 кадра бесплатно» проверяет tests/cta.spec.ts.
+test("«Написать» в шапке ведёт к контакту", async ({ page }) => {
   await go(page, "/");
-  const mobile = page.locator(".mobile-cta a");
-  if ((page.viewportSize()?.width ?? 0) < 768) {
-    // На первом экране кнопка есть в hero, липкая появляется после прокрутки.
-    await expect(mobile).toBeHidden();
-    await page.evaluate(() => window.scrollTo({ top: window.innerHeight * 1.5, behavior: "instant" }));
-    await expect(mobile).toBeVisible();
-    const box = await mobile.boundingBox();
-    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
-  } else {
-    await expect(mobile).toBeHidden();
-  }
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.locator("header").getByRole("link", { name: "Написать", exact: true }).click();
   await expect(page.locator("#contact h2")).toBeInViewport();
 });

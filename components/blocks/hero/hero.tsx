@@ -8,7 +8,7 @@ import styles from "./hero.module.css";
 /** 1. Первый экран: оффер и сразу много работ. */
 export function Hero() {
   return (
-    <section className={styles.hero} data-view aria-labelledby="hero-title">
+    <section className={styles.hero} data-view data-first-screen aria-labelledby="hero-title">
       <div className={`shell ${styles.heroGrid}`}>
         <div className={styles.heroCopy}>
           <p className="eyebrow">Елена Бадьина · фото одежды и обуви для WB и Ozon</p>

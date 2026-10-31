@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ScrollFx } from "@/components/scroll-fx";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
+import { MobileTrialBar } from "@/components/ui/mobile-trial-bar";
 import { WorksGrid } from "@/components/works-grid";
 import { categoryLabels, works } from "@/lib/works";
 import styles from "./works.module.css";
@@ -18,7 +19,7 @@ export default function WorksPage() {
       <ScrollFx />
       <SiteHeader current="works" />
       <main id="main" tabIndex={-1}>
-        <section className={`shell ${styles.archiveHead}`}>
+        <section className={`shell ${styles.archiveHead}`} data-first-screen>
           <p className="eyebrow">Работы</p>
           <h1>
             {works.length} вещей. <em>{frameTotal} кадров.</em>
@@ -35,9 +36,7 @@ export default function WorksPage() {
         <ContactBlock />
       </main>
       <SiteFooter />
-      <div className="mobile-cta">
-        <TrialLink className="button" />
-      </div>
+      <MobileTrialBar />
     </>
   );
 }
