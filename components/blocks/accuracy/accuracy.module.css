@@ -5,7 +5,8 @@
 .accuracy {
   --p: 1;
   position: relative;
-  background: var(--cocoa);
+  --focus-color: var(--champagne);
+  background: var(--noir);
   color: var(--on-dark);
 }
 
@@ -30,7 +31,7 @@
 }
 
 .accuracyCopy h2 em {
-  color: var(--camel);
+  color: var(--champagne);
 }
 
 .accuracyCopy > p {
@@ -52,7 +53,7 @@
   grid-template-columns: 40px 1fr;
   gap: 14px;
   padding-block: 12px;
-  border-top: 1px solid var(--cocoa-soft);
+  border-top: 1px solid rgb(244 238 230 / 0.14);
 }
 
 .checkList span {
@@ -61,9 +62,9 @@
   height: 36px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--camel);
+  border: 1px solid var(--champagne);
   border-radius: 50%;
-  color: var(--camel);
+  color: var(--champagne);
   font-weight: 650;
 }
 
@@ -92,7 +93,7 @@
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: var(--radius-small);
-  background: var(--cocoa-soft);
+  background: color-mix(in srgb, var(--on-dark) 8%, var(--noir));
 }
 
 .accuracyCompare figcaption {

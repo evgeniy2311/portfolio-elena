@@ -8,7 +8,7 @@ export function Pains() {
   return (
     <section className={styles.pains} aria-labelledby="pains-title">
       <div className="shell">
-        <p className="eyebrow eyebrow-light" data-reveal>
+        <p className="eyebrow" data-reveal>
           Почему так бывает
         </p>
         <h2 id="pains-title" className={styles.painsTitle} data-reveal>

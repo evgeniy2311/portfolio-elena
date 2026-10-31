@@ -1,7 +1,8 @@
 /* Блок «Контакты». Правила перенесены из app/globals.css без изменений, классы переименованы для CSS-модуля. */
 
 .contact {
-  background: var(--cocoa);
+  --focus-color: var(--champagne);
+  background: var(--wine-deep);
   color: var(--on-dark);
   padding-block: clamp(80px, 12vw, 160px);
 }
@@ -18,7 +19,7 @@
 }
 
 .contact h2 em {
-  color: var(--camel);
+  color: var(--on-wine-accent);
 }
 
 .contactLead {

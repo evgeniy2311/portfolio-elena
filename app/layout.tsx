@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "./globals.css";
 
+// Шрифты версии 3 (design/brief.md): Cormorant Garamond 500/600 и курсив, Manrope 400/500/600.
 const display = Cormorant_Garamond({
   subsets: ["cyrillic", "latin"],
-  weight: ["400", "500", "600"],
+  weight: ["500", "600"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
 
 const ui = Manrope({
   subsets: ["cyrillic", "latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-ui",
   display: "swap",
 });

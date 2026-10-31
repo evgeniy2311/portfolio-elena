@@ -3,8 +3,8 @@
 /* ---------- 2. Боль ---------- */
 
 .pains {
-  background: var(--cocoa);
-  color: var(--on-dark);
+  background: var(--blush);
+  color: var(--ink);
   padding-block: clamp(88px, 12vw, 168px);
 }
 
@@ -14,7 +14,7 @@
 }
 
 .painsTitle em {
-  color: var(--camel);
+  color: var(--wine);
 }
 
 .painList {
@@ -37,7 +37,7 @@
   margin: 0 0 12px;
   overflow: hidden;
   border-radius: var(--radius);
-  background: var(--cocoa-soft);
+  background: var(--surface);
 }
 
 .painList img {
@@ -60,7 +60,7 @@
 }
 
 .painList span {
-  color: var(--camel);
+  color: var(--wine);
   font-family: var(--font-display);
   font-size: 1.5rem;
 }
@@ -74,13 +74,13 @@
 
 .painList p {
   max-width: 44ch;
-  color: var(--on-dark-muted);
+  color: var(--muted);
 }
 
 .painsAnswer {
   max-width: 24ch;
   margin-top: clamp(48px, 7vw, 96px);
-  color: var(--camel);
+  color: var(--wine);
   font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 3.5rem);
   font-style: italic;

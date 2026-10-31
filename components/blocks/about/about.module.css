@@ -41,7 +41,7 @@
 }
 
 .aboutMonogram {
-  color: var(--camel);
+  color: var(--on-wine-accent);
   font-family: var(--font-display);
   font-size: clamp(6rem, 14vw, 10rem);
   font-style: italic;
