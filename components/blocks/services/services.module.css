@@ -202,8 +202,17 @@
 /* Статичный список на широком экране (reduced motion, без JS): три колонки. */
 @media (min-width: 1024px) {
   .slides {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-7) var(--space-5);
+  }
+
+  /* Седьмая услуга не остаётся одна в ряду: во всю ширину, кадр 16:9. */
+  .slides > .slide:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .slides > .slide:last-child:nth-child(odd) .figure img {
+    aspect-ratio: 16 / 9;
   }
 }
 
@@ -307,7 +316,8 @@
   .services[data-pinned="on"] .text {
     grid-column: 1;
     grid-row: 1;
-    align-self: center;
+    align-self: start;
+    padding-top: var(--space-6);
     opacity: calc(var(--in) * (1 - var(--out)));
   }
 
@@ -397,15 +407,21 @@
     display: grid;
     grid-column: 3;
     grid-row: 1;
-    align-self: end;
+    align-self: start;
+    padding-top: var(--space-6);
     gap: var(--space-2);
     color: var(--muted);
     opacity: 0;
-    transition: opacity var(--dur-3) var(--ease-atelier);
   }
 
+  /* Превью не показывает фото, которое уже стало главным: гаснет до начала перехода (t .70–.85),
+     у новой услуги появляется, когда её фото полностью открылось (t .15–.30). У первой есть сразу. */
   .services[data-pinned="on"] .slide[data-active] .preview {
-    opacity: 1;
+    opacity: calc(clamp(0, (var(--d) - 0.15) / 0.15, 1) * (1 - clamp(0, (var(--d) - 0.7) / 0.15, 1)));
+  }
+
+  .services[data-pinned="on"] .slide:first-child[data-active] .preview {
+    opacity: calc(1 - clamp(0, (var(--d) - 0.7) / 0.15, 1));
   }
 
   .preview img {
