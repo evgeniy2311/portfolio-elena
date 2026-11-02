@@ -1,0 +1,435 @@
+/* Блок 5 «Что вы получаете» · «Atelier Slideshow» · фон canvas + подложки --tint-* (design/brief.md). */
+
+/* Ход перехода кадра 0..1. Зарегистрировано, чтобы на телефоне переход мог идти по времени (transition). */
+@property --svc-q {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+.services {
+  position: relative;
+  background: var(--canvas);
+  padding-block: var(--space-section);
+}
+
+.head {
+  display: grid;
+  gap: var(--space-stack);
+  margin-bottom: var(--space-head);
+}
+
+.head h2 {
+  max-width: 16ch;
+}
+
+.headSide {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+/* Счётчик-одометр показывается только в сцене; в списке у каждой услуги свой номер. */
+.counter {
+  display: none;
+}
+
+.slides {
+  display: grid;
+  gap: var(--space-7);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slide {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+}
+
+.tint,
+.preview {
+  display: none;
+}
+
+.figure {
+  position: relative;
+  order: -1;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-small);
+  background: var(--surface);
+}
+
+.figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.text {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+}
+
+.mask {
+  /* Маска строки: при смене услуги строки уходят вверх за её край. Запас под выносные элементы. */
+  padding-block: 0.06em;
+}
+
+.lift {
+  display: block;
+}
+
+.number {
+  color: var(--wine);
+  font-size: 0.9375rem;
+  line-height: 1.2;
+}
+
+.text h3 a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+  transition: color var(--dur-1) var(--ease-atelier);
+}
+
+.text h3 a:hover {
+  color: var(--wine);
+}
+
+.text p {
+  max-width: 52ch;
+  color: var(--muted);
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .slides {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-7) var(--space-5);
+  }
+}
+
+/* ---------- Переходы кадров: форма по data-transition, ход по --svc-q ---------- */
+
+:global([data-fx="on"]) .figure[data-transition="curtain"] {
+  clip-path: inset(0 0 0 calc((1 - var(--svc-q)) * 100%));
+}
+
+:global([data-fx="on"]) .figure[data-transition="iris"] {
+  clip-path: circle(calc(var(--svc-q) * 150%) at 70% 40%);
+}
+
+/* «Новый цвет»: диагональная шторка (одинаковой позы в разных цветах в серии нет). */
+:global([data-fx="on"]) .figure[data-transition="wipe"] {
+  clip-path: polygon(0 0, calc(var(--svc-q) * 200%) 0, 0 calc(var(--svc-q) * 200%));
+}
+
+/* Жалюзи: пять полос раскрываются слева направо с задержкой; соединения по нижнему краю без площади. */
+:global([data-fx="on"]) .figure[data-transition="blinds"] {
+  clip-path: polygon(
+    0 100%,
+    0% 100%,
+    0% 0,
+    calc(0% + clamp(0, (var(--svc-q) - 0) / 0.6, 1) * 20%) 0,
+    calc(0% + clamp(0, (var(--svc-q) - 0) / 0.6, 1) * 20%) 100%,
+    20% 100%,
+    20% 0,
+    calc(20% + clamp(0, (var(--svc-q) - 0.1) / 0.6, 1) * 20%) 0,
+    calc(20% + clamp(0, (var(--svc-q) - 0.1) / 0.6, 1) * 20%) 100%,
+    40% 100%,
+    40% 0,
+    calc(40% + clamp(0, (var(--svc-q) - 0.2) / 0.6, 1) * 20%) 0,
+    calc(40% + clamp(0, (var(--svc-q) - 0.2) / 0.6, 1) * 20%) 100%,
+    60% 100%,
+    60% 0,
+    calc(60% + clamp(0, (var(--svc-q) - 0.3) / 0.6, 1) * 20%) 0,
+    calc(60% + clamp(0, (var(--svc-q) - 0.3) / 0.6, 1) * 20%) 100%,
+    80% 100%,
+    80% 0,
+    calc(80% + clamp(0, (var(--svc-q) - 0.4) / 0.6, 1) * 20%) 0,
+    calc(80% + clamp(0, (var(--svc-q) - 0.4) / 0.6, 1) * 20%) 100%
+  );
+}
+
+:global([data-fx="on"]) .figure[data-transition="zoom"] {
+  clip-path: inset(calc((1 - var(--svc-q)) * 10%) round calc(24px - 12px * var(--svc-q)));
+  --fade-in: clamp(0, var(--svc-q) * 4, 1);
+  opacity: var(--fade-in);
+}
+
+:global([data-fx="on"]) .figure[data-transition="zoom"] img {
+  transform: scale(calc(0.9 + 0.1 * var(--svc-q)));
+}
+
+/* Две половины сходятся к середине. */
+:global([data-fx="on"]) .figure[data-transition="split"] {
+  clip-path: polygon(
+    0 0,
+    calc(var(--svc-q) * 50%) 0,
+    calc(var(--svc-q) * 50%) 100%,
+    calc(100% - var(--svc-q) * 50%) 100%,
+    calc(100% - var(--svc-q) * 50%) 0,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Телефон, планшет, низкое окно: каждый кадр один раз раскрывается своим переходом при появлении (900 мс).
+   Наблюдается строка услуги (data-reveal), а не кадр: обрезанный clip-path кадр не «пересекает» экран. */
+:global([data-fx="on"]) .slide[data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+@media (max-width: 1023px), (max-height: 599px) {
+  :global([data-fx="on"]) .slide[data-reveal] .figure {
+    --svc-q: 0;
+    transition: --svc-q 900ms var(--ease-expo);
+  }
+
+  :global([data-fx="on"]) .slide[data-reveal]:global(.is-in) .figure {
+    --svc-q: 1;
+  }
+}
+
+/* Статичный список на широком экране (reduced motion, без JS): три колонки. */
+@media (min-width: 1024px) {
+  .slides {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-7) var(--space-5);
+  }
+
+  /* Седьмая услуга не остаётся одна в ряду: во всю ширину, кадр 16:9. */
+  .slides > .slide:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .slides > .slide:last-child:nth-child(odd) .figure img {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* ---------- Сцена от 1024 × 600: секция 7 × 75vh + 100vh, слайды по --k/--t движка ---------- */
+@media (min-width: 1024px) and (min-height: 600px) {
+  .services[data-pinned="on"] {
+    height: calc(var(--n) * 75vh + 100vh);
+    padding-block: 0;
+  }
+
+  .services[data-pinned="on"] .stage {
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100vh - var(--header-h));
+    padding-block: var(--space-4);
+    overflow: clip;
+  }
+
+  .services[data-pinned="on"] .inner {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: var(--space-5);
+    height: 100%;
+  }
+
+  .services[data-pinned="on"] .head {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    margin: 0;
+  }
+
+  .services[data-pinned="on"] .head h2 {
+    font-size: min(clamp(2.5rem, 1.6rem + 3.6vw, 5rem), 8.5vh);
+  }
+
+  .services[data-pinned="on"] .counter {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    color: var(--wine);
+    font-size: 0.9375rem;
+    line-height: 1;
+  }
+
+  .odometer {
+    display: inline-block;
+    height: 1em;
+    overflow: hidden;
+  }
+
+  .odometerColumn {
+    display: flex;
+    flex-direction: column;
+    transform: translateY(calc(var(--k, 0) * -1em));
+    transition: transform var(--dur-3) var(--ease-atelier);
+  }
+
+  .odometerColumn span {
+    height: 1em;
+    line-height: 1;
+  }
+
+  .services[data-pinned="on"] .slides {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    min-height: 0;
+  }
+
+  .services[data-pinned="on"] .slide {
+    --d: calc(var(--k, 0) + var(--t, 0) - var(--i));
+    --svc-q: clamp(0, (var(--d) + 0.15) / 0.3, 1);
+    --qn: clamp(0, (var(--d) - 0.85) / 0.3, 1);
+    --gone: clamp(0, (var(--d) - 1.5) * 10, 1);
+    --in: 0;
+    --out: 1;
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr) minmax(0, 3fr);
+    column-gap: var(--space-6);
+    min-height: 0;
+    pointer-events: none;
+  }
+
+  /* Один текст в слоте: уходит вверх за маску в t .78–.90, слот пуст .90 → .10, новый входит в .10–.22. */
+  .services[data-pinned="on"] .slide[data-active] {
+    --in: clamp(0, (var(--t, 0) - 0.1) / 0.12, 1);
+    --out: clamp(0, (var(--t, 0) - 0.78) / 0.12, 1);
+    pointer-events: auto;
+  }
+
+  .services[data-pinned="on"] .slide:first-child[data-active] {
+    --in: 1;
+  }
+
+  .services[data-pinned="on"] .slide:last-child[data-active] {
+    --out: 0;
+  }
+
+  .services[data-pinned="on"] .text {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    padding-top: var(--space-6);
+    opacity: calc(var(--in) * (1 - var(--out)));
+  }
+
+  .services[data-pinned="on"] .slide:not([data-active]) .text,
+  .services[data-pinned="on"] .text[data-text-state="hidden"] {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .services[data-pinned="on"] .mask {
+    overflow: clip;
+  }
+
+  .services[data-pinned="on"] .mask:first-child {
+    display: none;
+  }
+
+  .services[data-pinned="on"] .lift {
+    transform: translateY(calc((1 - var(--in)) * 100% - var(--out) * 100%));
+  }
+
+  /* Подложка во всю высоту сцены, по цвету вещи; сменяется за 600 мс. */
+  .services[data-pinned="on"] .tint {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+    z-index: 0;
+    border-radius: var(--radius-small);
+    opacity: 0;
+    transition: opacity 600ms var(--ease-atelier);
+  }
+
+  .services[data-pinned="on"] .slide[data-active] .tint {
+    opacity: 1;
+  }
+
+  .tint[data-tint="mustard"] {
+    background: var(--tint-mustard);
+  }
+
+  .tint[data-tint="rose"] {
+    background: var(--tint-rose);
+  }
+
+  .tint[data-tint="mint"] {
+    background: var(--tint-mint);
+  }
+
+  .tint[data-tint="stone"] {
+    background: var(--tint-stone);
+  }
+
+  .tint[data-tint="blush"] {
+    background: var(--tint-blush);
+  }
+
+  .services[data-pinned="on"] .figure {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    justify-self: center;
+    order: 0;
+    z-index: calc(1 + var(--i));
+    height: calc(100% - 2 * var(--space-6));
+    max-width: calc(100% - 2 * var(--space-6));
+    aspect-ratio: 3 / 4;
+    opacity: calc((1 - var(--gone)) * var(--fade-in, 1) * var(--fade-out, 1));
+    transform: none;
+    transition: none;
+  }
+
+  /* Уходящий кадр: при «шторке» сдвигается на −6 %, при «наезде» увеличивается до 1,25 и гаснет. */
+  .services[data-pinned="on"] .slide[data-out="curtain"] .figure img {
+    transform: translateX(calc(var(--qn) * -6%));
+  }
+
+  .services[data-pinned="on"] .slide[data-out="zoom"] .figure {
+    --fade-out: calc(1 - var(--qn));
+  }
+
+  .services[data-pinned="on"] .slide[data-out="zoom"] .figure img {
+    transform: scale(calc(1 + 0.25 * var(--qn)));
+  }
+
+  /* Превью следующей услуги: 3:4 в рамке 1 px и подпись. */
+  .services[data-pinned="on"] .preview {
+    display: grid;
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
+    padding-top: var(--space-6);
+    gap: var(--space-2);
+    color: var(--muted);
+    opacity: 0;
+  }
+
+  /* Превью не показывает фото, которое уже стало главным: гаснет до начала перехода (t .70–.85),
+     у новой услуги появляется, когда её фото полностью открылось (t .15–.30). У первой есть сразу. */
+  .services[data-pinned="on"] .slide[data-active] .preview {
+    opacity: calc(clamp(0, (var(--d) - 0.15) / 0.15, 1) * (1 - clamp(0, (var(--d) - 0.7) / 0.15, 1)));
+  }
+
+  .services[data-pinned="on"] .slide:first-child[data-active] .preview {
+    opacity: calc(1 - clamp(0, (var(--d) - 0.7) / 0.15, 1));
+  }
+
+  .preview img {
+    width: min(100%, 200px);
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-small);
+  }
+}

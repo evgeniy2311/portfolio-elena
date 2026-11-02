@@ -1,3 +1,4 @@
+import { withBase as withBasePath } from "./media-path";
 import media from "./works-media.json";
 
 export type WorkImage = { src: string; width: number; height: number };
@@ -184,9 +185,8 @@ const copy: WorkCopy[] = [
   },
 ];
 
-// Превью на GitHub Pages живёт в подпапке, next/image сам её к src не добавляет.
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const withBase = (image: WorkImage): WorkImage => ({ ...image, src: basePath + image.src });
+// Превью на GitHub Pages живёт в подпапке, next/image сам её к src не добавляет (lib/media-path.ts).
+const withBase = (image: WorkImage): WorkImage => ({ ...image, src: withBasePath(image.src) });
 
 export const works: Work[] = copy.map((item) => {
   const files = media[item.slug];

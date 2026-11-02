@@ -1,20 +1,7 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
 import Link from "next/link";
+import { display, displayItalic, ui } from "./fonts";
 import "./globals.css";
-
-const display = Cormorant_Garamond({
-  subsets: ["cyrillic", "latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const ui = Manrope({
-  subsets: ["cyrillic", "latin"],
-  variable: "--font-ui",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Работа не найдена | Елена Бадьина",
@@ -23,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function GlobalNotFound() {
   return (
-    <html lang="ru" className={`${display.variable} ${ui.variable}`}>
+    <html lang="ru" className={`${display.variable} ${displayItalic.variable} ${ui.variable}`}>
       <body>
         <a className="skip-link" href="#main">К основному содержанию</a>
         <main id="main" tabIndex={-1} className="not-found shell">

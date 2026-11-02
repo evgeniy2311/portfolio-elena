@@ -1,147 +1,315 @@
 "use client";
 
 import { useEffect } from "react";
+import { panelProgress, pinProgress, segmentOf, smoothStep, viewProgress } from "@/components/fx/progress";
+import { subscribeTicker } from "@/components/fx/ticker";
 
 /*
- * Один лёгкий драйвер прокрутки для всей страницы. Сам ничего не анимирует:
- * записывает прогресс в CSS-переменную --p, а движение описано в CSS.
+ * Один драйвер прокрутки для всей страницы. Сам ничего не анимирует: пишет CSS-переменные,
+ * а движение описано в CSS блоков. Кадры идут через общий ticker (components/fx/ticker.ts),
+ * только пока значения догоняют прокрутку; в покое цикл стоит.
  *
- * [data-pin]    прогресс 0..1 по «липкому» участку секции (её высота минус окно)
- * [data-view]   прогресс 0..1 от появления элемента снизу до ухода вверх
- * [data-rail]   горизонтальная лента внутри [data-pin]: высота секции подгоняется под ширину ленты
- * [data-reveal] получает класс is-in один раз при появлении
+ * [data-pin]       --p 0..1 по фактическому ходу sticky-слоя ([data-stage] или первый sticky-потомок)
+ *                  с учётом его top (шапка); data-pinned="on", пока сцена действительно «липкая»
+ * [data-segments]  у [data-pin]: --k (номер сегмента), --t (прогресс внутри), data-active у [data-segment]
+ * [data-view]      --p 0..1 от появления элемента снизу до ухода вверх
+ * [data-rail]      горизонтальная лента внутри [data-pin]: высота секции подгоняется под ширину ленты;
+ *                  её [data-panel] получают --pp (0 — панель у правого края окна, 1 — у левого);
+ *                  кадры ленты начинают грузиться заранее, когда она в двух экранах от окна
+ * [data-reveal]    получает класс is-in один раз при появлении; значение атрибута выбирает вид
+ *                  появления в CSS, data-reveal-threshold — свой порог срабатывания
  *
- * Без JavaScript и при prefers-reduced-motion атрибут data-fx не ставится,
- * и CSS показывает каждую сцену сразу в финальном состоянии.
+ * Значения сглаживаются (0,14 за кадр при 60 fps, с поправкой на dt) и встают точно в 0 и 1.
+ * Без JavaScript и при prefers-reduced-motion атрибут data-fx не ставится, и CSS показывает
+ * каждую сцену сразу в финальном состоянии.
  */
 
-// Должно совпадать с media-условием «липких» сцен в home.module.css.
-const RAIL_QUERY = "(min-width: 1024px) and (min-height: 600px)";
+// Должно совпадать с media-условием «липких» сцен в CSS-модулях блоков.
+const PIN_QUERY = "(min-width: 1024px) and (min-height: 600px)";
 
-function clamp(value: number) {
-  return value < 0 ? 0 : value > 1 ? 1 : value;
+type Tracked = { element: HTMLElement; kind: "pin" | "view"; current: number; target: number; stage: HTMLElement | null; segments: HTMLElement[]; segmentCount: number; panels: HTMLElement[] };
+
+function findStage(section: HTMLElement) {
+  const marked = section.querySelector<HTMLElement>("[data-stage]");
+  if (marked) return marked;
+  for (const child of Array.from(section.children) as HTMLElement[]) {
+    if (getComputedStyle(child).position === "sticky") return child;
+  }
+  return null;
 }
 
 export function ScrollFx() {
   useEffect(() => {
     const root = document.documentElement;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const railMedia = window.matchMedia(RAIL_QUERY);
+    const pinMedia = window.matchMedia(PIN_QUERY);
+    function write(element: HTMLElement, name: string, value: string) {
+      if (element.style.getPropertyValue(name) !== value) element.style.setProperty(name, value);
+    }
 
-    const revealObserver = new IntersectionObserver(
+    // Появление: отдельный наблюдатель на каждый порог, а не один общий fade-up.
+    const revealObservers = new Map<string, IntersectionObserver>();
+    function revealObserver(threshold: string) {
+      let observer = revealObservers.get(threshold);
+      if (!observer) {
+        observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add("is-in");
+              observer!.unobserve(entry.target);
+            }
+          },
+          { rootMargin: "0px 0px -12% 0px", threshold: Math.min(1, Math.max(0, Number(threshold) || 0.08)) },
+        );
+        revealObservers.set(threshold, observer);
+      }
+      return observer;
+    }
+
+    // Кадры горизонтальной ленты лежат за правым краем окна, и ленивая загрузка браузера до них
+    // может не дойти при быстрой прокрутке. Когда лента приближается (за два экрана), они грузятся сразу.
+    const railImages = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-in");
-            revealObserver.unobserve(entry.target);
-          }
+          if (!entry.isIntersecting) continue;
+          for (const image of entry.target.querySelectorAll<HTMLImageElement>("[data-rail-track] img[loading='lazy']")) image.loading = "eager";
+          railImages.unobserve(entry.target);
         }
       },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.08 },
+      { rootMargin: "200% 0px" },
     );
+    for (const rail of document.querySelectorAll("[data-rail]")) railImages.observe(rail);
 
-    let frame = 0;
-    let pins: HTMLElement[] = [];
-    let views: HTMLElement[] = [];
-    const last = new WeakMap<HTMLElement, string>();
-
-    function write(element: HTMLElement, value: number) {
-      const text = value.toFixed(4);
-      if (last.get(element) === text) return;
-      last.set(element, text);
-      element.style.setProperty("--p", text);
-    }
+    let tracked: Tracked[] = [];
+    let unsubscribe: (() => void) | null = null;
+    let motion = false;
 
     function measureRails() {
       for (const section of document.querySelectorAll<HTMLElement>("[data-rail]")) {
         const track = section.querySelector<HTMLElement>("[data-rail-track]");
         if (!track) continue;
-        if (!railMedia.matches || reduced.matches) {
+        if (!pinMedia.matches || reduced.matches) {
           section.style.removeProperty("height");
           section.style.removeProperty("--rail-shift");
           continue;
         }
         const shift = Math.max(0, track.scrollWidth - window.innerWidth);
         section.style.setProperty("--rail-shift", `${shift}px`);
-        section.style.height = `${shift + window.innerHeight}px`;
+        // Ход sticky-слоя ровно равен сдвигу ленты: секция = высота слоя + сдвиг.
+        const stage = findStage(section);
+        const stageHeight = stage ? stage.getBoundingClientRect().height : window.innerHeight;
+        section.style.height = `${shift + stageHeight}px`;
       }
     }
 
-    function update() {
-      frame = 0;
-      const viewport = window.innerHeight;
-      for (const section of pins) {
-        const rect = section.getBoundingClientRect();
-        if (rect.bottom < -viewport || rect.top > viewport * 2) continue;
-        const travel = rect.height - viewport;
-        write(section, travel > 0 ? clamp(-rect.top / travel) : rect.top <= 0 ? 1 : 0);
+    function targetOf(item: Tracked, viewport: number, everywhere = false) {
+      const rect = item.element.getBoundingClientRect();
+      // Далеко за экраном значение на каждом кадре не нужно: frame() ставит его при возвращении.
+      if (!everywhere && (rect.bottom < -viewport || rect.top > viewport * 2)) return null;
+      if (item.kind === "view") return viewProgress(rect.top, rect.height, viewport);
+      if (item.stage) {
+        const stageTop = parseFloat(getComputedStyle(item.stage).top) || 0;
+        return pinProgress(rect.top, rect.height, stageTop, item.stage.getBoundingClientRect().height);
       }
-      for (const element of views) {
-        const rect = element.getBoundingClientRect();
-        if (rect.bottom < 0 || rect.top > viewport) continue;
-        write(element, clamp((viewport - rect.top) / (viewport + rect.height)));
+      // Сцена без sticky-слоя (телефон или старая разметка): прежняя формула «высота минус окно».
+      return pinProgress(rect.top, rect.height, 0, viewport);
+    }
+
+    function publish(item: Tracked) {
+      const value = item.current;
+      write(item.element, "--p", value.toFixed(4));
+      if (item.kind !== "pin") return;
+      if (item.segmentCount > 0 && pinMedia.matches) {
+        const { k, t } = segmentOf(value, item.segmentCount);
+        write(item.element, "--k", String(k));
+        write(item.element, "--t", t.toFixed(4));
+        item.segments.forEach((segment, index) => {
+          if (index === k) segment.setAttribute("data-active", "");
+          else segment.removeAttribute("data-active");
+        });
+      }
+      if (item.panels.length > 0) {
+        const width = window.innerWidth;
+        for (const panel of item.panels) write(panel, "--pp", panelProgress(panel.getBoundingClientRect().left, width).toFixed(4));
+      }
+    }
+
+    function frame(dt: number) {
+      const viewport = window.innerHeight;
+      let moving = false;
+      for (const item of tracked) {
+        const target = targetOf(item, viewport);
+        if (target === null) continue;
+        item.target = target;
+        // За пределами sticky-хода (0 или 1) значение встаёт сразу: слой уже отлип или ещё не прилип,
+        // и при отлипании содержимое не должно догонять с рывком. Внутри хода — сглаживание.
+        const next = item.kind === "pin" && (target === 0 || target === 1) ? target : smoothStep(item.current, target, dt);
+        if (next !== item.current) {
+          item.current = next;
+          publish(item);
+        }
+        if (next !== target) moving = true;
       }
       const scrollable = root.scrollHeight - viewport;
-      root.style.setProperty("--page-p", scrollable > 0 ? clamp(window.scrollY / scrollable).toFixed(4) : "0");
+      write(root, "--page-p", scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)).toFixed(4) : "0");
+      if (!moving) stopFrames();
     }
 
-    function schedule() {
-      if (!frame) frame = window.requestAnimationFrame(update);
+    function startFrames() {
+      if (motion && !unsubscribe) unsubscribe = subscribeTicker(frame);
     }
 
-    // Липкая кнопка на телефоне прячется, пока виден первый экран. Работает и при reduced motion.
-    function updateCta() {
-      root.dataset.cta = window.scrollY > window.innerHeight * 0.7 ? "show" : "hide";
+    function stopFrames() {
+      unsubscribe?.();
+      unsubscribe = null;
+    }
+
+    function collect() {
+      const make = (element: HTMLElement, kind: Tracked["kind"]): Tracked => {
+        const segments = kind === "pin" ? Array.from(element.querySelectorAll<HTMLElement>("[data-segment]")) : [];
+        const declared = Number(element.dataset.segments);
+        return {
+          element,
+          kind,
+          current: Number.NaN,
+          target: 0,
+          stage: kind === "pin" ? findStage(element) : null,
+          segments,
+          segmentCount: element.hasAttribute("data-segments") ? (Number.isFinite(declared) && declared > 0 ? declared : segments.length) : 0,
+          panels: kind === "pin" && element.hasAttribute("data-rail") ? Array.from(element.querySelectorAll<HTMLElement>("[data-panel]")) : [],
+        };
+      };
+      tracked = [
+        ...Array.from(document.querySelectorAll<HTMLElement>("[data-pin]"), (element) => make(element, "pin")),
+        ...Array.from(document.querySelectorAll<HTMLElement>("[data-view]"), (element) => make(element, "view")),
+      ];
+    }
+
+    function markPinned() {
+      for (const item of tracked) {
+        if (item.kind !== "pin") continue;
+        if (motion && pinMedia.matches) item.element.dataset.pinned = "on";
+        else delete item.element.dataset.pinned;
+      }
+    }
+
+    /** Первый кадр после настройки: без сглаживания, сразу в положение прокрутки, для всех сцен страницы. */
+    function snap() {
+      const viewport = window.innerHeight;
+      for (const item of tracked) {
+        const target = targetOf(item, viewport, true);
+        if (target === null) continue;
+        item.current = item.target = target;
+        publish(item);
+      }
+      const scrollable = root.scrollHeight - viewport;
+      write(root, "--page-p", scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)).toFixed(4) : "0");
+    }
+
+    function onScroll() {
+      startFrames();
     }
 
     function onResize() {
       measureRails();
-      schedule();
+      for (const item of tracked) if (item.kind === "pin") item.stage = findStage(item.element);
+      markPinned();
+      startFrames();
     }
 
     function setup() {
-      window.cancelAnimationFrame(frame);
-      frame = 0;
-      window.removeEventListener("scroll", schedule);
+      stopFrames();
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      pins = Array.from(document.querySelectorAll<HTMLElement>("[data-pin]"));
-      views = Array.from(document.querySelectorAll<HTMLElement>("[data-view]"));
+      collect();
+      motion = !reduced.matches;
 
-      if (reduced.matches) {
+      if (!motion) {
         delete root.dataset.fx;
-        for (const element of [...pins, ...views]) element.style.setProperty("--p", "1");
+        for (const item of tracked) {
+          write(item.element, "--p", "1");
+          item.element.style.removeProperty("--k");
+          item.element.style.removeProperty("--t");
+          for (const segment of item.segments) segment.removeAttribute("data-active");
+        }
+        markPinned();
         for (const element of document.querySelectorAll("[data-reveal]")) element.classList.add("is-in");
         measureRails();
         return;
       }
 
       root.dataset.fx = "on";
-      for (const element of document.querySelectorAll("[data-reveal]:not(.is-in)")) revealObserver.observe(element);
+      for (const element of document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-in)")) {
+        revealObserver(element.dataset.revealThreshold ?? "0.08").observe(element);
+      }
       measureRails();
-      update();
-      window.addEventListener("scroll", schedule, { passive: true });
+      for (const item of tracked) if (item.kind === "pin") item.stage = findStage(item.element);
+      markPinned();
+      snap();
+      window.addEventListener("scroll", onScroll, { passive: true });
       window.addEventListener("resize", onResize);
     }
 
+    // Шапка прозрачна у самого верха и получает фон и линию после 40 px прокрутки.
+    function updateHeader() {
+      root.dataset.header = window.scrollY > 40 ? "scrolled" : "top";
+    }
+
+    /*
+     * Липкая панель «2 кадра бесплатно» (телефон и планшет, components/ui/mobile-trial-bar.tsx).
+     * Показывается, когда посетитель дошёл до блока услуг (#services), а на страницах без него —
+     * когда первый экран ([data-first-screen]) ушёл вверх. Скрыта, пока виден первый экран или #contact.
+     * Состояние считается по фактическому положению секций при каждой прокрутке: наблюдатель
+     * пересечений не сообщает о секции, которую прыжок по якорю перескочил целиком.
+     * Работает и при reduced motion.
+     */
+    const ctaGate = document.getElementById("services");
+    const firstScreen = document.querySelector("[data-first-screen]");
+    const contactBlock = document.getElementById("contact");
+    function updateCta() {
+      const viewport = window.innerHeight;
+      const onScreen = (element: Element | null) => {
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        return rect.bottom > 0 && rect.top < viewport;
+      };
+      const firstPassed = !firstScreen || firstScreen.getBoundingClientRect().bottom <= 0;
+      const reached = ctaGate ? ctaGate.getBoundingClientRect().top < viewport : firstPassed;
+      const show = reached && !onScreen(firstScreen) && !onScreen(contactBlock);
+      const value = show ? "show" : "hide";
+      if (root.dataset.cta !== value) root.dataset.cta = value;
+    }
+
+    function updateChrome() {
+      updateHeader();
+      updateCta();
+    }
+
     setup();
-    updateCta();
-    window.addEventListener("scroll", updateCta, { passive: true });
+    updateChrome();
+    window.addEventListener("scroll", updateChrome, { passive: true });
+    window.addEventListener("resize", updateChrome);
     reduced.addEventListener("change", setup);
-    railMedia.addEventListener("change", onResize);
+    pinMedia.addEventListener("change", onResize);
     // Шрифты и картинки могут изменить ширину ленты после первого замера.
     const lateMeasure = window.setTimeout(onResize, 600);
 
     return () => {
       window.clearTimeout(lateMeasure);
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
+      stopFrames();
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", updateCta);
+      window.removeEventListener("scroll", updateChrome);
+      window.removeEventListener("resize", updateChrome);
       reduced.removeEventListener("change", setup);
-      railMedia.removeEventListener("change", onResize);
-      revealObserver.disconnect();
+      pinMedia.removeEventListener("change", onResize);
+      for (const observer of revealObservers.values()) observer.disconnect();
+      railImages.disconnect();
+      for (const item of tracked) delete item.element.dataset.pinned;
       delete root.dataset.fx;
       delete root.dataset.cta;
+      delete root.dataset.header;
     };
   }, []);
 

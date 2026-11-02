@@ -7,6 +7,7 @@ import { ArrowIcon } from "@/components/arrow-icon";
 import { CardPreview } from "@/components/card-preview";
 import { ScrollFx } from "@/components/scroll-fx";
 import { ContactBlock, SiteFooter, SiteHeader, TrialLink } from "@/components/site-shell";
+import { MobileTrialBar } from "@/components/ui/mobile-trial-bar";
 import { categoryLabels, getWork, works } from "@/lib/works";
 import styles from "../works.module.css";
 
@@ -43,7 +44,7 @@ export default async function WorkPage({ params }: Props) {
       <SiteHeader current="works" />
       <main id="main" tabIndex={-1}>
         <article>
-          <header className={`shell ${styles.caseHead}`}>
+          <header className={`shell ${styles.caseHead}`} data-first-screen>
             <Link className="text-link" href="/works">
               <ArrowIcon direction="left" /> Все работы
             </Link>
@@ -124,9 +125,7 @@ export default async function WorkPage({ params }: Props) {
         <ContactBlock />
       </main>
       <SiteFooter />
-      <div className="mobile-cta">
-        <TrialLink className="button" />
-      </div>
+      <MobileTrialBar />
     </>
   );
 }

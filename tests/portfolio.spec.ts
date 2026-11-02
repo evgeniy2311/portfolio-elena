@@ -1,6 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { works } from "../lib/works";
+import { go, isPages, urlPattern } from "./helpers/navigation";
+import { scrollToPin } from "./helpers/scenes";
 
 const longestWork = [...works].sort((a, b) => b.frames.length - a.frames.length)[0];
 const routes = ["/", "/works", `/works/${longestWork.slug}`, "/works/white-wrap-blouse"];
@@ -9,15 +11,12 @@ async function expectNoOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 }
 
+/**
+ * Прокрутка к прогрессу «липкой» сцены. Точка перемеряется на каждом шаге ожидания (helpers/scenes.ts):
+ * прокрутка до гидрации или до догрузки раскладки выше сцены больше не оставляет прогресс на полпути.
+ */
 async function scrollToProgress(page: Page, selector: string, progress: number) {
-  const target = await page.locator(selector).evaluate((element, value) => {
-    const top = element.getBoundingClientRect().top + window.scrollY;
-    return top + (element.getBoundingClientRect().height - window.innerHeight) * value;
-  }, progress);
-  await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), target);
-  await expect
-    .poll(async () => Number(await page.locator(selector).evaluate((element) => getComputedStyle(element).getPropertyValue("--p"))))
-    .toBeCloseTo(progress, 1);
+  await scrollToPin(page, selector, progress);
 }
 
 const isDesktop = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1024;
@@ -26,7 +25,7 @@ for (const path of routes) {
   test(`${path}: страница открывается, без горизонтальной прокрутки и ошибок доступности`, async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    const response = await page.goto(path);
+    const response = await go(page, path);
     expect(response?.status()).toBe(200);
     await expect(page.locator("h1")).toHaveCount(1);
     await expectNoOverflow(page);
@@ -39,7 +38,7 @@ for (const path of routes) {
 
 test("в текстах сайта нет длинного тире и DEMO-пометок", async ({ page }) => {
   for (const path of ["/", "/works", `/works/${longestWork.slug}`]) {
-    await page.goto(path);
+    await go(page, path);
     const text = await page.locator("body").innerText();
     expect(text).not.toContain("—");
     expect(text).not.toMatch(/DEMO|прототип/i);
@@ -47,32 +46,49 @@ test("в текстах сайта нет длинного тире и DEMO-по
 });
 
 test("все изображения главной загружаются", async ({ page }) => {
-  await page.goto("/");
+  await go(page, "/");
+  // Прокрутка до гидрации обгоняет ScrollFx: ленту «исходник → карточка» тогда никто не двигает.
+  await expect(page.locator("html")).toHaveAttribute("data-cta", /show|hide/);
   await page.evaluate(async () => {
     for (let y = 0; y < document.body.scrollHeight; y += window.innerHeight / 2) {
       window.scrollTo(0, y);
       await new Promise((resolve) => setTimeout(resolve, 40));
     }
   });
+  // Кадры, которые на этой ширине не рисуются (display: none, например превью сцены услуг на телефоне), браузер
+  // с loading="lazy" не грузит, и это правильно: проверяются только отрисованные.
+  // Под нагрузкой быстрый проход обгоняет IntersectionObserver ленивых кадров: такой кадр так и не начал грузиться.
+  // Каждый ещё не загруженный кадр подводится к окну и ждёт там; сломанный файл всё равно останется в счёте.
   await expect
-    .poll(() => page.evaluate(() => Array.from(document.images).filter((image) => !image.complete || image.naturalWidth === 0).length), { timeout: 15_000 })
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const pending = Array.from(document.images).filter((image) => image.getClientRects().length > 0 && (!image.complete || image.naturalWidth === 0));
+          pending[0]?.scrollIntoView({ block: "center", behavior: "instant" });
+          return pending.length;
+        }),
+      { timeout: 30_000 },
+    )
     .toBe(0);
 });
 
-test("неизвестная работа отдаёт 404, старые адреса перенаправляются", async ({ page }) => {
-  const missing = await page.goto("/works/not-a-real-work");
+test("неизвестная работа отдаёт 404", async ({ page }) => {
+  const missing = await go(page, "/works/not-a-real-work");
   expect(missing?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "Такой работы нет" })).toBeVisible();
+});
 
-  await page.goto("/cases/storm");
-  await expect(page).toHaveURL(/\/works$/);
-  await page.goto("/works/atelier-in-motion");
-  await expect(page).toHaveURL(/\/works\/burgundy-coat-city$/);
+test("старые адреса перенаправляются (только сервер Next)", async ({ page }) => {
+  test.skip(isPages, "Server redirects не существуют в статичной сборке Pages");
+  await go(page, "/cases/storm");
+  await expect(page).toHaveURL(urlPattern("/works"));
+  await go(page, "/works/atelier-in-motion");
+  await expect(page).toHaveURL(urlPattern("/works/burgundy-coat-city"));
 });
 
 test("архив показывает все работы и фильтрует по типу одежды", async ({ page }) => {
-  await page.goto("/works");
-  const cards = page.locator("main ul li a[href^='/works/']");
+  await go(page, "/works");
+  const cards = page.locator("main ul li a[href*='/works/']");
   await expect(cards).toHaveCount(works.length);
 
   const coats = works.filter((work) => work.category === "coats").length;
@@ -87,7 +103,7 @@ test("архив показывает все работы и фильтрует 
 });
 
 test("телефон с карточкой листается до последнего кадра кнопками и клавиатурой", async ({ page }) => {
-  await page.goto(`/works/${longestWork.slug}`);
+  await go(page, `/works/${longestWork.slug}`);
   const total = longestWork.frames.length;
   const next = page.getByRole("button", { name: "Следующий кадр" });
   const previous = page.getByRole("button", { name: "Предыдущий кадр" });
@@ -105,20 +121,20 @@ test("телефон с карточкой листается до послед�
 });
 
 test("первый экран сразу показывает работы, услуги сменяют друг друга при прокрутке", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator("main > section:first-child figure")).toHaveCount(9);
+  await go(page, "/");
+  await expect(page.locator("main > section:first-child [data-copy=\"0\"] figure")).toHaveCount(12);
   test.skip(!isDesktop(page), "Сцена услуг работает от 1024 px");
   await expect(page.locator("html")).toHaveAttribute("data-fx", "on");
   const services = "#services";
-  const items = page.locator(`${services} ol:first-of-type > li`);
-  const opacityOfText = (index: number) => items.nth(index).locator("h3").evaluate((element) => Number(getComputedStyle(element.parentElement!).opacity));
+  const slots = page.locator(`${services} [data-text-slot]`);
+  const opacityOfText = (index: number) => slots.nth(index).evaluate((element) => Number(getComputedStyle(element).opacity));
 
   await scrollToProgress(page, services, 0);
   expect(await opacityOfText(0)).toBeGreaterThan(0.95);
-  expect(await opacityOfText(5)).toBeLessThan(0.05);
+  expect(await opacityOfText(6)).toBeLessThan(0.05);
 
   await scrollToProgress(page, services, 1);
-  expect(await opacityOfText(5)).toBeGreaterThan(0.95);
+  expect(await opacityOfText(6)).toBeGreaterThan(0.95);
   expect(await opacityOfText(0)).toBeLessThan(0.05);
   await expectNoOverflow(page);
 });
@@ -126,7 +142,7 @@ test("первый экран сразу показывает работы, ус
 test("сцена сверки деталей помещается в экран ноутбука", async ({ page }) => {
   test.skip(!isDesktop(page), "Сцена работает от 1024 px");
   await page.setViewportSize({ width: 1280, height: 680 });
-  await page.goto("/");
+  await go(page, "/");
   const section = "section[aria-labelledby=accuracy-title]";
   await scrollToProgress(page, section, 1);
   const overflow = await page.locator(section).evaluate((element) => {
@@ -139,11 +155,11 @@ test("сцена сверки деталей помещается в экран 
 
 test("лента «исходник → карточка» доезжает до последней панели", async ({ page }) => {
   test.skip(!isDesktop(page), "Горизонтальная лента работает от 1024 px");
-  await page.goto("/");
+  await go(page, "/");
   const rail = "#transform";
   await scrollToProgress(page, rail, 1);
-  const outro = page.locator(`${rail} a[href='/works']`);
-  await expect(outro).toBeInViewport();
+  // Последняя панель целиком в окне; вывод с кнопкой пробы идёт следом, в обычном потоке (tests/transform.spec.ts).
+  await expect(page.locator(`${rail} [data-panel]`).last()).toBeInViewport({ ratio: 0.95 });
   await expectNoOverflow(page);
   await scrollToProgress(page, rail, 0);
   await expect(page.locator(`${rail} h2`)).toBeInViewport();
@@ -151,11 +167,12 @@ test("лента «исходник → карточка» доезжает до
 
 test("при reduced motion всё показано сразу и без «липких» сцен", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await go(page, "/");
   await expect(page.locator("html")).not.toHaveAttribute("data-fx", "on");
   const servicesHeight = await page.locator("#services").evaluate((element) => element.getBoundingClientRect().height);
-  expect(servicesHeight).toBeLessThan((page.viewportSize()?.height ?? 800) * 6);
-  expect(await page.locator("#services ol:first-of-type > li h3").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element.parentElement!).opacity)))).toEqual([1, 1, 1, 1, 1, 1]);
+  // Семь услуг списком на телефоне: заметно короче сцены (7 × 75vh + 100vh), но длиннее шести экранов.
+  expect(servicesHeight).toBeLessThan((page.viewportSize()?.height ?? 800) * 7);
+  expect(await page.locator("#services [data-text-slot]").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)))).toEqual([1, 1, 1, 1, 1, 1, 1]);
   for (const opacity of await page.locator("main figure").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)))) {
     expect(opacity).toBe(1);
   }
@@ -164,7 +181,7 @@ test("при reduced motion всё показано сразу и без «ли�
 test("без JavaScript главная показывает весь контент", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
-  await page.goto("/");
+  await go(page, "/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   for (const opacity of await page.locator("main figure, [data-reveal]").evaluateAll((elements) => elements.map((element) => Number(getComputedStyle(element).opacity)))) {
     expect(opacity).toBe(1);
@@ -172,26 +189,15 @@ test("без JavaScript главная показывает весь конте�
   await context.close();
 });
 
-test("кнопка «2 кадра бесплатно» появляется на телефоне после первого экрана и ведёт к контакту", async ({ page }) => {
-  await page.goto("/");
-  const mobile = page.locator(".mobile-cta a");
-  if ((page.viewportSize()?.width ?? 0) < 768) {
-    // На первом экране кнопка есть в hero, липкая появляется после прокрутки.
-    await expect(mobile).toBeHidden();
-    await page.evaluate(() => window.scrollTo({ top: window.innerHeight * 1.5, behavior: "instant" }));
-    await expect(mobile).toBeVisible();
-    const box = await mobile.boundingBox();
-    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
-  } else {
-    await expect(mobile).toBeHidden();
-  }
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-  await page.locator("header").getByRole("link", { name: /2 кадра бесплатно/ }).click();
+// Правила липкой панели «2 кадра бесплатно» проверяет tests/cta.spec.ts.
+test("«Написать» в шапке ведёт к контакту", async ({ page }) => {
+  await go(page, "/");
+  await page.locator("header").getByRole("link", { name: "Написать", exact: true }).click();
   await expect(page.locator("#contact h2")).toBeInViewport();
 });
 
 test("вопросы раскрываются с клавиатуры", async ({ page }) => {
-  await page.goto("/#faq");
+  await go(page, "/#faq");
   const first = page.locator("#faq summary").first();
   await first.focus();
   await page.keyboard.press("Enter");
